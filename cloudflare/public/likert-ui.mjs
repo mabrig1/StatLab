@@ -287,6 +287,12 @@ function wire(){
     try{
       const preferred=document.querySelector('input[name="li-source"]:checked')?.value;
       if(preferred==="cases"&&state.sourceType!=="cases")throw Error("First click Import ordinal columns from Data View, or switch to Frequency counts.");
+      if(state.sourceType==="cases"){
+        const fresh=casesToItems(state.project,e("li-labels").value,state.points);
+        if(fresh.length!==state.items.length||fresh.some((item,i)=>item.id!==state.items[i].id||
+          item.counts.some((count,j)=>count!==Number(state.items[i].counts[j]))))
+          throw Error("Data View counts, item codes or scale labels changed since import. Import ordinal columns again before analysis.");
+      }
       const report=analyzeLikert(state.items,e("li-labels").value,state.points,state.objectives,{
         sdMethod:e("li-sd").value,studyTitle:e("li-title").value,
         sourceType:state.sourceType,sourceLabel:e("li-source-label").value
