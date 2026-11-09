@@ -1,0 +1,1 @@
+"""MABRIG StatLab package."""

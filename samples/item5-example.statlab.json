@@ -1,0 +1,32 @@
+{
+  "schema": "mabrig-statlab-project-v1",
+  "id": "example-item5-20261109",
+  "title": "Illustrative Item 5 — Likert survey",
+  "notes": "SYNTHETIC worked example from the user request; not field survey evidence.",
+  "created_at": "2026-11-09T00:00:00Z",
+  "updated_at": "2026-11-09T00:00:00Z",
+  "frequency": {
+    "text": "Item 5 (5-point scale):\nStrongly Disagree = 30\nDisagree = 23\nNeutral = 20\nAgree = 45\nStrongly Agree = 35\nTotal N = 153",
+    "labels": "1 = Strongly Disagree\n2 = Disagree\n3 = Neutral\n4 = Agree\n5 = Strongly Agree",
+    "reversed": false,
+    "sd_method": "sample",
+    "population": "",
+    "sample": ""
+  },
+  "chapter_four": {
+    "title": "Illustrative questionnaire results",
+    "source": "",
+    "objectives": "1. Describe responses to Item 5",
+    "assignments": {
+      "Item 5": "1"
+    }
+  },
+  "dataset": null,
+  "reports": {
+    "chapter_four": {
+      "html": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width\"><title>Chapter Four — Illustrative questionnaire results</title><style>body{font-family:Georgia,\"Times New Roman\",serif;max-width:950px;margin:35px auto;padding:0 22px;color:#1e2e35;font-size:15px;line-height:1.65}h1{text-align:center;font-size:22px}h2{font-size:18px;margin-top:30px}h3{font-size:16px;margin-top:24px}h4{margin-bottom:5px}p{margin:9px 0 13px}table{border-collapse:collapse;width:100%;margin:12px 0 7px;font-size:12px}td,th{border:1px solid #8b9699;padding:7px;text-align:left}th{background:#f3f6f5}.table-wrap{overflow-x:auto}.note{font-size:12px;color:#45616a}.warning{border:1px solid #d5b46a;background:#fff9e8;padding:10px 13px}.caption{font-weight:bold;margin-bottom:3px}.source{font-size:12px;margin:3px 0 20px}.discussion{margin-top:7px}@media print{body{margin:10mm}.warning{background:white}h3{break-after:avoid}.table-wrap{break-inside:avoid}}</style></head><body><h1>CHAPTER FOUR</h1><h1>DATA PRESENTATION, ANALYSIS AND DISCUSSION OF FINDINGS</h1><p><b>Study:</b> Illustrative questionnaire results</p><p class=\"warning\"><b>Researcher review required:</b> DRAFT FOR RESEARCHER REVIEW: Check every input count, objective assignment, reverse-coding instruction, question wording and source label against the original records. No hypothesis test or empirical citation has been generated.</p><h2>4.1 Introduction</h2><p>This chapter presents descriptive statistics derived solely from the frequency counts supplied for individual questionnaire items. Frequency tables show original response labels, and the numerical mean and standard deviation use the questionnaire coding and any specified reverse-scoring.</p><h2>4.2 Survey Coverage and Analytical Basis</h2><p>No overall sample size was declared. These figures are metadata only: valid N is calculated separately as the sum of supplied frequency counts for each item. No questionnaire return rate can be calculated from these inputs.</p><p>Sample SD divides by N−1 (Bessel correction), treating observed frequencies as a sample. For N=1, sample SD is undefined.</p><h2>4.3 Data Presentation and Descriptive Statistics</h2><h3>Objective 1: Describe responses to Item 5</h3><p class=\"caption\">Table 4.1: Response Distribution for Item 5</p><div class=\"table-wrap\"><table><thead><tr><th scope=\"col\">Response category</th><th scope=\"col\">Frequency</th><th scope=\"col\">Percent</th></tr></thead><tbody><tr><td>Strongly Disagree</td><td>30</td><td>19.61%</td></tr><tr><td>Disagree</td><td>23</td><td>15.03%</td></tr><tr><td>Neutral</td><td>20</td><td>13.07%</td></tr><tr><td>Agree</td><td>45</td><td>29.41%</td></tr><tr><td>Strongly Agree</td><td>35</td><td>22.88%</td></tr><tr><td>Total</td><td>153</td><td>100.00%</td></tr></tbody></table></div><p class=\"source\"><b>Source:</b> User-supplied frequency counts (not independently verified)</p><p><b>Item statistics:</b> Valid N = 153; Mean = 3.21; Sample SD = 1.45; Median = 4.00; Mode = 4.</p><h2>4.4 Discussion of Descriptive Findings</h2><h3>Objective 1: Describe responses to Item 5</h3><p class=\"discussion\">For Item 5, 153 valid category responses were provided. The most frequent response was Agree (45; 29.41%). The frequency-weighted mean was 3.21; the sample standard deviation was 1.45. The scored median was 4.00, and the scored mode was 4. These results describe the item distribution; they do not establish a causal explanation or statistical significance.</p><h2>4.5 Limitations of Frequency-Only Analysis</h2><p>The supplied figures are marginal frequency distributions for individual questionnaire items. They do not identify how any respondent answered other items. Therefore correlations, regressions, group comparisons (t-tests or ANOVA), Cronbach&#x27;s alpha, factor analysis, respondent-level composite scores, and hypothesis significance cannot be computed from this input alone. Neither sample-size nor population-size metadata reconstruct paired observations. Treat numeric Likert means/SD as summaries based on an approximately equally spaced coding convention; the underlying response categories are ordinal.</p><p class=\"note\">This draft deliberately contains no invented respondent-level records, response rates, hypothesis-test results, p-values, literature citations or causal claims.</p></body></html>",
+      "csv": "Item,Objective,Valid N,Mean,SD,Median,Mode,Top response,Top response %\r\nItem 5,Objective 1,153,3.2092,1.4539,4.0000,4,Agree,29.41\r\n",
+      "created_at": "2026-11-09T00:00:00Z"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+# Illustrative summary counts (not actual field data).
+# Paste only the Item 5 block below into StatLab, without these comment lines.
+
+Item 5 (5-point scale):
+Strongly Disagree = 30
+Disagree = 23
+Neutral = 20
+Agree = 45
+Strongly Agree = 35
+Total N = 153

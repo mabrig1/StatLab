@@ -1,0 +1,34 @@
+/* Project Manager: distinct save, open, portable backup workflow */
+.project-notice{padding:16px 22px;background:#e9f4f2;color:#244f48;border:1px solid #b9ded3;border-radius:13px;margin:0 0 22px;line-height:1.65;font-size:14px}
+.project-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(240px,1fr);gap:18px;align-items:start}
+.project-editor,.project-guide,.project-library,.project-archive{padding:24px;margin-bottom:20px}
+.project-editor .panel-heading,.project-library .panel-heading,.project-archive .panel-heading{margin-bottom:20px}
+.project-fields{display:flex;flex-direction:column;gap:16px}
+.project-fields textarea{width:100%;min-height:76px;resize:vertical}
+.project-check{display:flex;align-items:flex-start;gap:12px;padding:17px;background:#f6f9f9;border:1px solid #dae5e5;border-radius:12px;cursor:pointer;color:#1b3442}
+.project-check input{margin-top:4px;width:18px;height:18px;flex-shrink:0;accent-color:#138374}
+.project-check small{display:block;font-weight:normal;margin-top:7px;color:#667b83;line-height:1.6}
+.project-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+.project-buttons .button{font-size:13px}
+.project-feedback{padding:13px 15px;border-radius:9px;background:#eaf7ee;color:#205b39;font-size:13px;line-height:1.5;margin-top:16px}
+.project-feedback.project-error{background:#fff0e8;color:#964b20}
+.project-archive-hint{margin-top:16px;font-size:13px;color:#526b74;line-height:1.65}
+.project-guide{background:linear-gradient(145deg,#f0faf5,#f8fafc)}
+.project-guide h3{margin:12px 0 18px;font-size:20px}
+.project-guide ol{padding-left:24px;margin:0 0 28px;display:flex;flex-direction:column;gap:17px}
+.project-guide li strong,.project-guide li span{display:block}
+.project-guide li span{color:#5f7480;font-size:13px;line-height:1.6}
+.project-import-row{display:flex;gap:8px;flex-wrap:wrap}
+.project-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:12px}
+.project-card{border:1px solid #dce6e8;border-radius:12px;padding:18px;background:#fff;min-width:0}
+.project-card-current{border-color:#24967b;box-shadow:0 0 0 1px #24967b33}
+.project-card h3{font-size:16px;margin:8px 0 6px;color:#1a3242;overflow-wrap:anywhere}
+.project-card p{font-size:12px;color:#657984;line-height:1.55;overflow-wrap:anywhere;margin:8px 0}
+.project-tag{display:inline-block;background:#eaf4f1;color:#1d715b;padding:4px 8px;border-radius:7px;font-size:11px;font-weight:700}
+.project-card .project-card-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:15px}
+.project-card .project-card-actions button{font-size:12px;padding:8px 10px}
+.project-archive iframe{width:100%;min-height:520px;border:1px solid #d6e5e5;border-radius:10px;background:white}
+@media(max-width:950px){.project-layout{grid-template-columns:1fr}}
+@media(max-width:580px){.project-editor,.project-guide,.project-library,.project-archive{padding:16px}.project-card{padding:14px}.project-buttons .button{width:100%;justify-content:center}}
+.project-fields textarea{box-sizing:border-box;border:1px solid #d8e3e7;border-radius:9px;background:#fff;color:#223a49;padding:12px 14px;font:inherit;line-height:1.6;outline:none}
+.project-fields textarea:focus,.project-fields input:focus{border-color:#1c9b81;box-shadow:0 0 0 3px #1c9b811e}
