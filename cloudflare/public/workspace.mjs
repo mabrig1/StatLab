@@ -266,7 +266,7 @@ export function frequencyFromColumn(data,index){
   const labelMap=new Map(sorted.map(code=>[code,v.values[code]||"Response "+code]));
   if(new Set([...labelMap.values()].map(x=>x.toLowerCase())).size!==labelMap.size)throw Error("Response labels must be unique.");
   return {scale:sorted.map(code=>code+" = "+labelMap.get(code)).join("\n"),
-    counts:"Item 1:\n"+sorted.map(code=>labelMap.get(code)+" = "+(counts.get(code)||0)).join("\n")+
+    counts:"Item "+v.name+":\n"+sorted.map(code=>labelMap.get(code)+" = "+(counts.get(code)||0)).join("\n")+
       "\nTotal N = "+[...counts.values()].reduce((a,b)=>a+b,0),
     variable:v.name};
 }
