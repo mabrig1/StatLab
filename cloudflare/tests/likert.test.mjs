@@ -149,3 +149,24 @@ test("frontend has a dedicated Likert mode with objectives, scale and exports",(
   assert.match(ui,/casesToItems/);
   assert.match(ui,/analyzeLikert/);
 });
+
+test("optional source label is attributed as user supplied rather than verified",()=>{
+  const r=analyzeLikert([exampleItems()[0]],scale,5,["Objective one"],{
+    sourceLabel:"Field Survey, 2026"
+  });
+  assert.match(chapterFourText(r),/Field Survey, 2026/);
+  assert.match(chapterFourText(r),/source label supplied by user; not independently verified/);
+  assert.throws(()=>analyzeLikert(exampleItems(),scale,5,obj,{sourceLabel:"x".repeat(201)}),/Source label is too long/);
+});
+
+test("CSV prevents formula execution from questionnaire headings",()=>{
+  const items=exampleItems();
+  items[0].question='=HYPERLINK("https://example.com","click")';
+  const r=analyzeLikert(items,scale,5,obj);
+  assert.match(summaryCsv(r),/'=HYPERLINK/);
+});
+
+test("Data View label mismatch cannot silently recode response categories",()=>{
+  const data=updateVariable(exampleWorkspace(),3,{values:{"1":"Strongly Agree","5":"Strongly Disagree"}});
+  assert.throws(()=>casesToItems(data,scale,5),/differs from the Likert scale/);
+});
