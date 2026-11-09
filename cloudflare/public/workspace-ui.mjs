@@ -69,7 +69,7 @@ function clearHistory(){
   state.undo=[];state.redo=[];state.page=0;state.selected=null;
 }
 function setTab(name){
-  if(!["data","variables","frequency"].includes(name))return;
+  if(!["data","variables","frequency","likert"].includes(name))return;
   state.active=name;
   for(const b of document.querySelectorAll("[data-workspace-view]")){
     const active=b.dataset.workspaceView===name;
@@ -78,6 +78,8 @@ function setTab(name){
   }
   for(const section of document.querySelectorAll(".workspace-section"))
     section.hidden=section.id!=="workspace-"+name;
+  if(name==="likert")window.dispatchEvent(new CustomEvent("statlab:likert-open",
+    {detail:{project:structuredClone(state.data)}}));
 }
 function rowsMatchingQuery(){
   const q=state.search.trim().toLowerCase();
@@ -355,6 +357,7 @@ function wire(){
   el("menu-export").addEventListener("click",()=>el("export-data").click());
   el("menu-prepare").addEventListener("click",()=>setTab("variables"));
   el("menu-sample").addEventListener("click",()=>el("load-demo").click());
+  el("menu-likert").addEventListener("click",()=>setTab("likert"));
   el("import-data").addEventListener("click",()=>el("file-picker").click());
   el("file-picker").addEventListener("change",event=>loadFromFile(event.target.files[0]));
   el("export-data").addEventListener("click",()=>downloadText("statlab-data.csv",exportCsv(state.data),"text/csv;charset=utf-8"));
