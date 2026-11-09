@@ -90,3 +90,18 @@ The objective panel shows an **unweighted mean of item means**, explicitly label
 - The full Python inferential engine and multiuser authentication remain separate and are not deployed by this static Cloudflare Worker.
 
 The synthetic questionnaire examples and numeric calculations are covered by tests in cloudflare/tests/likert.test.mjs.
+
+## Student Likert project backups and Chapter Four tables
+
+Likert Scale Studio now supports **unfinished-project backups** and **objective-aligned thesis tables**, including:
+
+- Browser-local autosave of questionnaire settings and response counts when storage is available. Storage is not encrypted, synchronized or suitable for confidential research data on shared computers; users should download a portable backup.
+- Download or reopen a validated **Likert Studio JSON project**. Partial draft count cells can remain blank. Only frequencies and questionnaire metadata are in the backup, not respondent-level rows, API secrets, or case pairings. If originally derived from Data View, the restored copy is explicitly treated as a detached frequency snapshot.
+- A **Chapter Four thesis tables** section that presents every response category as frequency and valid percentage, with valid N, item mean, item SD and a descriptive comparison against the scale midpoint.
+- Column order can be changed from strong agreement → disagreement (common thesis layout) to ascending codes, without changing original scores or calculations.
+- Download a **print/Word-friendly HTML table** (with escaped user text and source notes) or a **spreadsheet-safe CSV table** grouped by research objective.
+- Each objective's arithmetic average of item means is explicitly distinguished from a composite respondent score. No inferential significance test is implied.
+
+StatLab does not fabricate field observations, response rates, or correlations from marginal frequency counts. Numerical means for ordered responses assume approximately equally spaced rating codes. The user must provide any survey source label, which remains unverified.
+
+To review this feature locally: run `node --test cloudflare/tests/*.test.mjs` and open the static frontend through Wrangler. Files: `cloudflare/public/likert-student.mjs`, `cloudflare/tests/likert-student.test.mjs`.
