@@ -183,7 +183,8 @@ export function chapterFourText(report){
   out.push("4.1 Introduction","This chapter presents descriptive findings calculated directly from "+
     (report.sourceType==="cases"?"the respondent-level data presently available in Data View.":"user-supplied questionnaire frequency counts.")+
     " A "+report.scale.length+"-point rating scale was used. The table reports valid responses for each item and "+
-    (report.sdMethod==="sample"?"sample":"population")+" standard deviation.","");
+    (report.sdMethod==="sample"?"sample":"population")+" standard deviation.","",
+    "4.2 Data Presentation and Analysis by Research Objective","");
   let number=0;
   for(const g of report.groups){
     out.push("Research Objective "+(g.index+1)+": "+g.objective);
@@ -205,7 +206,14 @@ export function chapterFourText(report){
     out.push("Average of item means (descriptive only): "+g.averageItemMean.toFixed(2)+
       ". This is not a respondent-level composite score.","");
   }
-  out.push("4.4 Limitations");
+  out.push("4.3 Discussion of Descriptive Findings");
+  for(const group of report.groups){
+    if(!group.items.length)continue;
+    out.push("Under Objective "+(group.index+1)+", "+group.items.length+" questionnaire item(s) were examined. "+
+      "The arithmetic average of their item means was "+group.averageItemMean.toFixed(2)+
+      ". This is a description of the supplied responses, not evidence of statistical significance or causation.");
+  }
+  out.push("","4.4 Limitations");
   out.push(...report.warnings);
   if(report.unequalNs)out.push("Valid response totals differ across items; compare their percentages and denominators carefully.");
   out.push("All conclusions above are descriptive; they do not support causal or inferential claims.");
