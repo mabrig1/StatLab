@@ -85,11 +85,12 @@ function weightedMedian(rows,N){
   }
   return (lo+hi)/2;
 }
-export function analyzeLikert(items,rawScale,points,objectives,{sdMethod="sample",studyTitle="",sourceType="frequencies"}={}){
+export function analyzeLikert(items,rawScale,points,objectives,{sdMethod="sample",studyTitle="",sourceType="frequencies",sourceLabel=""}={}){
   const scale=scaleDefinition(rawScale,points);
   if(!["sample","population"].includes(sdMethod))throw Error("Choose sample or population SD.");
   if(!["frequencies","cases"].includes(sourceType))throw Error("Unknown source type.");
   if(typeof studyTitle!=="string"||studyTitle.length>260)throw Error("Study title is too long.");
+  if(typeof sourceLabel!=="string"||sourceLabel.length>200)throw Error("Source label is too long.");
   if(!objectives.every(x=>typeof x==="string"&&x.trim().length>0&&x.length<=240))
     throw Error("Research objectives must be clearly stated (maximum 240 characters each).");
   const checked=validateItems(items,scale,objectives);
@@ -124,13 +125,13 @@ export function analyzeLikert(items,rawScale,points,objectives,{sdMethod="sample
     return {objective:objective.trim(),index,items:entries,
       averageItemMean,numberOfItems:entries.length};
   });
-  return {studyTitle:studyTitle.trim(),sourceType,scale,sdMethod,midpoint,results,groups,
+  return {studyTitle:studyTitle.trim(),sourceLabel:sourceLabel.trim(),sourceType,scale,sdMethod,midpoint,results,groups,
     unequalNs:new Set(results.map(x=>x.N)).size>1,
     warnings:[
       "Frequency distributions support descriptive, single-item statistics only. They do not establish correlations, regression, t-tests, ANOVA, or Cronbach's alpha.",
       "The objective figure is an unweighted arithmetic average of item means, NOT a respondent-level composite score or its standard deviation.",
       "The mean treats ordered response codes as approximately equally spaced. Report frequencies and percentages alongside it.",
-      "The examples are synthetic; do not label them as genuine field-survey observations."
+      "Example presets are synthetic. Only data independently collected by you should be described as field-survey results."
     ]};
 }
 export function casesToItems(project,rawScale,points,objectiveIndex=0){
@@ -140,6 +141,11 @@ export function casesToItems(project,rawScale,points,objectiveIndex=0){
     .filter(({v})=>v.type==="numeric" && v.measure==="ordinal");
   if(!candidates.length)throw Error("No numeric ordinal variables found. Define Likert variables in Variable View first.");
   return candidates.slice(0,LIMIT_ITEMS).map(({v,i})=>{
+    for(const s of scale){
+      const labelled=v.values?.[String(s.code)];
+      if(labelled && String(labelled).trim().toLowerCase()!==s.label.trim().toLowerCase())
+        throw Error(v.name+": Data View value label for code "+s.code+" differs from the Likert scale. Match the labels before import, or paste counts manually.");
+    }
     const counts=Array.from({length:scale.length},()=>0);
     for(const [rowNumber,row] of project.rows.entries()){
       const raw=row[i];
@@ -154,7 +160,10 @@ export function casesToItems(project,rawScale,points,objectiveIndex=0){
   });
 }
 function csvEscape(value){
-  return '"'+String(value??"").replace(/"/g,'""')+'"';
+  const raw=String(value??"");
+  // Spreadsheet apps can evaluate formulas even when a cell is CSV-quoted.
+  const safe=/^\s*[=+@-]/.test(raw)&&!/^\s*-?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?\s*$/.test(raw)?"'"+raw:raw;
+  return '"'+safe.replace(/"/g,'""')+'"';
 }
 export function summaryCsv(report){
   const labels=report.scale.map(s=>s.label);
@@ -184,8 +193,10 @@ export function chapterFourText(report){
       "Item | Valid N | Mean | SD | Modal answer");
     for(const item of g.items)out.push(item.id+" | "+item.N+" | "+item.mean.toFixed(2)+" | "+
       (item.sd===null?"N/A":item.sd.toFixed(2))+" | "+item.topResponse);
-    out.push("Source: "+(report.sourceType==="cases"?"values entered in Data View; not independently verified.":
-      "user-supplied frequency counts; not independently verified."),"");
+    out.push("Source: "+(report.sourceLabel?
+      report.sourceLabel+" (source label supplied by user; not independently verified).":
+      (report.sourceType==="cases"?"values entered in Data View; not independently verified.":
+      "user-supplied frequency counts; not independently verified.")),"");
     for(const item of g.items){
       out.push(item.id+" — "+item.question);
       out.push(report.scale.map((r,i)=>r.label+": "+item.counts[i]+" ("+item.rows[i].percent.toFixed(1)+"%)").join("; ")+".");
