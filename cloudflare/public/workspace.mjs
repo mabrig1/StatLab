@@ -231,6 +231,7 @@ export function frequencyFromColumn(data,index){
     const value=row[index];if(value===null||isUserMissing(value,v))continue;
     const code=String(value);counts.set(code,(counts.get(code)||0)+1);
   }
+  if(!counts.size)throw Error("This variable has no usable responses.");
   const codes=new Set([...Object.keys(v.values),...counts.keys()]);
   const sorted=[...codes].sort((a,b)=>Number(a)-Number(b));
   if(sorted.length<2||sorted.length>11)throw Error("Frequency-only calculator requires 2 to 11 numeric response codes.");
@@ -238,7 +239,7 @@ export function frequencyFromColumn(data,index){
   const labelMap=new Map(sorted.map(code=>[code,v.values[code]||"Response "+code]));
   if(new Set([...labelMap.values()].map(x=>x.toLowerCase())).size!==labelMap.size)throw Error("Response labels must be unique.");
   return {scale:sorted.map(code=>code+" = "+labelMap.get(code)).join("\n"),
-    counts:v.name+":\n"+sorted.map(code=>labelMap.get(code)+" = "+(counts.get(code)||0)).join("\n")+
+    counts:"Item 1:\n"+sorted.map(code=>labelMap.get(code)+" = "+(counts.get(code)||0)).join("\n")+
       "\nTotal N = "+[...counts.values()].reduce((a,b)=>a+b,0),
     variable:v.name};
 }
