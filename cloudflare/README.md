@@ -55,3 +55,15 @@ The Wrangler dry run packages the code without publishing to Cloudflare.
 - Website returns 404: inspect asset upload output and visit the Worker root URL; the integration gateway alone does not implement the full Python API.
 
 Official docs: https://developers.cloudflare.com/workers/ci-cd/builds/configuration/ and https://developers.cloudflare.com/workers/static-assets/binding/
+
+## Browser Data View and Variable View (Cloudflare edition)
+
+The Cloudflare-hosted interface now includes three functional tabs: **Data View**, **Variable View**, and **Frequency-only Analysis**. Its independently implemented spreadsheet layout follows familiar statistical-editor conventions: numbered cases, two-level nominal / metric / ordinal column headings, and a lightweight import/export toolbar. The supplied machine-quality example is **synthetic**, not genuine field-survey data.
+
+- **Data View:** click cells to edit respondent-level observations; add/delete rows or columns; navigate up to 5,000 cases and 80 variables; search cases; paste up to 2,500 tab-separated cells at once; display value labels; undo/redo up to 25 actions.
+- **Variable View:** edit name, numeric/string/date type, width, decimals, descriptive label, value labels, user-defined missing codes, displayed columns, alignment, nominal/ordinal/scale measurement and input/target role. Reorder or delete variables with their case values aligned.
+- **Project handling:** browser-local IndexedDB save (when permitted), CSV import/export, variable dictionary export and complete JSON project backup/restore. Do not assume browser data is encrypted or backed up remotely. Users should export portable backups and avoid sensitive records on shared computers.
+- **Analysis hand-off:** choose an encoded ordinal/scale question in Data View to generate frequency-only input using the actual observed counts and missing-value rules; it does not reconstruct data from marginal tables.
+- **Sample presets:** synthetic machine-quality sample matching the spreadsheet reference format, and synthetic Likert survey sample. Start from a blank project if preferred.
+
+**Security and deployment boundary:** These browser-only features do not send case records to the Cloudflare Worker, to OpenRouter, or to Resend. The static app does not yet provide full Python-based regression, t-tests, ANOVA, account logins, cross-device sync, a data backend, or secure multiuser storage. The Worker integrations remain disabled by default. Cloudflare builds use `wrangler.jsonc` from the repo root and `npx wrangler deploy` as previously documented.
