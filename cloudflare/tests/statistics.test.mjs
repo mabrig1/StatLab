@@ -7,8 +7,8 @@ import {DEFAULT_SCALE,DEFAULT_COUNTS,analyzeFrequencies,toSummaryCsv} from "../p
 const base=resolve(dirname(fileURLToPath(import.meta.url)),"../..");
 
 test("existing Cloudflare worker name matches both build roots",()=>{
-  const root=JSON.parse(readFileSync(resolve(base,"../wrangler.jsonc"),"utf8"));
-  const nested=JSON.parse(readFileSync(resolve(base,"wrangler.jsonc"),"utf8"));
+  const root=JSON.parse(readFileSync(resolve(base,"wrangler.jsonc"),"utf8"));
+  const nested=JSON.parse(readFileSync(resolve(base,"cloudflare/wrangler.jsonc"),"utf8"));
   assert.equal(root.name,"statlab");assert.equal(nested.name,"statlab");
   assert.equal(root.main,"./cloudflare/src/index.mjs");
   assert.equal(nested.main,"./src/index.mjs");
@@ -17,7 +17,7 @@ test("existing Cloudflare worker name matches both build roots",()=>{
   assert.equal(root.vars.INTEGRATIONS_ENABLED,"false");
   assert.equal(nested.vars.INTEGRATIONS_ENABLED,"false");
   assert.ok(!root.secrets?.required?.length && !nested.secrets?.required?.length);
-  assert.ok(existsSync(resolve(base,"public/index.html")));
+  assert.ok(existsSync(resolve(base,"cloudflare/public/index.html")));
 });
 test("worked example from Item 5 agrees with manual computation",()=>{
   const [result]=analyzeFrequencies(DEFAULT_COUNTS,DEFAULT_SCALE);
