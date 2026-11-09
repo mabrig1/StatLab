@@ -1,18 +1,94 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MABRIG StatLab — Cloudflare preview</title><meta name="theme-color" content="#102741">
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MABRIG StatLab — Data & Variable View</title>
+<meta name="theme-color" content="#102741">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'">
-<link rel="stylesheet" href="/styles.css"><script type="module" src="/app.mjs"></script></head>
-<body><header><span class="brand">M. <b>MABRIG StatLab</b></span><span class="tag">Cloudflare edition · Preview</span></header>
-<main><section class="hero"><span class="eyebrow">RESEARCH STATISTICS</span><h1>From frequency counts to clear findings.</h1>
-<p>Paste summary-level Likert responses to calculate descriptive statistics without submitting respondent data to a server.</p></section>
-<div class="layout"><section class="panel"><h2>1. Define your scale</h2><p>Specify what each numeric code means.</p>
-<label for="scale">Response labels</label><textarea id="scale" spellcheck="false">1 = Strongly Disagree
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/workspace.css">
+<script type="module" src="/app.mjs"></script>
+<script type="module" src="/workspace-ui.mjs"></script>
+</head>
+<body>
+<header class="statlab-header"><div class="header-left"><a class="brand" href="/" aria-label="MABRIG StatLab home">M. <b>MABRIG StatLab</b></a><span class="header-divider"></span><strong class="header-page">Statistics Calculator</strong></div><span class="tag">Browser workspace · Cloudflare</span></header>
+<main class="statlab-main">
+<h1 class="screen-title">Statistics Calculator</h1>
+<div class="quick-menu" role="group" aria-label="Research data tools">
+<button type="button" id="menu-new">enter new data</button>
+<button type="button" id="menu-import">import</button>
+<button type="button" id="menu-export">export data</button>
+<button type="button" id="menu-prepare">prepare data</button>
+<button type="button" id="menu-sample">example dataset</button>
+<span class="privacy-caption">☁ no data is sent to the cloud</span>
+</div>
+<nav class="workspace-tabs" aria-label="StatLab workspaces">
+<button type="button" class="workspace-tab active" data-workspace-view="data" aria-current="page">▦ Data View</button>
+<button type="button" class="workspace-tab" data-workspace-view="variables">▤ Variable View</button>
+<button type="button" class="workspace-tab" data-workspace-view="frequency">▥ Frequency-only Analysis</button>
+</nav>
+
+<section id="workspace-data" class="workspace-section" aria-label="Data View">
+<div class="panel data-panel">
+<div class="studio-heading"><div><span class="eyebrow">DATA EDITOR</span><h2>Data View <span class="soft-label">Respondents × Variables</span></h2><p>Enter cases below. Select a variable name or open Variable View to change its properties. Copy and paste cells from Excel.</p></div><div class="save-indicator" id="workspace-save">Browser-local workspace</div></div>
+<div class="project-toolbar">
+<label for="project-title">Project name</label><input id="project-title" class="project-title" maxlength="120" value="Untitled survey" aria-label="Project name">
+<button type="button" id="new-project" class="secondary">New blank project</button>
+<label for="example-kind" class="preset-label">Example</label><select id="example-kind" aria-label="Choose sample dataset"><option value="industrial">Machine quality data</option><option value="survey">Likert questionnaire</option></select><button type="button" id="load-demo" class="secondary">Load example</button>
+</div>
+<div class="data-toolbar">
+<button type="button" id="add-case" class="primary">+ Add case</button>
+<button type="button" id="add-ten" class="secondary">+ 10 cases</button>
+<button type="button" id="add-column" class="secondary">+ Variable</button>
+<button type="button" id="delete-case" class="secondary" disabled>Delete selected case</button>
+<button type="button" id="undo-data" class="secondary" disabled>↶ Undo</button>
+<button type="button" id="redo-data" class="secondary" disabled>↷ Redo</button>
+</div>
+<div class="data-toolbar secondary-toolbar">
+<label for="case-search">Find cases</label><input id="case-search" type="search" placeholder="Search displayed values or codes" autocomplete="off">
+<label class="check"><input type="checkbox" id="show-labels"> Display value labels</label>
+<button type="button" id="import-data" class="secondary">Import CSV / project</button>
+<button type="button" id="export-data" class="secondary">Export CSV</button>
+<button type="button" id="export-project" class="secondary">Save project JSON</button>
+<button type="button" id="clear-project" class="secondary">Clear saved browser data</button>
+<input id="file-picker" hidden type="file" accept=".csv,.json,.statlab.json,text/csv,application/json">
+</div>
+<div class="data-grid-wrap" id="data-grid-scroll" tabindex="0" aria-label="Editable data grid scroll region">
+<table id="data-grid" class="data-grid"><thead id="data-head"></thead><tbody id="data-body"></tbody></table>
+</div>
+<div class="grid-footer"><span id="data-count">0 cases</span><div class="pager">
+<button id="prev-page" type="button" class="secondary" disabled>‹ Previous</button>
+<span id="page-status">Page 1</span>
+<button id="next-page" type="button" class="secondary" disabled>Next ›</button></div></div>
+<p class="status-message" id="data-message" role="status" aria-live="polite"></p>
+</div>
+<div class="panel quick-analysis">
+<div><h3>Analyze a coded survey question</h3><p>Choose a numeric Scale or Ordinal variable and transfer its observed frequencies to the summary calculator. Missing codes are excluded.</p></div>
+<label for="question-variable">Question</label><select id="question-variable" aria-label="Variable to summarize"></select>
+<button id="send-to-frequency" type="button" class="primary">Summarize frequencies →</button>
+</div>
+</section>
+
+<section id="workspace-variables" class="workspace-section" aria-label="Variable View" hidden>
+<div class="panel variables-panel">
+<div class="studio-heading"><div><span class="eyebrow">DATA DICTIONARY</span><h2>Variable View <span class="soft-label">Define your columns</span></h2><p>Give every question a name, type, label, code meanings, missing values and measurement level. Changes apply immediately to Data View.</p></div><button type="button" class="primary" id="add-variable">+ New variable</button></div>
+<div class="variable-wrap" tabindex="0" aria-label="Variable properties horizontal scroll">
+<table class="variables-table"><thead><tr><th>#</th><th>Name</th><th>Type</th><th>Width</th><th>Decimals</th><th>Label / Questionnaire item</th><th>Values</th><th>Missing</th><th>Columns</th><th>Align</th><th>Measure</th><th>Role</th><th>Arrange</th></tr></thead><tbody id="variable-body"></tbody></table>
+</div>
+<p class="status-message" id="variable-message" role="status" aria-live="polite"></p>
+<div class="variable-footer"><button type="button" class="secondary" id="export-dictionary">Export variable dictionary</button>
+<p>Nominal = categories without rank. Ordinal = ordered responses (e.g., Likert). Scale = numeric measurements. Value labels explain stored codes; missing-value codes remain visible but are excluded from frequency summaries.</p></div>
+</div>
+</section>
+
+<section id="workspace-frequency" class="workspace-section" aria-label="Frequency-only Analysis" hidden>
+<div class="layout"><section class="panel"><h2>1. Define your rating scale</h2><p>Choose the meaning of every numeric response code.</p>
+<label for="scale">Scale labels</label><textarea id="scale" spellcheck="false">1 = Strongly Disagree
 2 = Disagree
 3 = Neutral
 4 = Agree
 5 = Strongly Agree</textarea>
-<h2>2. Enter item frequencies</h2><p>Use a new Item heading for each question. You can paste multiple items.</p>
+<h2>2. Enter item frequencies</h2><p>Paste one or more item frequency distributions without respondent-level data.</p>
 <label for="counts">Summary counts</label><textarea id="counts" class="counts" spellcheck="false">Item 5:
 Strongly Disagree = 30
 Disagree = 23
@@ -21,11 +97,21 @@ Agree = 45
 Strongly Agree = 35
 Total N = 153</textarea>
 <div class="options"><label><input type="checkbox" id="reverse"> Reverse-score</label><label>SD: <select id="method"><option value="sample">Sample (N − 1)</option><option value="population">Population (N)</option></select></label></div>
-<div class="buttons"><button id="analyze" class="primary" type="button">Calculate</button><button id="sample" type="button">Restore example</button></div>
-<p id="error" class="error" role="alert" aria-live="polite"></p></section>
-<aside class="panel help"><h2>What works here?</h2><ul><li>Frequency and percentage tables</li><li>Weighted mean and standard deviation</li><li>Median, mode and top response</li><li>Calculation formulas and CSV export</li></ul>
-<h3>Important limitations</h3><p>Summary frequencies cannot support correlations, regressions, t-tests, ANOVA, or Cronbach's alpha, because answers are not paired across items.</p>
-<p class="caution">The full Python Data View, Variable View, and advanced statistical engine are <b>not hosted on this Worker</b>. This is an explicitly limited, usable Cloudflare preview.</p></aside></div>
-<section id="results" class="panel results" hidden><div class="section-head"><h2>Descriptive results</h2><button id="csv" type="button">Export summary CSV</button></div>
-<div class="table-scroll"><table><thead><tr><th>Item</th><th>N</th><th>Mean</th><th>SD</th><th>Median</th><th>Mode</th><th>Top response</th></tr></thead><tbody id="summary"></tbody></table></div><div id="details"></div></section>
-</main><footer>Privacy first · All calculations run in your browser · <a href="https://github.com/mabrig1/StatLab">View source</a></footer></body></html>
+<div class="buttons"><button id="analyze" class="primary" type="button">Calculate</button><button id="sample" type="button">Restore example</button></div><p id="error" class="error" role="alert" aria-live="polite"></p>
+</section>
+<aside class="panel help"><h2>Choose your data-entry method</h2><p><b>Data View:</b> enter respondent-by-respondent records and define the codes in Variable View.</p><p><b>Frequency-only:</b> enter just counts for each rating, without any individual records.</p><h3>Statistical limitations</h3><p>Summary-level counts alone cannot support correlations, regressions, t-tests, ANOVA, or Cronbach's alpha. These require respondents' paired data.</p><p class="caution">The complete Python analysis backend remains separate and is not publicly hosted by this Cloudflare Worker. This edition includes a working browser-local data editor and frequency calculator.</p></aside></div>
+<section id="results" class="panel results" hidden>
+<div class="section-head"><h2>Descriptive results</h2><button id="csv" type="button">Export summary CSV</button></div>
+<div class="table-scroll"><table><thead><tr><th>Item</th><th>N</th><th>Mean</th><th>SD</th><th>Median</th><th>Mode</th><th>Top response</th></tr></thead><tbody id="summary"></tbody></table></div><div id="details"></div>
+</section></section>
+
+<dialog id="variable-dialog" class="variable-dialog">
+<form id="variable-details-form" method="dialog"><h2 id="dialog-heading">Define coded responses</h2>
+<p>One value label per line, e.g., <code>1 = Strongly Disagree</code>. For missing values, enter comma-separated codes (such as 99 or -9).</p>
+<label for="value-label-editor">Value labels</label><textarea id="value-label-editor" placeholder="1 = Strongly Disagree&#10;2 = Disagree&#10;3 = Neutral"></textarea>
+<label for="missing-editor">User-defined missing codes</label><input id="missing-editor" type="text" placeholder="99, -9">
+<div class="dialog-actions"><button id="cancel-details" type="button" class="secondary">Cancel</button><button type="submit" class="primary">Save definitions</button></div>
+</form></dialog>
+</main>
+<footer>All case data stay in this browser unless you explicitly export them. Saved browser projects are not encrypted—avoid shared devices for confidential surveys. · <a href="https://github.com/mabrig1/StatLab">View source</a></footer>
+</body></html>
