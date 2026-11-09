@@ -11,11 +11,17 @@
 <script type="module" src="/workspace-ui.mjs"></script>
 </head>
 <body>
-<header><span class="brand">M. <b>MABRIG StatLab</b></span><span class="tag">Research Studio · Cloudflare edition</span></header>
-<main>
-<section class="hero workspace-hero"><span class="eyebrow">SURVEY DATA, MADE SIMPLE</span>
-<h1>A practical statistics workspace.</h1><p>Enter individual responses in Data View, define their meaning in Variable View, or paste frequency counts directly. Choose the workflow that matches the data you actually have.</p>
-</section>
+<header class="statlab-header"><div class="header-left"><a class="brand" href="/" aria-label="MABRIG StatLab home">M. <b>MABRIG StatLab</b></a><span class="header-divider"></span><strong class="header-page">Statistics Calculator</strong></div><span class="tag">Browser workspace · Cloudflare</span></header>
+<main class="statlab-main">
+<h1 class="screen-title">Statistics Calculator</h1>
+<div class="quick-menu" role="group" aria-label="Research data tools">
+<button type="button" id="menu-new">enter new data</button>
+<button type="button" id="menu-import">import</button>
+<button type="button" id="menu-export">export data</button>
+<button type="button" id="menu-prepare">prepare data</button>
+<button type="button" id="menu-sample">example dataset</button>
+<span class="privacy-caption">☁ no data is sent to the cloud</span>
+</div>
 <nav class="workspace-tabs" aria-label="StatLab workspaces">
 <button type="button" class="workspace-tab active" data-workspace-view="data" aria-current="page">▦ Data View</button>
 <button type="button" class="workspace-tab" data-workspace-view="variables">▤ Variable View</button>
@@ -24,11 +30,11 @@
 
 <section id="workspace-data" class="workspace-section" aria-label="Data View">
 <div class="panel data-panel">
-<div class="studio-heading"><div><span class="eyebrow">DATA EDITOR</span><h2>Data View <span class="soft-label">Respondents × Variables</span></h2><p>Each row is one respondent or observation. Each column is a defined variable. Click any cell to edit it, or paste a rectangle from Excel.</p></div><div class="save-indicator" id="workspace-save">Browser-local workspace</div></div>
+<div class="studio-heading"><div><span class="eyebrow">DATA EDITOR</span><h2>Data View <span class="soft-label">Respondents × Variables</span></h2><p>Enter cases below. Select a variable name or open Variable View to change its properties. Copy and paste cells from Excel.</p></div><div class="save-indicator" id="workspace-save">Browser-local workspace</div></div>
 <div class="project-toolbar">
 <label for="project-title">Project name</label><input id="project-title" class="project-title" maxlength="120" value="Untitled survey" aria-label="Project name">
 <button type="button" id="new-project" class="secondary">New blank project</button>
-<button type="button" id="load-demo" class="secondary">Load sample data</button>
+<label for="example-kind" class="preset-label">Example</label><select id="example-kind" aria-label="Choose sample dataset"><option value="industrial">Machine quality data</option><option value="survey">Likert questionnaire</option></select><button type="button" id="load-demo" class="secondary">Load example</button>
 </div>
 <div class="data-toolbar">
 <button type="button" id="add-case" class="primary">+ Add case</button>
