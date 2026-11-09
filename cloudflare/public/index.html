@@ -7,8 +7,10 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'">
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/workspace.css">
+<link rel="stylesheet" href="/likert.css">
 <script type="module" src="/app.mjs"></script>
 <script type="module" src="/workspace-ui.mjs"></script>
+<script type="module" src="/likert-ui.mjs"></script>
 </head>
 <body>
 <header class="statlab-header"><div class="header-left"><a class="brand" href="/" aria-label="MABRIG StatLab home">M. <b>MABRIG StatLab</b></a><span class="header-divider"></span><strong class="header-page">Statistics Calculator</strong></div><span class="tag">Browser workspace · Cloudflare</span></header>
@@ -20,11 +22,13 @@
 <button type="button" id="menu-export">export data</button>
 <button type="button" id="menu-prepare">prepare data</button>
 <button type="button" id="menu-sample">example dataset</button>
+<button type="button" id="menu-likert">★ Likert Studio</button>
 <span class="privacy-caption">☁ no data is sent to the cloud</span>
 </div>
 <nav class="workspace-tabs" aria-label="StatLab workspaces">
 <button type="button" class="workspace-tab active" data-workspace-view="data" aria-current="page">▦ Data View</button>
 <button type="button" class="workspace-tab" data-workspace-view="variables">▤ Variable View</button>
+<button type="button" class="workspace-tab likert-featured" data-workspace-view="likert">★ Likert Scale Studio</button>
 <button type="button" class="workspace-tab" data-workspace-view="frequency">▥ Frequency-only Analysis</button>
 </nav>
 
@@ -79,6 +83,83 @@
 <div class="variable-footer"><button type="button" class="secondary" id="export-dictionary">Export variable dictionary</button>
 <p>Nominal = categories without rank. Ordinal = ordered responses (e.g., Likert). Scale = numeric measurements. Value labels explain stored codes; missing-value codes remain visible but are excluded from frequency summaries.</p></div>
 </div>
+</section>
+
+
+<section id="workspace-likert" class="workspace-section" aria-label="Likert Scale Studio" hidden>
+  <div class="likert-hero">
+    <div class="likert-hero-main">
+      <span class="likert-kicker">★ BUILT FOR QUESTIONNAIRE RESEARCH</span>
+      <h2>Likert Scale Studio</h2>
+      <p>Turn Strongly Disagree → Strongly Agree responses into clean tables, weighted means, standard deviations and understandable Chapter Four descriptions—without an SPSS learning curve.</p>
+      <div class="likert-chips"><span>4-, 5- and 7-point scales</span><span>Research objectives</span><span>Editable Chapter Four draft</span></div>
+    </div>
+    <div class="likert-hero-actions"><button id="li-example" type="button">Use example questionnaire</button><button id="li-blank" type="button">Start blank</button></div>
+  </div>
+  <div class="likert-flow">
+    <section class="likert-card">
+      <div class="likert-step"><span>1</span><div><h3>Set up your research</h3><p>Define the scale and questionnaire topic once.</p></div></div>
+      <div class="likert-settings">
+        <label class="li-field">Study / project title<input type="text" maxlength="260" id="li-title" value="Digital Skills and Graduate Employability (Synthetic Demonstration)"></label>
+        <label class="li-field">Source label (optional)<input type="text" maxlength="200" id="li-source-label" placeholder="e.g., Field Survey, 2026 (only if accurate)"></label>
+        <label class="li-field">Rating scale<select id="li-scale"><option value="5">5-point — SA to SD + Neutral</option><option value="4">4-point — No Neutral</option><option value="7">7-point — Detailed ratings</option></select></label>
+        <label class="li-field">SD type<select id="li-sd"><option value="sample">Sample SD (N − 1)</option><option value="population">Population SD (N)</option></select></label>
+      </div>
+      <details class="li-scale-settings"><summary>Customize labels / check numeric coding</summary><p>Edit the labels without changing the code numbers. Larger scores indicate stronger agreement unless an item is marked reverse-scored.</p>
+        <label for="li-labels">Response categories (code = label)</label>
+        <textarea id="li-labels" rows="6" spellcheck="false"></textarea>
+        <button type="button" id="li-apply-labels">Apply labels to table</button>
+      </details>
+    </section>
+    <section class="likert-card">
+      <div class="likert-step"><span>2</span><div><h3>Connect questions to your research objectives</h3><p>Use an objective for each dimension you intend to describe; assign each questionnaire item below.</p></div></div>
+      <div id="li-objectives" class="li-objectives"></div>
+      <button type="button" id="li-add-objective" class="li-minor-action">+ Add research objective</button>
+    </section>
+    <section class="likert-card">
+      <div class="likert-step"><span>3</span><div><h3>Enter your questionnaire results</h3><p>Choose the data you actually have. All calculations happen locally in this browser.</p></div></div>
+      <div class="li-source-switch" role="group" aria-label="Likert data entry method">
+        <label class="li-source-choice"><input type="radio" name="li-source" value="frequencies" checked><strong>Frequency counts</strong><small>I know how many chose each answer</small></label>
+        <label class="li-source-choice"><input type="radio" name="li-source" value="cases"><strong>From Data View</strong><small>I entered respondents individually</small></label>
+      </div>
+      <div class="li-toolbar">
+        <button id="li-add-item" type="button" class="primary">+ Add questionnaire item</button>
+        <button id="li-pull-cases" type="button">Import ordinal columns from Data View</button>
+        <span id="li-source-note">Frequency-only: no individual response rows are required.</span>
+      </div>
+      <details class="li-paste-details" id="li-paste-wrap">
+        <summary>Paste multiple questions from Excel or a frequency list</summary>
+        <p>Accepts headings like <code>Item 1:</code> with <code>Agree = 45</code> or a CSV/TSV matrix with one column for each response label.</p>
+        <textarea id="li-paste" rows="5" spellcheck="false" placeholder="Item 1:
+Strongly Disagree = 30
+Disagree = 23
+Neutral = 20
+Agree = 45
+Strongly Agree = 35
+Total N = 153"></textarea>
+        <button id="li-import-paste" type="button">Import pasted frequencies</button>
+      </details>
+      <div class="li-table-scroll"><table class="li-editor-table">
+        <thead id="li-editor-head"></thead><tbody id="li-editor-body"></tbody></table></div>
+      <p id="li-input-note" class="li-note">The N for each item is calculated from its frequency cells. Total N may differ by item; the app will report this rather than invent missing responses.</p>
+    </section>
+  </div>
+  <div class="li-runbar">
+    <div><b>Ready to analyze?</b><small>Generate frequency percentages, sample SD, median, mode, research-question tables and defensible interpretation.</small></div>
+    <button type="button" id="li-run" class="li-run-button">Analyze my Likert data →</button>
+  </div>
+  <p id="li-error" class="error" role="alert" aria-live="polite"></p>
+  <section id="li-results" class="likert-results" hidden>
+    <div class="li-results-title"><div><span class="likert-kicker">YOUR RESEARCH OUTPUT</span><h2>Descriptive findings</h2></div>
+      <div class="li-export-actions"><button type="button" id="li-csv">Export table (CSV)</button><button type="button" id="li-html">Download Chapter Four (HTML)</button><button type="button" id="li-copy">Copy Chapter Four discussion</button></div>
+    </div>
+    <div class="li-stat-cards" id="li-stat-cards"></div>
+    <div class="li-table-scroll"><table class="li-summary-table"><thead><tr><th>Objective</th><th>Item</th><th>Valid N</th><th>Mean</th><th>SD</th><th>Median</th><th>Mode</th><th>Top response</th></tr></thead><tbody id="li-summary-body"></tbody></table></div>
+    <h3>Item-by-item frequency distribution</h3><div id="li-item-cards" class="li-item-cards"></div>
+    <h3>Research objective summaries</h3><div id="li-group-cards" class="li-group-cards"></div>
+    <div class="li-limits"><h3>Important statistical notes</h3><ul id="li-warnings"></ul></div>
+    <p id="li-copy-result" role="status" aria-live="polite"></p>
+  </section>
 </section>
 
 <section id="workspace-frequency" class="workspace-section" aria-label="Frequency-only Analysis" hidden>
