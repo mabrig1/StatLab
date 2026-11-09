@@ -1,5 +1,5 @@
 import {
-  LIMITS, DEFAULT_LIKERT, newWorkspace, exampleWorkspace, validateWorkspace,
+  LIMITS, DEFAULT_LIKERT, newWorkspace, exampleWorkspace, industrialWorkspace, validateWorkspace,
   renameProject, changeCell, addRows, removeRow, addVariable, updateVariable,
   deleteVariable, moveVariable, pasteCells, importCsv, exportCsv,
   exportDictionary, exportProject, importProject, displayValue, isUserMissing,
@@ -123,16 +123,26 @@ function inputCell(value,variable,rowIndex,colIndex){
 function renderData(){
   const head=el("data-head"),body=el("data-body");
   head.replaceChildren();body.replaceChildren();
-  const row=make("tr");row.append(make("th","Case","case-heading"));
+  const typeRow=make("tr","","column-types");
+  const nameRow=make("tr","","column-names");
+  const caseHead=make("th","Case","case-heading");
+  caseHead.rowSpan=2;caseHead.scope="col";
+  typeRow.append(caseHead);
   state.data.variables.forEach((v,index)=>{
+    const type=v.measure==="scale"?"metric":v.measure;
+    const typeHead=make("th","","variable-type-cell");
+    const symbol=make("span",v.measure==="nominal"?"● ●":v.measure==="ordinal"?"▥":"✎","type-icon "+v.measure);
+    typeHead.append(make("span",type,"measure-mark"),symbol);
+    typeHead.scope="col";
+    typeRow.append(typeHead);
     const th=make("th","","variable-heading");
-    th.append(make("span",v.measure,"measure-mark"));
+    th.scope="col";
     const pick=button(v.name,()=>{setTab("variables");el("variable-body").querySelector('[data-var-index="'+index+'"]')?.scrollIntoView({block:"nearest"});},"column-name");
-    pick.title="Edit "+v.name+" in Variable View";
+    pick.title=(v.label||v.name)+" — edit in Variable View";
     th.append(pick);
-    th.append(make("small",v.label||v.type));row.append(th);
+    nameRow.append(th);
   });
-  head.append(row);
+  head.append(typeRow,nameRow);
   const matching=rowsMatchingQuery();
   const pages=Math.max(1,Math.ceil(matching.length/PAGE_SIZE));
   state.page=Math.max(0,Math.min(state.page,pages-1));
@@ -333,9 +343,18 @@ function wire(){
     }
   });
   el("load-demo").addEventListener("click",()=>{
-    if(confirm("Replace this project with an explicitly synthetic survey example?"))
-      replaceProject(exampleWorkspace());
+    const industrial=el("example-kind").value==="industrial";
+    const description=industrial?"machine quality":"Likert questionnaire";
+    if(confirm("Load synthetic "+description+" example? This replaces your current project.")){
+      replaceProject(industrial?industrialWorkspace():exampleWorkspace());
+      state.search="";el("case-search").value="";setTab("data");
+    }
   });
+  el("menu-new").addEventListener("click",()=>el("new-project").click());
+  el("menu-import").addEventListener("click",()=>el("import-data").click());
+  el("menu-export").addEventListener("click",()=>el("export-data").click());
+  el("menu-prepare").addEventListener("click",()=>setTab("variables"));
+  el("menu-sample").addEventListener("click",()=>el("load-demo").click());
   el("import-data").addEventListener("click",()=>el("file-picker").click());
   el("file-picker").addEventListener("change",event=>loadFromFile(event.target.files[0]));
   el("export-data").addEventListener("click",()=>downloadText("statlab-data.csv",exportCsv(state.data),"text/csv;charset=utf-8"));
