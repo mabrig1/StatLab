@@ -148,6 +148,7 @@ function resetExample(){
   state.points=5;state.items=exampleItems();state.objectives=[...EXAMPLE_OBJECTIVES];
   state.sourceType="frequencies";
   e("li-title").value=EXAMPLE_STUDY;
+  e("li-source-label").value="";
   e("li-scale").value="5";e("li-labels").value=presetLabels(5);
   e("li-sd").value="sample";
   document.querySelector('input[name="li-source"][value="frequencies"]').checked=true;
@@ -160,6 +161,7 @@ function resetBlank(){
   state.objectives=["Research objective 1"];
   state.sourceType="frequencies";
   e("li-title").value="";
+  e("li-source-label").value="";
   e("li-scale").value="5";e("li-labels").value=presetLabels(5);
   e("li-sd").value="sample";
   document.querySelector('input[name="li-source"][value="frequencies"]').checked=true;
@@ -279,6 +281,7 @@ function wire(){
     }catch(err){showError(err.message);}
   });
   e("li-title").addEventListener("input",markStale);
+  e("li-source-label").addEventListener("input",markStale);
   e("li-sd").addEventListener("change",markStale);
   e("li-run").addEventListener("click",()=>{
     try{
@@ -286,7 +289,7 @@ function wire(){
       if(preferred==="cases"&&state.sourceType!=="cases")throw Error("First click Import ordinal columns from Data View, or switch to Frequency counts.");
       const report=analyzeLikert(state.items,e("li-labels").value,state.points,state.objectives,{
         sdMethod:e("li-sd").value,studyTitle:e("li-title").value,
-        sourceType:state.sourceType
+        sourceType:state.sourceType,sourceLabel:e("li-source-label").value
       });
       state.report=report;showError("");renderReport(report);
     }catch(err){showError(err.message);}
