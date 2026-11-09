@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "mabrig-statlab-integrations",
+  "main": "./src/index.mjs",
+  "compatibility_date": "2026-11-09",
+  "workers_dev": true,
+  "vars": {
+    "INTEGRATIONS_ENABLED": "false",
+    "OPENROUTER_MODEL": "",
+    "RESEND_FROM_EMAIL": "",
+    "STATLAB_SITE_URL": ""
+  },
+  "secrets": {
+    "required": [
+      "OPENROUTER_API_KEY",
+      "RESEND_API_KEY",
+      "RESEND_TEST_TO_EMAIL",
+      "STATLAB_ADMIN_TOKEN"
+    ]
+  }
+}
