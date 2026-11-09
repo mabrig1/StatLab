@@ -94,3 +94,29 @@
 @media(max-width:900px){.likert-settings{grid-template-columns:1fr 1fr}.li-stat-cards{grid-template-columns:repeat(2,minmax(120px,1fr))}.likert-hero{flex-direction:column;align-items:stretch}.likert-hero-actions{flex-direction:row}}
 @media(max-width:600px){.likert-settings{grid-template-columns:1fr}.likert-card{padding:15px}.likert-hero{padding:22px}.likert-hero-actions{flex-direction:column}.li-runbar{flex-direction:column;align-items:stretch}.li-objective-line{flex-wrap:wrap}.li-objective-counter{min-width:70px}.li-stat-cards{grid-template-columns:1fr 1fr}.li-export-actions button{flex:1}}
 @media print{.likert-hero,.likert-flow,.li-runbar,.li-export-actions{display:none!important}.likert-results{border:0}}
+
+
+/* Student project protection and Chapter Four-ready tables */
+.li-backup-bar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:#f4f8ff;border:1px solid #d8e4f2;border-radius:10px;padding:16px 18px;margin:17px 0}
+.li-backup-bar>div{flex:1;min-width:200px}
+.li-backup-bar strong,.li-backup-bar small{display:block}
+.li-backup-bar strong{font-size:14px;color:#1e5273}
+.li-backup-bar small{font-size:12px;color:#628095;margin-top:4px}
+.li-backup-bar button{font-size:12px;background:#fff;border:1px solid #a8c7dd;color:#195974;padding:10px 13px}
+.li-backup-bar #li-save-status{font-size:11px;color:#42778f;min-width:130px}
+.li-thesis-heading{display:flex;justify-content:space-between;align-items:end;flex-wrap:wrap;gap:12px;margin-top:23px}
+.li-thesis-heading h3{margin:0}
+.li-thesis-heading p{font-size:12px;color:#617b84;margin:5px 0}
+.li-thesis-heading label{font-size:12px;font-weight:750;color:#2d6162;display:flex;gap:8px;align-items:center}
+.li-thesis-heading select{font:inherit;padding:8px;border-radius:7px;border:1px solid #cadfdf;background:#fff}
+.li-thesis-tables{display:grid;gap:15px;margin:14px 0}
+.li-thesis-table{border:1px solid #d9e8e8;border-radius:9px;padding:17px;background:#fff}
+.li-thesis-table h4{font-size:15px;margin:0 0 6px;color:#104b4a}
+.li-thesis-table>p{font-size:12px;color:#53757b;margin:6px 0 13px}
+.li-thesis-table .li-table-scroll{margin-top:7px}
+.li-thesis-table td,.li-thesis-table th{min-width:73px;white-space:normal;line-height:1.4}
+.li-thesis-table td:nth-child(2),.li-thesis-table th:nth-child(2){min-width:220px}
+.li-thesis-table td:first-child,.li-thesis-table th:first-child{position:sticky;left:0;background:#f5fbfa;font-weight:700;z-index:2}
+.li-thesis-table .li-thesis-note{margin:10px 0 2px;font-size:11px;color:#657b86}
+@media(max-width:640px){.li-backup-bar button{flex:1}.li-thesis-heading{align-items:stretch;flex-direction:column}.li-thesis-heading label{justify-content:space-between}}
+@media print{.li-backup-bar{display:none!important}}

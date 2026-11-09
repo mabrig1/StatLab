@@ -144,6 +144,13 @@ Total N = 153"></textarea>
       <p id="li-input-note" class="li-note">The N for each item is calculated from its frequency cells. Total N may differ by item; the app will report this rather than invent missing responses.</p>
     </section>
   </div>
+  <div class="li-backup-bar" role="group" aria-label="Save and reopen Likert project">
+    <div><strong>Keep your questionnaire work safe</strong><small>Automatically saved on this browser when available. Download a portable backup for another device.</small></div>
+    <button type="button" id="li-backup-export">↓ Save Likert project</button>
+    <button type="button" id="li-backup-open">↑ Open project backup</button>
+    <input type="file" id="li-backup-file" accept=".json,application/json" hidden>
+    <span id="li-save-status" role="status" aria-live="polite">Browser storage not checked</span>
+  </div>
   <div class="li-runbar">
     <div><b>Ready to analyze?</b><small>Generate frequency percentages, sample SD, median, mode, research-question tables and defensible interpretation.</small></div>
     <button type="button" id="li-run" class="li-run-button">Analyze my Likert data →</button>
@@ -155,6 +162,11 @@ Total N = 153"></textarea>
     </div>
     <div class="li-stat-cards" id="li-stat-cards"></div>
     <div class="li-table-scroll"><table class="li-summary-table"><thead><tr><th>Objective</th><th>Item</th><th>Valid N</th><th>Mean</th><th>SD</th><th>Median</th><th>Mode</th><th>Top response</th></tr></thead><tbody id="li-summary-body"></tbody></table></div>
+    <div class="li-thesis-heading"><div><h3>Chapter Four thesis tables</h3><p>Frequencies and valid percentages together for every scale category, grouped under your research objectives.</p></div>
+      <label>Column order <select id="li-table-order"><option value="high">Strong agreement → disagreement</option><option value="low">Disagreement → strong agreement</option></select></label></div>
+    <div id="li-thesis-tables" class="li-thesis-tables"></div>
+    <div class="li-export-actions"><button type="button" id="li-tables-html">Download formatted Chapter Four tables (HTML)</button>
+       <button type="button" id="li-tables-csv">Download thesis tables (CSV)</button></div>
     <h3>Item-by-item frequency distribution</h3><div id="li-item-cards" class="li-item-cards"></div>
     <h3>Research objective summaries</h3><div id="li-group-cards" class="li-group-cards"></div>
     <div class="li-limits"><h3>Important statistical notes</h3><ul id="li-warnings"></ul></div>

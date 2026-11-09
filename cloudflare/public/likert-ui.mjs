@@ -3,10 +3,15 @@ import {
   presetLabels, scaleDefinition, emptyItem, exampleItems, analyzeLikert,
   casesToItems, itemsFromPasted, summaryCsv, chapterFourText, reportHtml
 } from "./likert-engine.mjs";
+import {
+  exportLikertDraft, importLikertDraft, objectiveTables, objectiveTablesCsv, objectiveTablesHtml
+} from "./likert-student.mjs";
 
 const e=id=>document.getElementById(id);
 const state={points:5,items:exampleItems(),objectives:[...EXAMPLE_OBJECTIVES],
-  project:null,sourceType:"frequencies",report:null,version:0};
+  project:null,sourceType:"frequencies",report:null,version:0,restoredCaseSnapshot:false};
+const LIKERT_STORAGE_KEY="mabrig.statlab.likert.project.v1";
+let draftReady=false, saveTimer=null;
 const el=(tag,text,className)=>{
   const result=document.createElement(tag);
   if(text!==undefined&&text!==null)result.textContent=String(text);
@@ -21,6 +26,7 @@ function markStale(){
   state.report=null;e("li-results").hidden=true;
   state.version++;
   e("li-copy-result").textContent="";
+  if(draftReady)scheduleDraftSave();
 }
 function currentScale(){return scaleDefinition(e("li-labels").value,state.points);}
 function addOption(select,value,label){
@@ -120,7 +126,7 @@ function renderItems(){
   e("li-add-item").disabled=state.items.length>=LIMIT_ITEMS;
 }
 function changedCaseCounts(){
-  state.sourceType="frequencies";
+  state.sourceType="frequencies";state.restoredCaseSnapshot=false;
   document.querySelector('input[name="li-source"][value="frequencies"]').checked=true;
   e("li-source-note").textContent="Counts manually edited. Results will be labelled frequency-only, not Data View cases.";
 }
@@ -145,6 +151,7 @@ function applyPreset(n){
   changedCaseCounts();markStale();renderItems();
 }
 function resetExample(){
+  state.restoredCaseSnapshot=false;
   state.points=5;state.items=exampleItems();state.objectives=[...EXAMPLE_OBJECTIVES];
   state.sourceType="frequencies";
   e("li-title").value=EXAMPLE_STUDY;
@@ -157,6 +164,7 @@ function resetExample(){
 }
 function resetBlank(){
   if(!confirm("Start a blank Likert analysis? Your current unsaved Likert inputs will be replaced."))return;
+  state.restoredCaseSnapshot=false;
   state.points=5;state.items=[emptyItem(5,1)];
   state.objectives=["Research objective 1"];
   state.sourceType="frequencies";
@@ -237,8 +245,96 @@ function renderReport(report){
   const list=e("li-warnings");list.replaceChildren();
   report.warnings.forEach(x=>list.append(el("li",x)));
   if(report.unequalNs)list.append(el("li","Valid N differs between items; percentages use each item's own denominator."));
+  renderObjectiveTables(report);
   e("li-results").scrollIntoView({behavior:"smooth",block:"start"});
 }
+
+function draftSnapshot(){
+  return {
+    title:e("li-title").value,sourceLabel:e("li-source-label").value,
+    points:state.points,scaleLabels:e("li-labels").value,
+    sdMethod:e("li-sd").value,objectives:state.objectives,
+    items:state.items,sourceType:state.sourceType,
+    wasDerivedFromCases:state.restoredCaseSnapshot
+  };
+}
+function scheduleDraftSave(){
+  clearTimeout(saveTimer);
+  e("li-save-status").textContent="Unsaved changes";
+  saveTimer=setTimeout(()=>{
+    try{
+      const json=exportLikertDraft(draftSnapshot());
+      localStorage.setItem(LIKERT_STORAGE_KEY,json);
+      e("li-save-status").textContent="Saved on this device";
+    }catch{
+      e("li-save-status").textContent="Browser save unavailable · download JSON backup";
+    }
+  },500);
+}
+function loadDraft(data,{fromBrowser=false}={}){
+  // Saved projects contain item frequencies and metadata, never paired respondents.
+  state.points=data.points;
+  state.items=structuredClone(data.items);
+  state.objectives=[...data.objectives];
+  state.sourceType="frequencies";
+  state.restoredCaseSnapshot=Boolean(data.wasDerivedFromCases);
+  e("li-title").value=data.title;
+  e("li-source-label").value=data.sourceLabel;
+  e("li-scale").value=String(data.points);
+  e("li-labels").value=data.scaleLabels;
+  e("li-sd").value=data.sdMethod;
+  document.querySelector('input[name="li-source"][value="frequencies"]').checked=true;
+  e("li-source-note").textContent=data.wasDerivedFromCases?
+    "Restored a frequency snapshot derived from Data View. Case pairings are NOT in this backup. Use Data View again for case-based methods.":
+    "Restored frequency counts from your saved questionnaire project.";
+  markStale();renderObjectives();renderItems();showError("");
+  e("li-save-status").textContent=fromBrowser?"Restored browser project":"Opened portable JSON backup";
+}
+function restoreBrowserDraft(){
+  try{
+    const raw=localStorage.getItem(LIKERT_STORAGE_KEY);
+    if(!raw)return;
+    const project=importLikertDraft(raw);
+    loadDraft(project,{fromBrowser:true});
+  }catch{
+    e("li-save-status").textContent="Could not restore local draft; export current work";
+  }
+}
+function tableColumn(tag,text){
+  const td=el(tag,text);if(tag==="th")td.scope="col";
+  return td;
+}
+function renderObjectiveTables(report){
+  const model=objectiveTables(report,{highestFirst:e("li-table-order").value==="high"});
+  const container=e("li-thesis-tables");container.replaceChildren();
+  for(const part of model.tables){
+    const article=el("article",null,"li-thesis-table");
+    article.append(el("h4","Research Objective "+part.number),
+      el("p",part.objective));
+    const scroller=el("div",null,"li-table-scroll");
+    const table=el("table",null,"li-summary-table");
+    const thead=el("thead"),heading=el("tr");
+    model.headers.forEach(header=>heading.append(tableColumn("th",header)));
+    thead.append(heading);
+    const tbody=el("tbody");
+    for(const record of part.rows){
+      const tr=el("tr");
+      record.cells.forEach((cell,i)=>tr.append(tableColumn(i===0?"th":"td",cell)));
+      tbody.append(tr);
+    }
+    if(!part.rows.length){
+      const tr=el("tr"),td=tableColumn("td","No questionnaire items assigned.");
+      td.colSpan=model.headers.length;tr.append(td);tbody.append(tr);
+    }
+    table.append(thead,tbody);scroller.append(table);article.append(scroller);
+    if(part.averageItemMean!==null)article.append(el("p",
+      "Arithmetic average of item means: "+part.averageItemMean.toFixed(2)+
+      " (not a respondent-level composite or hypothesis test).","li-thesis-note"));
+    article.append(el("p","Source: "+model.source,"li-thesis-note"));
+    container.append(article);
+  }
+}
+
 function wire(){
   e("li-labels").value=presetLabels(state.points);
   e("li-example").addEventListener("click",()=>{
@@ -267,7 +363,7 @@ function wire(){
     try{
       const items=casesToItems(state.project,e("li-labels").value,state.points);
       if(!confirm("Import "+items.length+" ordinal column(s) from Data View? This replaces the Likert items shown here."))return;
-      state.items=items;state.sourceType="cases";
+      state.items=items;state.sourceType="cases";state.restoredCaseSnapshot=false;
       document.querySelector('input[name="li-source"][value="cases"]').checked=true;
       e("li-source-note").textContent="Imported numeric ordinal columns from Data View. User-missing codes are excluded.";
       markStale();renderItems();showError("");
@@ -281,6 +377,38 @@ function wire(){
     }catch(err){showError(err.message);}
   });
   e("li-title").addEventListener("input",markStale);
+  e("li-backup-export").addEventListener("click",()=>{
+    try{
+      download("statlab-likert-project.json",exportLikertDraft(draftSnapshot()),"application/json");
+      e("li-save-status").textContent="Portable backup downloaded";
+    }catch(err){showError(err.message);}
+  });
+  e("li-backup-open").addEventListener("click",()=>e("li-backup-file").click());
+  e("li-backup-file").addEventListener("change",async event=>{
+    const file=event.target.files?.[0];
+    if(!file)return;
+    try{
+      if(file.size>250000)throw Error("Likert project backup must be smaller than 250 KB.");
+      const data=importLikertDraft(await file.text());
+      if(confirm("Replace your current Likert questions with the selected project backup?"))loadDraft(data);
+    }catch(err){showError(err.message);}
+    finally{e("li-backup-file").value="";}
+  });
+  e("li-table-order").addEventListener("change",()=>{
+    if(state.report)renderObjectiveTables(state.report);
+  });
+  e("li-tables-html").addEventListener("click",()=>{
+    if(!state.report)return;
+    const high=e("li-table-order").value==="high";
+    download("statlab-chapter-four-tables.html",
+      objectiveTablesHtml(state.report,{highestFirst:high}),"text/html;charset=utf-8");
+  });
+  e("li-tables-csv").addEventListener("click",()=>{
+    if(!state.report)return;
+    download("statlab-chapter-four-tables.csv",
+      objectiveTablesCsv(state.report,{highestFirst:e("li-table-order").value==="high"}),
+      "text/csv;charset=utf-8");
+  });
   e("li-source-label").addEventListener("input",markStale);
   e("li-sd").addEventListener("change",markStale);
   e("li-run").addEventListener("click",()=>{
@@ -319,5 +447,7 @@ function wire(){
     state.project=event.detail?.project||null;
   });
   resetExample();renderObjectives();renderItems();
+  restoreBrowserDraft();
+  draftReady=true;
 }
 wire();
