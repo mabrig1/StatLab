@@ -3,10 +3,12 @@ on:
   push:
     paths:
       - "cloudflare/**"
+      - "wrangler.jsonc"
       - ".github/workflows/cloudflare-check.yml"
   pull_request:
     paths:
       - "cloudflare/**"
+      - "wrangler.jsonc"
       - ".github/workflows/cloudflare-check.yml"
 jobs:
   worker-tests:
@@ -17,4 +19,6 @@ jobs:
         with:
           node-version: "22"
       - run: node --check cloudflare/src/index.mjs
+      - run: node --check cloudflare/public/statistics.mjs
+      - run: node --check cloudflare/public/app.mjs
       - run: node --test cloudflare/tests/*.test.mjs
