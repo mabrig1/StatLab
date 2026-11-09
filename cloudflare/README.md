@@ -1,59 +1,57 @@
-# StatLab Cloudflare integration gateway (pre-deployment)
+# MABRIG StatLab — Cloudflare deployment repair
 
-This directory prepares an **opt-in, administrator-only** Cloudflare Worker for OpenRouter and Resend. **It is not the StatLab statistical engine.** The pandas/SciPy/statsmodels/FastAPI application in ../app still needs private Python hosting with authentication, user/session isolation and controlled storage before public rollout.
+This directory supports the existing Cloudflare Worker named **statlab**. The repository also contains a FastAPI/Python application (which does not run in a standard JavaScript Worker). The Worker deployment serves a lightweight frequency-only survey analysis screen and restricted integration gateway; it is not the full Python SPSS-style product.
 
-## 1. Configure credentials
+## Correct Workers Builds settings
 
-Copy .dev.vars.example to .dev.vars (local development only). Replace placeholders with your own keys. The repository ignores .dev.vars. Never share API keys in a chat, commit, screenshot, frontend bundle or browser code.
+Open **Workers & Pages → statlab → Settings → Builds**:
 
-Use these exact names:
+| Setting | Value |
+| --- | --- |
+| GitHub repository | mabrig1/StatLab |
+| Production branch | main |
+| Root directory | repository root (blank or / depending on dashboard) |
+| Build command | leave blank |
+| Deploy command | npx wrangler deploy |
+| Wrangler configuration | wrangler.jsonc in repo root |
+| Worker name | statlab |
 
-- OPENROUTER_API_KEY: secret, OpenRouter provider key
-- RESEND_API_KEY: secret, Resend provider key
-- STATLAB_ADMIN_TOKEN: secret, independent random token of at least 32 characters for administrative requests
-- RESEND_TEST_TO_EMAIL: secret, fixed recipient for the one test-email endpoint
-- OPENROUTER_MODEL: non-secret Wrangler var, a model ID you have explicitly selected in OpenRouter
-- RESEND_FROM_EMAIL: non-secret Wrangler var, a sender email on a domain already verified in Resend
-- STATLAB_SITE_URL: non-secret Wrangler var, optional actual site URL for OpenRouter attribution
-- INTEGRATIONS_ENABLED: non-secret feature flag, defaults to false and must be deliberately set to "true" before calls are allowed
+If you intentionally set root to the cloudflare/ subdirectory, its cloudflare/wrangler.jsonc is also configured with matching relative paths. Choose only one root directory.
 
-In Cloudflare Dashboard > Workers & Pages > your Worker > Settings > Variables and Secrets, save the four secrets above using **Secret** type. Or from this directory use:
-  
-    npx wrangler secret put OPENROUTER_API_KEY
-    npx wrangler secret put RESEND_API_KEY
-    npx wrangler secret put RESEND_TEST_TO_EMAIL
-    npx wrangler secret put STATLAB_ADMIN_TOKEN
+Save the changes, visit **Deployments**, open the most recent failed build, and use **Retry** once main is updated. If a new build still fails, inspect its **Build logs** and share the first meaningful error line (not your API keys).
 
-Note: wrangler secret put can immediately deploy a new Worker version. For staged changes use the Dashboard workflow or wrangler versions secret put and a deliberate subsequent deployment.
+## What has been fixed
 
-Set OPENROUTER_MODEL to a currently available model ID; do not assume any model is free or included in your account. Set RESEND_FROM_EMAIL only after verifying its domain in Resend. Set INTEGRATIONS_ENABLED to "true" only once credentials and access controls are ready.
+- Wrangler now uses the exact existing Worker name (statlab).
+- Root and nested Wrangler configurations both resolve correctly.
+- The unconditional required-secret validation has been removed. Provider integrations remain disabled by default, and missing optional credentials will fail closed only when the relevant endpoint is explicitly called.
+- Static assets under cloudflare/public serve a browser-only, frequency-count descriptive calculator. Results do not leave the browser.
+- No Python packages, Pandas or FastAPI server are required in the Worker build.
 
-## 2. Local verification
+## OpenRouter and Resend environment variables
 
-From cloudflare/, install or run Wrangler using Node.js. For local development, set the non-secret vars in wrangler.jsonc, and provide secrets in .dev.vars.
+Keep these as encrypted Cloudflare secrets (already visible in your screenshot): OPENROUTER_API_KEY, RESEND_API_KEY.
 
-    npx wrangler dev
+For optional, administrator-only integration tests later: STATLAB_ADMIN_TOKEN (secret; at least 32 random characters), RESEND_TEST_TO_EMAIL (secret; fixed test recipient), OPENROUTER_MODEL (text; valid model ID), RESEND_FROM_EMAIL (text; verified-domain sender), STATLAB_SITE_URL (text; optional). Leave INTEGRATIONS_ENABLED=false until secure authentication and quotas exist.
 
-The optional admin endpoints are:
-- GET /api/integrations/status: only reports whether integrations are enabled
-- POST /api/integrations/explain: bearer admin token; JSON with {"kind":"frequency-summary","summary":"Item 5: N=153, mean=3.21, sample SD=1.45; top answer Agree (45/153).","allowExternalAI":true}
-- POST /api/integrations/test-email: bearer admin token; no arbitrary recipients, message content, or account signup. Sends one fixed test to RESEND_TEST_TO_EMAIL
+The Resend endpoint is only an administrator-initiated test email with a fixed recipient. It does NOT yet implement registration, password reset, or public transactional email. The OpenRouter endpoint is admin-only and requires explicit consent before sending aggregate summary text.
 
-Example (replace the URL with your own local worker URL; do NOT paste actual tokens into shells or screenshots):
+## Local validation (no deployment)
 
-    curl -X POST http://127.0.0.1:8787/api/integrations/explain \
-      -H "Content-Type: application/json" \
-      -H "Authorization: Bearer $STATLAB_ADMIN_TOKEN" \
-      -d '{"kind":"frequency-summary","summary":"Item 5: N=153, mean=3.21, sample SD=1.45.","allowExternalAI":true}'
+From the repository root:
 
-Running the local tests does not call either provider:
+    node --test cloudflare/tests/*.test.mjs
+    npx wrangler deploy --dry-run
 
-    node --test tests/*.test.mjs
+The Wrangler dry run packages the code without publishing to Cloudflare.
 
-## 3. Important deployment boundary
+## Diagnosing errors
 
-Do NOT enable this Worker for unrestricted public requests. All costly integrations require the separate admin token. Keep it off until tenant authentication, rate limits, quotas, abuse protection, and data privacy safeguards exist. The AI endpoint explicitly sends user-provided *aggregate summary text* to OpenRouter after an opt-in flag; do not send named respondents, confidential survey records or case-by-case data.
+- Cannot find config: set root directory to repository root, or explicitly to cloudflare.
+- Cannot resolve entrypoint: check cloudflare/src/index.mjs and the selected Wrangler config.
+- Missing required secrets: use the current main branch, which removes the premature requirement.
+- npm run build / pip / uvicorn failure: clear the dashboard Build command; deploy the Worker preview, not the Python backend.
+- Cloudflare authentication failure: inspect the Git integration/Builds deploy token.
+- Website returns 404: inspect asset upload output and visit the Worker root URL; the integration gateway alone does not implement the full Python API.
 
-This Worker does not host the Python application, handle user login, send verification/password-reset emails, or provide a production email API. The restricted email endpoint is an administrator-only sender verification test. No production changes or secret values are stored in this repository.
-
-Docs: https://developers.cloudflare.com/workers/configuration/secrets/ , https://openrouter.ai/docs/quickstart , https://resend.com/docs/api-reference/emails/send-email
+Official docs: https://developers.cloudflare.com/workers/ci-cd/builds/configuration/ and https://developers.cloudflare.com/workers/static-assets/binding/
