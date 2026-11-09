@@ -87,3 +87,76 @@ button:disabled{opacity:.45;cursor:not-allowed}
   .grid-footer{flex-wrap:wrap}
   .quick-analysis{align-items:stretch}
 }
+
+
+/* Numiqo-style clean spreadsheet composition, independently implemented for StatLab. */
+body{background:#fff;color:#131d26}
+.statlab-header{background:#fff;color:#142e33;border-bottom:1px solid #eef1f1;box-shadow:none;padding:10px max(20px,calc((100% - 1500px)/2));min-height:58px}
+.statlab-header .header-left{display:flex;gap:20px;align-items:center;min-width:0}
+.statlab-header .brand{font-size:22px;color:#0a766f;text-decoration:none;white-space:nowrap}
+.statlab-header .brand b{color:#152027;font-weight:750;font-size:20px}
+.header-divider{height:28px;width:1px;background:#dae3e4}
+.header-page{color:#007d81;font-weight:700;white-space:nowrap;font-size:16px}
+.statlab-header .tag{color:#0d8689;border-color:#dbe5e5;padding:7px 12px}
+.statlab-main{max-width:1510px;padding:18px 14px 50px}
+.screen-title{font-size:32px;font-weight:500;margin:6px 0 22px;color:#151f29}
+.quick-menu{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:13px;min-height:32px}
+.quick-menu button{padding:4px 0;background:transparent;border:none;color:#027d81;border-radius:0;font-size:14px;font-weight:500;white-space:nowrap}
+.quick-menu button:first-child{font-weight:750}
+.quick-menu button:hover,.quick-menu button:focus-visible{text-decoration:underline;color:#005b65}
+.quick-menu .privacy-caption{margin-left:auto;color:#04767b;font-size:12px;white-space:nowrap}
+.workspace-tabs{background:none;border:none;border-bottom:1px solid #d8e3e3;border-radius:0;padding:0;gap:24px;margin-bottom:12px;overflow-x:auto}
+.workspace-tabs .workspace-tab{background:transparent;box-shadow:none!important;color:#5e7076;border-radius:0;padding:11px 3px 12px;border-bottom:3px solid transparent;flex:initial;font-weight:600;font-size:14px}
+.workspace-tabs .workspace-tab.active{background:transparent;color:#00838a;border-bottom-color:#00838a}
+.workspace-tabs .workspace-tab:hover{color:#036f77}
+.data-panel,.variables-panel{border:1px solid #dce5e9;border-radius:4px;box-shadow:none;padding:12px}
+.studio-heading{margin:4px 3px 10px;align-items:center}
+.studio-heading .eyebrow{color:#168a8a}
+.studio-heading h2{font-size:17px;margin:2px 0 3px}
+.studio-heading p{font-size:12px;margin:0}
+.soft-label{font-size:12px}
+.project-toolbar{background:#f7f9f9;border:1px solid #e7eeee;border-radius:5px;padding:7px 9px;margin:7px 0}
+.project-toolbar .preset-label{font-size:12px}
+.project-toolbar select{border:1px solid #c6d6dc;border-radius:4px;background:#fff;padding:8px;font-size:12px;max-width:180px}
+.data-toolbar{margin:8px 0}
+.data-toolbar button,.project-toolbar button{border-radius:4px}
+.data-grid-wrap,.variable-wrap{border:1px solid #d0d7da;border-radius:1px;max-height:590px;min-height:340px;overflow:auto}
+.data-grid{font-size:13px;table-layout:auto}
+.data-grid .column-types th{top:0;height:29px;z-index:5;font-size:12px;font-weight:400;background:#f7f9f9;border-bottom:1px solid #dce3e6}
+.data-grid .column-names th{top:29px;height:30px;z-index:4;background:#f1f4f5;border-bottom:1px solid #c3d5d8}
+.data-grid .column-types .case-heading{top:0;z-index:7;background:#f5f8f8!important;border-right:1px solid #cfdcde}
+.data-grid .variable-type-cell{text-align:center;padding:5px 10px;min-width:140px}
+.data-grid .variable-type-cell .measure-mark{display:inline;color:#37424a;font-size:12px;letter-spacing:0;text-transform:lowercase}
+.data-grid .type-icon{display:inline;margin-left:7px;color:#128c8a;font-size:13px;letter-spacing:-5px;padding-right:4px}
+.data-grid .type-icon.nominal{color:#b3364d}
+.data-grid .type-icon.ordinal{color:#007d8d}
+.data-grid .variable-heading{padding:2px 7px;min-width:140px;text-align:center}
+.data-grid .variable-heading .column-name{font-size:13px;font-weight:700;color:#111c22;text-decoration:none}
+.data-grid .variable-heading .column-name:hover{text-decoration:underline;color:#007b80}
+.data-grid tbody .case-heading{height:26px;min-width:56px;width:56px;font-weight:400;font-size:12px;color:#667e90;background:#fafafa!important}
+.data-grid tbody .case-heading input{margin:0 5px 0 0}
+.data-grid tbody td{min-width:140px}
+.data-grid tbody tr:nth-child(even) td{background:#fafcfc}
+.data-grid .data-cell{height:26px;padding:2px 8px;font-size:12px;text-align:center}
+.data-grid tbody tr td{height:26px}
+.data-grid .cell-wrap{min-height:26px}
+.data-grid tbody tr:hover td{background:#eef8f8}
+.data-grid tbody tr.selected-row td{background:#e8fbf6}
+.data-grid .cell-wrap.missing-cell{background:#fff1e7}
+.variables-table{font-size:12px}
+.variables-table thead th{background:#f1f5f6;font-size:12px}
+.quick-analysis{border:1px solid #dce5e9;box-shadow:none;border-radius:4px;padding:13px 15px}
+.results{border-radius:4px;box-shadow:none}
+footer{color:#667d84}
+@media(max-width:780px){
+.statlab-header .tag{display:none}
+.statlab-header{padding:10px 15px}
+.statlab-header .header-left{gap:10px}
+.statlab-header .brand b{font-size:15px}
+.header-page{font-size:12px}
+.screen-title{font-size:27px}
+.quick-menu{gap:14px}
+.quick-menu .privacy-caption{margin-left:0;width:100%}
+.workspace-tabs{gap:14px}
+.workspace-tabs .workspace-tab{font-size:12px;padding:9px 2px}
+}
