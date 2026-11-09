@@ -7,7 +7,7 @@ import {
 } from "./workspace.mjs";
 
 const el=id=>document.getElementById(id);
-const state={data:newWorkspace(),undo:[],redo:[],page:0,selected:null,
+const state={data:industrialWorkspace(),undo:[],redo:[],page:0,selected:null,
   search:"",labels:false,active:"data",editVar:null,ready:false,db:null};
 const PAGE_SIZE=50;
 let saveChain=Promise.resolve();
