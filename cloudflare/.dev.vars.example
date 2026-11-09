@@ -1,0 +1,6 @@
+# Copy this file to cloudflare/.dev.vars and replace placeholders locally.
+# NEVER commit actual secrets or send them in chat.
+OPENROUTER_API_KEY="YOUR_OPENROUTER_API_KEY"
+RESEND_API_KEY="YOUR_RESEND_API_KEY"
+RESEND_TEST_TO_EMAIL="you@example.com"
+STATLAB_ADMIN_TOKEN="GENERATE_A_RANDOM_TOKEN_WITH_AT_LEAST_32_CHARACTERS"
