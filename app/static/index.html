@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MABRIG StatLab — Research Statistics Studio</title>
+<meta name="theme-color" content="#101b31" />
+<link rel="stylesheet" href="/static/styles.css" />
+<link rel="stylesheet" href="/static/frequency.css" />
+<link rel="stylesheet" href="/static/projects.css" />
+<link rel="stylesheet" href="/static/output_history.css" />
+</head>
+<body>
+<div class="app-shell">
+<aside class="sidebar">
+  <a class="brand" href="/" aria-label="MABRIG StatLab home"><span class="mark">M<span class="mark-accent">.</span></span><span class="brand-name">MABRIG <b>StatLab</b><small>RESEARCH INTELLIGENCE</small></span></a>
+  <div class="workspace-label">YOUR WORKSPACE <span class="badge badge-muted">BETA</span></div>
+  <div class="project"><span class="project-dot"></span><div><strong>Statistical Workspace</strong><small id="project-state">No dataset loaded</small></div></div>
+  <div class="nav-caption">WORKSPACE</div>
+  <nav class="navigation" aria-label="Main navigation">
+    <button class="nav-item active" data-view="overview"><span class="nav-symbol">▦</span> Overview</button>
+    <button class="nav-item" data-view="data"><span class="nav-symbol">▤</span> Data & variables</button>
+    <button class="nav-item" data-view="analyze"><span class="nav-symbol">⌁</span> Analysis workbench</button>
+    <button class="nav-item" data-view="frequency"><span class="nav-symbol">▦</span> Frequencies only <span class="badge badge-muted">NEW</span></button>
+    <button class="nav-item" data-view="projects"><span class="nav-symbol">▣</span> Research projects <span class="badge badge-muted">NEW</span></button>
+    <button class="nav-item" data-view="results"><span class="nav-symbol">▣</span> Output viewer</button>
+  </nav>
+  <div class="nav-caption nav-caption-secondary">STATISTICAL PROCEDURES</div>
+  <nav id="analysis-nav" class="navigation procedures" aria-label="Analyses">
+    <button data-mode="questionnaire" class="nav-item"><span class="nav-symbol">☑</span> Questionnaire assistant</button>
+    <button data-mode="descriptives" class="nav-item"><span class="nav-symbol">☷</span> Descriptives</button>
+    <button data-mode="frequencies" class="nav-item"><span class="nav-symbol">▥</span> Frequencies</button>
+    <button data-mode="correlation" class="nav-item"><span class="nav-symbol">⌁</span> Correlations</button>
+    <button data-mode="regression" class="nav-item"><span class="nav-symbol">↗</span> Linear regression</button>
+    <button data-mode="crosstab" class="nav-item"><span class="nav-symbol">▦</span> Crosstabs & χ²</button>
+    <button data-mode="reliability" class="nav-item"><span class="nav-symbol">◇</span> Cronbach's alpha</button>
+    <button data-mode="ttest_ind" class="nav-item"><span class="nav-symbol">⇄</span> Independent t-test</button>
+    <button data-mode="ttest_paired" class="nav-item"><span class="nav-symbol">⇆</span> Paired t-test</button>
+    <button data-mode="anova" class="nav-item"><span class="nav-symbol">∿</span> One-way ANOVA</button>
+    <button data-mode="normality" class="nav-item"><span class="nav-symbol">◉</span> Normality</button>
+  </nav>
+  <div class="sidebar-bottom"><div class="privacy-dot"></div><div><strong>Local-first analytics</strong><small>Datasets stay in server memory. Only projects you explicitly save are kept in this browser.</small></div></div>
+</aside>
+<main class="main">
+  <header class="topbar"><div class="breadcrumb"><span>Workspace</span><span class="crumb-slash">/</span><span id="crumb-current">Overview</span></div><div class="top-actions"><span class="status-pill"><span class="live-dot"></span> Research suite · v0.9</span><button id="top-import" class="button button-small button-dark">+ Import data</button><button class="button button-outline button-small" data-view="projects" type="button">▣ Save project</button></div></header>
+  <section class="content">
+    <div class="view active" id="view-overview">
+      <div class="hero"><div class="hero-content"><div class="eyebrow">STATISTICAL ANALYSIS, SIMPLIFIED <span class="spark">✦</span></div><h1>From raw data to <em>meaningful findings.</em></h1><p>Explore your survey data, run trusted statistical methods, and turn results into clear, reproducible reports. No command line required.</p><div class="hero-actions"><button id="hero-import" class="button button-light">Import your dataset <span>↗</span></button><button id="hero-methods" class="button button-ghost">Explore analyses →</button></div></div><div class="hero-illustration" aria-hidden="true"><div class="chart-grid"><div class="chart-line"><svg viewBox="0 0 310 170" preserveAspectRatio="none"><defs><linearGradient id="grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#51d6bb" stop-opacity=".23"/><stop offset="100%" stop-color="#51d6bb" stop-opacity="0"/></linearGradient></defs><path d="M8 142 L52 128 L94 110 L132 126 L169 76 L202 91 L240 42 L283 21 L308 36 V160 H8Z" fill="url(#grad)"/><path d="M8 142 L52 128 L94 110 L132 126 L169 76 L202 91 L240 42 L283 21 L308 36" fill="none" stroke="#5ce0c1" stroke-width="3" stroke-linejoin="round"/></svg></div><div class="chart-card">r <span>=</span> <strong>.87</strong><small>Strong relationship</small></div></div></div></div>
+      <div class="stat-row"><div class="stat-card"><div class="stat-card-title">Total respondents <span>↗</span></div><strong id="count-rows">—</strong><small>Records in dataset</small></div><div class="stat-card"><div class="stat-card-title">Variables <span>▤</span></div><strong id="count-cols">—</strong><small>Available for analysis</small></div><div class="stat-card"><div class="stat-card-title">Analyses completed <span>⌁</span></div><strong id="count-runs">0</strong><small>In this workspace session</small></div><div class="stat-card"><div class="stat-card-title">Available tests <span>◈</span></div><strong>11</strong><small>Statistical analysis workflows</small></div></div>
+      <div class="section-heading"><div><h2>Get started</h2><p>Three steps from spreadsheet to research findings.</p></div></div>
+      <div class="step-grid"><button class="step-card" data-step="data"><span class="step-number">01</span><span class="step-icon">⇧</span><strong>Import your data</strong><p>Upload CSV, Excel, or SPSS .sav. Preview variables and missing values instantly.</p><span class="step-link">Open data manager ↗</span></button><button class="step-card" data-step="analyze"><span class="step-number">02</span><span class="step-icon">∑</span><strong>Choose an analysis</strong><p>Run descriptive statistics, t-tests, regression, correlations, reliability and more.</p><span class="step-link">Explore analyses ↗</span></button><button class="step-card" data-step="results"><span class="step-number">03</span><span class="step-icon">▧</span><strong>Export your findings</strong><p>Get results tables, plain-language summaries and reproducible analysis recipes.</p><span class="step-link">Open reports ↗</span></button></div>
+    </div>
+    <div class="view" id="view-data"><div class="page-title"><div><div class="eyebrow eyebrow-dark">01 · PREPARE</div><h1>Data & Variables</h1><p>Upload a dataset and inspect your data before testing hypotheses.</p></div><div class="page-title-actions"><button class="button button-outline" id="new-dataset">＋ Blank dataset</button><button class="button button-dark" id="data-import">⇧ Import dataset</button></div></div>
+      <div class="data-panel panel" aria-labelledby="dataset-title">
+        <div class="panel-heading data-heading"><div><div class="eyebrow eyebrow-dark">SPREADSHEET WORKSPACE</div><h2 id="dataset-title">Data View</h2><p id="data-subtitle">Import a dataset to enter and inspect individual cases.</p></div><div class="panel-actions"><span class="revision-tag" id="data-revision">Revision 0</span><button class="button button-outline button-small" id="download-data" disabled>⇩ Export CSV</button><button class="button button-danger button-small" id="discard-data" disabled>Clear dataset</button></div></div>
+        <div class="data-tabs" role="tablist" aria-label="Data editor sections"><button type="button" class="data-tab active" id="jump-data-view">▦ Data View</button><button type="button" class="data-tab" id="jump-variable-view">▤ Variable View</button><span class="data-tabs-help">Each row = one case · Each column = one variable</span></div>
+        <div class="data-toolbar">
+          <label class="variable-search-label data-search" for="case-search"><span>⌕</span><input id="case-search" type="search" placeholder="Search responses or codes" maxlength="128" aria-label="Search dataset responses"/></label>
+          <select id="case-filter-column" class="variable-filter" aria-label="Filter variable"><option value="">All variables</option></select>
+          <select id="case-filter-operator" class="variable-filter" aria-label="Filter type"><option value="contains">Contains</option><option value="equals">Equals</option><option value="is_missing">Missing</option><option value="is_valid">Valid</option></select>
+          <button class="button button-outline button-small" type="button" id="case-clear-filter">Reset filters</button>
+          <div class="data-toolbar-break"></div>
+          <select id="case-sort-column" class="variable-filter" aria-label="Sort cases"><option value="">Original case order</option></select>
+          <button class="button button-outline button-small" type="button" id="case-sort-direction" title="Toggle sorting direction" aria-label="Sort ascending or descending">↑ Asc</button>
+          <label class="switch-field" for="preview-labels"><input id="preview-labels" type="checkbox"/><span>Value labels</span></label>
+          <label class="switch-field" for="case-column-labels"><input id="case-column-labels" type="checkbox"/><span>Variable labels</span></label>
+        </div>
+        <div class="data-commandbar">
+          <div class="data-command-group"><button type="button" id="add-case" class="button button-dark button-small" disabled>＋ Add case</button><button type="button" id="delete-cases" class="button button-outline button-small" disabled>− Delete selected</button><button type="button" id="undo-data" class="button button-outline button-small" disabled title="Undo last data edit">↶ Undo</button><button type="button" id="redo-data" class="button button-outline button-small" disabled title="Redo last data edit">↷ Redo</button></div>
+          <div class="data-command-help">Double-click or press Enter to edit • Tab/arrow keys to navigate • Ctrl+C / Ctrl+V for cells and ranges</div>
+        </div>
+        <div class="data-cell-bar"><label for="case-active-value">Active cell <strong id="case-active-label">—</strong></label><input id="case-active-value" type="text" placeholder="Select a data cell to view its stored value" disabled aria-label="Active cell raw value"/><button class="button button-outline button-small" type="button" id="case-apply-value" disabled>Apply</button><span class="data-cell-hint" id="case-cell-hint">—</span></div>
+        <div class="table-scroll case-grid-scroll" id="case-grid-container"><table class="data-table case-grid" id="data-preview" role="grid" aria-label="Editable Data View"><thead><tr><th>Import dataset to begin</th></tr></thead><tbody><tr><td>Upload CSV, Excel or SPSS SAV to work with your observations.</td></tr></tbody></table></div>
+        <div class="case-footer"><div class="case-status" id="case-status" aria-live="polite">No dataset loaded</div><div class="case-page-controls"><label for="case-page-size">Rows/page</label><select id="case-page-size" class="variable-filter" aria-label="Rows per page"><option>25</option><option selected>50</option><option>100</option><option>200</option></select><button type="button" class="button button-outline button-small" id="case-first" aria-label="First page" disabled>«</button><button type="button" class="button button-outline button-small" id="case-previous" aria-label="Previous page" disabled>‹</button><span id="case-page-info" class="page-info">Page 0 of 0</span><button type="button" class="button button-outline button-small" id="case-next" aria-label="Next page" disabled>›</button><button type="button" class="button button-outline button-small" id="case-last" aria-label="Last page" disabled>»</button></div></div>
+        <div class="data-footer-note"><b>Data integrity:</b> Editing changes stored observations; display labels never change underlying codes. Blank cells represent system-missing values (shown as <code>·</code>). Orange cells are user-defined missing codes from Variable View. Changes affect the next analysis; export CSV to retain them beyond this session.</div>
+      </div>
+      <section class="panel variable-panel" aria-labelledby="variables-heading">
+        <div class="panel-heading"><div><div class="eyebrow eyebrow-dark">CODEBOOK EDITOR</div><h2 id="variables-heading">Variable View</h2><p>Define, label and validate every field as in a statistical data dictionary.</p></div><div class="panel-actions"><span class="revision-tag" id="dictionary-revision">Revision 0</span><button class="button button-outline button-small" id="export-dictionary" disabled>⇩ Export dictionary</button><button class="button button-outline button-small" id="import-dictionary" disabled>⇧ Import dictionary</button><input type="file" id="dictionary-file" accept=".json,application/json" hidden/><button class="button button-dark button-small" id="add-variable" disabled>+ Add variable</button></div></div>
+        <div class="variable-toolbar"><label class="variable-search-label" for="variable-search"><span>⌕</span><input id="variable-search" type="search" placeholder="Find a variable by name or label" aria-label="Search variables"/></label><select id="measure-filter" class="variable-filter" aria-label="Filter by measurement level"><option value="">All measurement levels</option><option value="nominal">Nominal</option><option value="ordinal">Ordinal</option><option value="scale">Scale</option></select><span id="variable-showing" class="table-count">0 variables</span></div>
+        <div class="variable-legend"><span><b>Nominal</b> categories without rank</span><span><b>Ordinal</b> ordered categories (e.g. Likert)</span><span><b>Scale</b> quantitative measurements</span></div>
+        <div class="table-scroll variable-scroll"><table class="data-table variable-grid" id="variable-table"><thead><tr><th>#</th><th>Name</th><th>Type</th><th>Width</th><th>Decimals</th><th>Label</th><th>Values</th><th>Missing</th><th>Columns</th><th>Align</th><th>Measure</th><th>Role</th><th>Valid</th><th>Missing N</th><th>Action</th></tr></thead><tbody><tr><td colspan="15" class="placeholder-cell">Upload a dataset to edit variable definitions.</td></tr></tbody></table></div>
+        <div class="variable-bottom"><div>ⓘ Select <strong>Edit</strong> to change a variable. Changes are validated by the server and are applied to future analyses.</div><div><span class="status-dot"></span> Session-only metadata</div></div>
+      </section>
+    </div>
+    <div class="view" id="view-analyze"><div class="page-title"><div><div class="eyebrow eyebrow-dark">02 · ANALYZE</div><h1>Analysis Workbench</h1><p>Select a statistical method, choose variables, and run your analysis.</p></div><span class="data-pill" id="analyze-dataset-pill">○ No dataset</span></div><div class="analysis-layout"><section class="panel analysis-form-panel"><div class="panel-heading"><div><h2 id="form-heading">Descriptive statistics made simple</h2><p id="form-description">Choose your questions and understand the answers.</p></div><span class="label-tag">METHOD</span></div><form id="analysis-form"><label class="field-label" for="analysis-mode">Statistical procedure</label><select id="analysis-mode" class="input-select"></select><div id="dynamic-controls" class="dynamic-controls"></div><div class="form-note"><span>ⓘ</span><span id="method-note">Numerical variables are analyzed using observed, nonmissing values.</span></div><button id="run-analysis" class="button button-run" type="submit" disabled>Run analysis <span>→</span></button></form></section><aside class="analysis-helper"><div class="helper-card"><div class="helper-icon">✦</div><strong>Built for researchers</strong><p>Every result links to the observed data, method and data-file SHA-256 fingerprint for reproducibility.</p></div><div class="helper-card helper-card-light"><strong>Before you analyze</strong><p>Check variable coding, missing responses and whether your chosen test's assumptions are reasonable.</p><span class="tiny-tag">No invented statistics</span></div></aside></div></div>
+    <div class="view" id="view-frequency">
+      <div class="page-title"><div><div class="eyebrow eyebrow-dark">NO CASE-LEVEL DATA REQUIRED</div><h1>Frequency-only analysis</h1><p>Paste counts for each questionnaire item. Calculate accurate descriptive statistics without entering individual respondents.</p></div><span class="data-pill">✓ Summary data only</span></div>
+      <div class="freq-intro"><strong>One-step survey summaries</strong><span>Paste item frequencies → select scale → calculate → export. No respondent records, no pairing, no invented data.</span></div>
+      <form id="frequency-form" class="freq-layout">
+        <div class="freq-stack">
+          <section class="panel freq-box"><div class="freq-box-top"><span class="freq-step">STEP 1</span><h2>Paste your response counts</h2><p>Works with multiple items, named categories, numeric codes, CSV/Markdown tables, or a pasted dictionary.</p></div>
+            <div class="freq-body"><label class="field-label" for="frequency-paste">Survey frequencies</label>
+            <textarea id="frequency-paste" class="freq-paste" placeholder="Item 5:
+Strongly Disagree = 30
+Disagree = 23
+Neutral = 20
+Agree = 45
+Strongly Agree = 35
+Total N = 153" maxlength="100000" required spellcheck="false" aria-describedby="freq-paste-hint"></textarea>
+            <div class="freq-helper-row"><small id="freq-paste-hint">Write Item 1:, Item 2:, etc. Add [reverse] to an item heading if needed.</small><button type="button" id="freq-load-example" class="button button-outline button-small">Load worked example</button></div></div>
+          </section>
+          <section class="panel freq-box"><div class="freq-box-top"><span class="freq-step">STEP 2</span><h2>Set your rating scale</h2><p>Change the labels or scores to match your original questionnaire.</p></div><div class="freq-body">
+            <div class="freq-quick"><button type="button" class="freq-preset active" data-freq-preset="five">5-point agreement</button><button type="button" class="freq-preset" data-freq-preset="four">4-point agreement</button><button type="button" class="freq-preset" data-freq-preset="three">3-point agreement</button></div>
+            <label class="field-label" for="freq-labels">Code = response label (one per line)</label>
+            <textarea id="freq-labels" class="freq-labels" required spellcheck="false">1 = Strongly Disagree
+2 = Disagree
+3 = Neutral
+4 = Agree
+5 = Strongly Agree</textarea>
+            <div class="freq-options"><label class="freq-checkbox"><input type="checkbox" id="freq-reverse-all"/> Reverse-score every item</label>
+            <label class="variable-field">SD method<select id="freq-sd"><option value="sample" selected>Sample SD (N − 1) · recommended</option><option value="population">Population SD (N)</option></select></label></div>
+            <p class="freq-tip">Optional: mark an individual item <code>Item 2 [reverse]:</code>. Reverse scoring changes the scored mean, SD, mode and median, but retains the original frequency labels.</p>
+          </div></section>
+          <section class="panel freq-box"><div class="freq-box-top"><span class="freq-step">OPTIONAL</span><h2>Survey metadata</h2><p>These figures are recorded for reference only; they do not affect item calculations.</p></div><div class="freq-body freq-metadata"><label class="variable-field">Population size<input type="number" min="1" step="1" id="freq-population" placeholder="e.g. 1000"/></label><label class="variable-field">Overall sample size<input type="number" min="1" step="1" id="freq-sample" placeholder="e.g. 153"/></label></div></section>
+          <div class="freq-run-row"><button id="freq-run" class="button button-run" type="submit">Calculate descriptive statistics →</button><span class="freq-status" id="freq-status" role="status" aria-live="polite">No respondent-level data needed.</span></div>
+        </div>
+        <aside class="freq-side"><div class="helper-card"><div class="helper-icon">✓</div><strong>What you will receive</strong><p>Exact category counts and percentages, weighted mean, standard deviation, mode, median, working formulas, and an easy interpretation for every item.</p></div><div class="helper-card helper-card-light"><strong>Statistical integrity</strong><p>Frequency summaries do not contain the relationships between individual responses. This mode never estimates correlations, regression, t-tests, ANOVA, or Cronbach’s alpha.</p><span class="tiny-tag">No fabricated records</span></div></aside>
+      </form>
+      <section id="freq-results" class="freq-results" hidden aria-labelledby="freq-results-title"><div class="page-title freq-result-header"><div><div class="eyebrow eyebrow-dark">STEP 3 · YOUR RESULTS</div><h2 id="freq-results-title">Descriptive analysis report</h2><p id="freq-result-method"></p></div><div class="freq-export"><button type="button" class="button button-outline button-small" id="freq-export-csv">⇩ Summary CSV</button><button type="button" class="button button-dark button-small" id="freq-export-html">⇩ Formatted report</button><button type="button" class="button button-outline button-small" data-view="projects">▣ Save project</button></div></div><div id="freq-summary"></div><div id="freq-item-blocks"></div><div id="freq-limits" class="freq-limitations"></div></section>
+      <section id="chapter4-builder" class="chapter4-builder" hidden aria-labelledby="chapter4-title-heading">
+        <div class="page-title"><div><div class="eyebrow eyebrow-dark">STEP 4 · OPTIONAL ACADEMIC REPORT</div><h2 id="chapter4-title-heading">Turn your frequencies into Chapter Four</h2><p>Use the item results above. Enter your objectives, assign each item, then generate an editable research draft.</p></div><span class="data-pill">No respondent data needed</span></div>
+        <form id="chapter4-form" class="panel chapter4-form">
+          <div class="chapter4-info">The report only describes the actual frequencies you entered. It will not invent a response rate, research citation, hypothesis test, or a combined respondent score.</div>
+          <div class="chapter4-fields">
+            <label class="variable-field">Research title <input id="chapter4-title" maxlength="240" placeholder="e.g. Employee motivation and performance (optional)"/></label>
+            <label class="variable-field">Source to print under each table <input id="chapter4-source" maxlength="200" placeholder="Leave blank for: User-supplied counts (unverified)"/><small>Only enter “Field Survey, 2026” if that is the true source of your counts.</small></label>
+          </div>
+          <label class="variable-field">Specific research objectives — one per line
+            <textarea id="chapter4-objectives" class="chapter4-objectives" maxlength="4400" placeholder="1. Examine employment generation...&#10;2. Assess access to basic services..." spellcheck="true"></textarea>
+            <small>Optional. If no objectives are provided, the report presents items separately without guessing your objectives. If one objective is entered, the items start assigned to it; you may change them.</small>
+          </label>
+          <div class="chapter4-mapper"><h3>Connect questionnaire items to objectives</h3><p>Use the dropdown next to each item. Unassigned items are still reported but never mislabelled.</p><div id="chapter4-assignments" class="chapter4-mapping"></div></div>
+          <div class="chapter4-actions"><button id="chapter4-generate" type="submit" class="button button-run">Generate Chapter Four draft →</button><span id="chapter4-status" class="freq-status" role="status" aria-live="polite">Calculate frequencies first.</span></div>
+        </form>
+        <section id="chapter4-output" class="chapter4-output" hidden aria-labelledby="chapter4-output-heading">
+          <div class="chapter4-preview-head"><div><h3 id="chapter4-output-heading">Preview your academic report</h3><p>Check every table, interpretation, and objective before submission.</p></div><div class="freq-export"><button type="button" id="chapter4-download-html" class="button button-outline button-small">⇩ HTML</button><button type="button" id="chapter4-download-csv" class="button button-outline button-small">⇩ CSV</button><button type="button" id="chapter4-download-docx" class="button button-dark button-small" disabled>⇩ Word (.docx)</button></div></div>
+          <iframe id="chapter4-preview" sandbox title="Chapter Four report preview" loading="lazy"></iframe>
+        </section>
+      </section>
+    </div>
+
+    <div class="view" id="view-projects">
+      <div class="page-title"><div><div class="eyebrow eyebrow-dark">SAVE · REOPEN · BACK UP</div><h1>Research Project Manager</h1><p>Keep questionnaire counts, scale coding, research objectives, variable definitions, and drafted reports together. Reopen them without entering the frequencies again.</p></div><span class="data-pill">Local-first · v0.9</span></div>
+      <div class="project-notice" role="note"><strong>Where your work is saved:</strong> Projects saved below use this browser's local IndexedDB storage on this device — not a cloud account. Other devices and browsers cannot see them. For dependable backup, download a project file. Clearing browser data may erase locally saved projects.</div>
+      <div class="project-layout">
+        <section class="panel project-editor"><div class="panel-heading"><div><div class="eyebrow eyebrow-dark">CURRENT WORKSPACE</div><h2>Save your research</h2><p id="project-active-label">New project · not saved yet</p></div><span class="label-tag">PRIVATE DEVICE</span></div>
+          <div class="project-fields"><label class="variable-field">Project title <input id="project-name" maxlength="120" placeholder="e.g. Employee motivation survey 2026" autocomplete="off"/></label>
+          <label class="variable-field">Project notes (optional) <textarea id="project-notes" maxlength="2000" rows="3" placeholder="Institution, research topic, date, source verification notes…"></textarea></label>
+          <label class="project-check"><input type="checkbox" id="project-include-cases"/><span><strong>Include individual Data View cases in this backup</strong><small>OFF by default. Turn on only if you need to back up respondents' rows and you have permission to retain them. Variable definitions are saved even when this is off. Frequency-only analysis needs no respondent rows.</small></span></label><label class="project-check"><input type="checkbox" id="project-include-history"/><span><strong>Include previous analysis history in this project backup</strong><small>OFF by default. The latest descriptive and Chapter Four report snapshots are already included as described below; this option also saves up to 20 previous HTML/CSV/recipe results. Reports may contain sensitive aggregate counts or questionnaire text even without case rows.</small></span></label></div>
+          <div class="project-buttons"><button class="button button-run" id="project-save" type="button">▣ Save in this browser</button><button class="button button-outline" id="project-save-copy" type="button">＋ Save as new copy</button><button class="button button-outline" id="project-download-current" type="button">⇩ Download backup JSON</button></div>
+          <p class="project-feedback" id="project-status" role="status" aria-live="polite">Ready to save. Save before closing the tab.</p>
+          <div class="project-archive-hint"><strong>Reports in the project:</strong> Available latest descriptive and Chapter Four HTML/CSV drafts are archived by default. Earlier analysis history is saved only if you select its checkbox. Reopen a project and click Calculate to verify fresh results; downloaded Word documents must be regenerated from the same inputs.</div>
+        </section>
+        <aside class="panel project-guide"><div class="eyebrow eyebrow-dark">HOW IT WORKS</div><h3>Three easy steps</h3><ol><li><strong>Enter counts</strong><span>Use Frequencies only; set your scale and reverse coding.</span></li><li><strong>Save</strong><span>Store it in this browser or download the portable JSON file.</span></li><li><strong>Reopen</strong><span>Restore your inputs, click Calculate, then generate an updated Chapter Four draft.</span></li></ol><button class="button button-outline" type="button" data-view="frequency">Go to Frequencies only →</button></aside>
+      </div>
+      <section class="panel project-library"><div class="panel-heading"><div><h2>Saved projects</h2><p>Click Open to restore a research workspace. Deleting a saved project does not delete external backups.</p></div><div class="project-import-row"><button id="project-apply-dictionary" class="button button-outline" type="button" disabled>↧ Apply saved codebook to Data View</button><button id="project-import" class="button button-outline" type="button">⇧ Import backup file</button><input type="file" id="project-import-file" accept=".json,.statlab" hidden/></div></div>
+      <div id="project-list" class="project-list"><p>Checking local projects…</p></div></section>
+      <section class="panel project-archive" id="project-archived" hidden><div class="panel-heading"><div><h2>Saved report snapshot</h2><p>This is an archived draft from the last time the project was saved, not a fresh calculation. Use Calculate to update it after editing any counts.</p></div><div class="project-import-row"><select id="project-report-switch" class="variable-filter" aria-label="Choose archived report"></select><button type="button" id="project-archive-html" class="button button-outline button-small">⇩ HTML</button><button type="button" id="project-archive-csv" class="button button-outline button-small">⇩ CSV</button></div></div><iframe id="project-report-preview" sandbox title="Archived Chapter Four research report"></iframe></section>
+    </div>
+    <div class="view output-enhanced" id="view-results"><div class="page-title"><div><div class="eyebrow eyebrow-dark">03 · INTERPRET</div><h1>Output Viewer</h1><p>Statistical results, notes, warnings, and traceable reports.</p></div><div class="report-actions"><button class="button button-outline button-small" id="download-chapter4" hidden>⇩ Chapter Four draft</button><button class="button button-outline button-small" id="download-recipe" disabled>⇩ Recipe JSON</button><button class="button button-dark button-small" id="download-report" disabled>⇩ Export HTML report</button></div></div><section class="output-workspace" id="output-workspace" aria-label="Unified statistical results and history">
+  <div class="output-help"><strong>All your analyses in one place</strong><span>Choose a result to review, export, or compare with earlier runs. This tab keeps up to 30 results. Reports are NOT saved automatically.</span></div>
+  <div class="output-grid">
+    <aside class="panel output-sidebar"><div class="output-sidebar-title"><h2>Analysis history</h2><span id="output-count">0 results in this workspace</span></div>
+      <label for="output-search" class="output-field-label">Find a result</label><input id="output-search" type="search" placeholder="Search title, method or source" maxlength="120" />
+      <label for="output-type" class="output-field-label">Analysis type</label><select id="output-type"><option value="all">All results</option><option value="case">Dataset analysis</option><option value="frequency">Frequency-only statistics</option><option value="chapter_four">Chapter Four draft</option></select>
+      <div id="output-history-list" class="output-history-list" aria-label="Select analysis result"></div>
+      <button type="button" id="output-clear" class="button button-danger button-small">Clear session history</button>
+    </aside>
+    <div class="panel output-right" aria-live="polite"><div id="output-preview-empty" class="output-preview-empty"><div class="output-empty-icon">▤</div><h2>Ready for your first analysis</h2><p>Use <strong>Frequencies only</strong> to analyze pasted counts, or the <strong>Analysis workbench</strong> for paired respondent data.</p><div class="output-quicklinks"><button type="button" class="button button-dark button-small" data-view="frequency">Analyze frequency counts →</button><button type="button" class="button button-outline button-small" data-view="analyze">Open workbench →</button></div></div>
+      <div id="output-selected" hidden><div class="output-selected-top"><div><span class="eyebrow eyebrow-dark">SELECTED OUTPUT</span><h2 id="output-selected-title">Analysis output</h2><p id="output-selected-method"></p><small id="output-selected-source"></small></div><span id="output-selected-status" class="output-result-tag"></span></div>
+        <div class="output-exportbar"><button type="button" class="button button-dark button-small" id="output-html">⇩ HTML report</button><button type="button" class="button button-outline button-small" id="output-csv">⇩ Tables CSV</button><button type="button" class="button button-outline button-small" id="output-recipe">⇩ Inputs / recipe JSON</button><button type="button" class="button button-danger button-small" id="output-remove">Remove result</button></div>
+        <p class="output-review-note" id="output-review-note"></p><iframe id="output-preview" sandbox title="Safely rendered statistical report" loading="lazy" referrerpolicy="no-referrer"></iframe>
+      </div>
+      <p id="output-message" role="status" class="output-status-note"></p>
+    </div>
+  </div>
+  <p class="output-bottom-note"><strong>Research integrity:</strong> Historical and archived outputs are retained for review, not silently recalculated. Frequency-only reports do not provide paired respondent records and cannot justify correlations, regression, reliability, t-tests or ANOVA.</p>
+</section><div id="results-empty" class="empty-state"><div>▤</div><h2>Nothing to display yet</h2><p>Import a dataset and run an analysis to see your results here.</p><button class="button button-dark" id="empty-analyze">Open workbench →</button></div><div id="results-content" hidden><div class="results-heading"><div><div class="eyebrow eyebrow-dark" id="run-number">ANALYSIS OUTPUT</div><h2 id="results-title">Analysis results</h2><p id="results-method"></p></div><span class="result-status">✓ Calculated</span></div><div id="results-summary" class="friendly-stats" hidden></div><section id="results-insights" class="panel friendly-results" hidden></section><div id="results-warnings"></div><div id="results-tables"></div><section id="results-glossary" class="panel friendly-glossary" hidden></section><section class="panel narrative-panel"><h3>Overall interpretation</h3><p id="narrative"></p><button class="button button-outline button-small" id="copy-interpretation">Copy interpretation</button></section><section class="panel chart-panel" id="chart-panel" hidden><h3>Visual overview</h3><div id="visualization"></div></section><section class="provenance" id="provenance"></section></div></div>
+  </section>
+  <footer class="footer"><span>© 2026 MABRIG StatLab · Independent research statistics software</span><span>Research integrity first · Verify assumptions before interpretation</span></footer>
+</main>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="upload-modal" class="modal-backdrop" hidden><section class="upload-dialog" role="dialog" aria-modal="true" aria-labelledby="upload-title"><div class="dialog-heading"><div><div class="eyebrow eyebrow-dark">DATA IMPORT</div><h2 id="upload-title">Import a research dataset</h2></div><button class="dialog-close" id="close-upload" aria-label="Close">×</button></div><p>Choose your file. The app holds records temporarily in local server memory and removes them when cleared or expired.</p><label class="dropzone" id="dropzone" for="file-input"><span class="upload-graphic">⇧</span><strong>Drag your dataset here or browse files</strong><span>CSV, TSV, Excel (.xlsx) or SPSS (.sav) · 12 MB maximum</span><input type="file" id="file-input" accept=".csv,.tsv,.xlsx,.sav" /></label><div class="file-ready" id="selected-file" hidden></div><div class="dialog-actions"><button class="button button-outline" id="cancel-import">Cancel</button><button class="button button-dark" id="submit-import" disabled>Import dataset →</button></div><small class="dialog-disclaimer">Use only data you are authorized to process. This beta is intended for local/private use, not exposed public hosting.</small></section></div>
+
+<div id="blank-modal" class="modal-backdrop" hidden><section class="upload-dialog" role="dialog" aria-modal="true" aria-labelledby="blank-title">
+  <div class="dialog-heading"><div><div class="eyebrow eyebrow-dark">START FROM SCRATCH</div><h2 id="blank-title">Create a blank dataset</h2></div><button class="dialog-close" type="button" id="close-blank" aria-label="Close">×</button></div>
+  <p>Start with an editable data grid; create additional variables in Variable View and enter your observations one case at a time.</p>
+  <form id="blank-form" class="blank-form">
+    <label class="variable-field">Dataset name <input id="blank-name" value="Untitled survey" maxlength="80" required/></label>
+    <label class="variable-field">First variable <input id="blank-variable" value="var_1" maxlength="64" pattern="[A-Za-z_][A-Za-z0-9_]*" required/></label>
+    <label class="variable-field">Storage type <select id="blank-type"><option value="numeric">Numeric</option><option value="string">String</option><option value="date">Date</option></select></label>
+    <label class="variable-field">Starting cases <input id="blank-rows" type="number" min="1" max="100" step="1" value="10" required/></label>
+    <div class="dialog-actions"><button type="button" class="button button-outline" id="cancel-blank">Cancel</button><button type="submit" class="button button-dark" id="create-blank">Create dataset →</button></div>
+  </form>
+  <small class="dialog-disclaimer">Blank means no responses have been collected. Do not use artificially entered observations as genuine field-survey data.</small>
+</section></div>
+
+<div id="variable-modal" class="modal-backdrop" hidden>
+  <section class="variable-dialog" role="dialog" aria-modal="true" aria-labelledby="variable-dialog-title" tabindex="-1">
+    <div class="variable-dialog-top"><div><div class="eyebrow eyebrow-dark">VARIABLE PROPERTIES</div><h2 id="variable-dialog-title">Edit variable</h2><p id="variable-dialog-subtitle">Changes to variable properties are recorded for the current session.</p></div><button id="close-variable" class="dialog-close" aria-label="Close variable editor">×</button></div>
+    <form id="variable-form">
+      <div class="variable-dialog-scroll">
+        <div class="variable-form-grid">
+          <label class="variable-field">Name <input id="v-name" required maxlength="64" pattern="[A-Za-z_][A-Za-z0-9_]*" autocomplete="off" spellcheck="false"/><small>Letters, digits, underscore; start with letter or underscore.</small></label>
+          <label class="variable-field">Type <select id="v-type"><option value="numeric">Numeric</option><option value="string">String</option><option value="date">Date (ISO format)</option></select><small>Changing type validates the existing observations.</small></label>
+          <label class="variable-field">Width <input id="v-width" type="number" min="1" max="255" step="1" required/></label>
+          <label class="variable-field">Decimals <input id="v-decimals" type="number" min="0" max="12" step="1" required/></label>
+          <label class="variable-field variable-span">Variable label <input id="v-label" maxlength="255" placeholder="Full questionnaire item or definition"/><small>Used to explain meaning; original variable names remain identifiable.</small></label>
+          <label class="variable-field">Columns <input id="v-columns" type="number" min="3" max="60" step="1" required/></label>
+          <label class="variable-field">Alignment <select id="v-align"><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></label>
+          <label class="variable-field">Measurement level <select id="v-measure"><option value="nominal">Nominal</option><option value="ordinal">Ordinal</option><option value="scale">Scale</option></select></label>
+          <label class="variable-field">Role <select id="v-role"><option value="input">Input</option><option value="target">Target</option><option value="both">Both</option><option value="none">None</option><option value="partition">Partition</option><option value="split">Split</option></select></label>
+        </div>
+        <div class="variable-editor-section"><div class="variable-editor-header"><div><h3>Value labels <span class="help-badge">CODES</span></h3><p>Map the original codes to understandable answers, without changing the recorded values.</p></div><div class="variable-action-row"><select id="label-preset" class="variable-filter" aria-label="Add value label preset"><option value="">Use a preset…</option><option value="yes-no">Yes / No (1–2)</option><option value="likert-5">5-point agreement (1–5)</option><option value="likert-4">4-point agreement (1–4)</option></select><button type="button" class="button button-outline button-small" id="add-value-label">+ Add label</button></div></div><div class="label-table-head"><span>Stored value</span><span>Display label</span><span></span></div><div id="value-label-rows" class="label-rows"></div></div>
+        <div class="variable-editor-section"><div class="variable-editor-header"><div><h3>Missing values <span class="help-badge">EXCLUDED FROM ANALYSIS</span></h3><p>Examples: 99 = No response; 98 = Not applicable. Missing codes remain in raw exports.</p></div></div><label class="variable-field">Discrete missing codes <input id="v-missing" placeholder="e.g. 99, 98"/><small>Up to three comma-separated codes; blank means system missing only.</small></label><div class="variable-range"><label class="variable-field">Numeric missing range · from <input id="v-range-low" placeholder="Lower bound"/></label><label class="variable-field">to <input id="v-range-high" placeholder="Upper bound"/></label></div><p class="variable-caution">For a missing-value range, you may additionally specify only one discrete code. Always verify questionnaire coding before excluding responses.</p></div>
+        <div id="variable-editor-error" class="variable-error" role="alert" hidden></div>
+      </div>
+      <div class="variable-dialog-footer"><div class="footer-hint">⚑ Changing variable definitions invalidates existing output until recalculated.</div><div class="dialog-actions"><button type="button" id="delete-variable" class="button button-danger" hidden>Delete variable</button><button type="button" id="cancel-variable" class="button button-outline">Cancel</button><button type="submit" id="save-variable" class="button button-dark">Save variable ✓</button></div></div>
+    </form>
+  </section>
+</div>
+<script defer src="/static/app.js"></script>
+<script defer src="/static/frequency.js"></script>
+<script defer src="/static/chapter_four.js"></script>
+<script defer src="/static/projects.js"></script>
+<script defer src="/static/output_history.js"></script>
+</body>
+</html>

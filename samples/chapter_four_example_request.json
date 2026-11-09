@@ -1,0 +1,17 @@
+{
+  "analysis": {
+    "text": "Item 5 (5-point scale):\nStrongly Disagree = 30\nDisagree = 23\nNeutral = 20\nAgree = 45\nStrongly Agree = 35\nTotal N = 153",
+    "scale_labels": {
+      "1": "Strongly Disagree",
+      "2": "Disagree",
+      "3": "Neutral",
+      "4": "Agree",
+      "5": "Strongly Agree"
+    },
+    "sd_method": "sample"
+  },
+  "research_title": "DEMONSTRATION DATA ONLY — Example Frequency Analysis",
+  "objectives": ["Describe the distribution of responses to Item 5"],
+  "item_objectives": {"Item 5": 1},
+  "source_label": "Illustrative values supplied in the worked example (not verified field data)"
+}
