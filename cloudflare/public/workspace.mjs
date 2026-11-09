@@ -23,6 +23,33 @@ export function exampleWorkspace() {
     [5,1,24,4,4],[6,2,31,5,5],[7,1,28,3,4],[8,2,36,4,3]];
   return {schema:SCHEMA,title:"Synthetic questionnaire demo",variables,rows};
 }
+export function industrialWorkspace() {
+  // Synthetic demo in the familiar statistical spreadsheet format.
+  const variables=[
+    makeVariable("Machine",{type:"string",label:"Machine",width:8,measure:"nominal",align:"left"}),
+    makeVariable("Shift",{type:"string",label:"Shift",width:10,measure:"nominal",align:"left"}),
+    makeVariable("Temperature",{label:"Temperature",decimals:0,measure:"scale"}),
+    makeVariable("CycleTime",{label:"Cycle time",decimals:1,measure:"scale"}),
+    makeVariable("Strength",{label:"Strength",decimals:0,measure:"scale"}),
+    makeVariable("Result",{type:"string",label:"Result",measure:"nominal",align:"left",values:{"Pass":"Pass","Fail":"Fail"}}),
+    makeVariable("Quality",{type:"string",label:"Quality",measure:"ordinal",align:"left",values:{"Low":"Low","Medium":"Medium","High":"High"}})
+  ];
+  const rows=[
+    ["A","Morning",182,41.5,310,"Pass","Medium"],
+    ["A","Evening",178,43,296,"Fail","Low"],
+    ["B","Night",191,38.2,342,"Pass","High"],
+    ["B","Morning",188,39.6,335,"Pass","High"],
+    ["A","Night",175,44.1,288,"Fail","Low"],
+    ["A","Morning",180,42.3,301,"Pass","Medium"],
+    ["B","Evening",193,37.5,348,"Pass","High"],
+    ["B","Night",186,40.2,322,"Pass","Medium"],
+    ["A","Evening",184,41,315,"Pass","High"],
+    ["B","Morning",190,38.9,338,"Pass","Medium"],
+    ["A","Night",177,43.6,292,"Fail","Low"],
+    ["B","Evening",185,40.8,297,"Fail","Medium"]
+  ];
+  return {schema:SCHEMA,title:"Synthetic machine quality demo",variables,rows};
+}
 export function validName(name) {
   return typeof name==="string" && /^[A-Za-z][A-Za-z0-9_]{0,63}$/.test(name);
 }
