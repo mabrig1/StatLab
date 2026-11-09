@@ -1,0 +1,9 @@
+__pycache__/
+.pytest_cache/
+.env
+.venv/
+*.pyc
+.DS_Store
+node_modules/
+uploads/
+examples_generated/
