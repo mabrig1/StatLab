@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MABRIG StatLab — Cloudflare preview</title><meta name="theme-color" content="#102741">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'">
+<link rel="stylesheet" href="/styles.css"><script type="module" src="/app.mjs"></script></head>
+<body><header><span class="brand">M. <b>MABRIG StatLab</b></span><span class="tag">Cloudflare edition · Preview</span></header>
+<main><section class="hero"><span class="eyebrow">RESEARCH STATISTICS</span><h1>From frequency counts to clear findings.</h1>
+<p>Paste summary-level Likert responses to calculate descriptive statistics without submitting respondent data to a server.</p></section>
+<div class="layout"><section class="panel"><h2>1. Define your scale</h2><p>Specify what each numeric code means.</p>
+<label for="scale">Response labels</label><textarea id="scale" spellcheck="false">1 = Strongly Disagree
+2 = Disagree
+3 = Neutral
+4 = Agree
+5 = Strongly Agree</textarea>
+<h2>2. Enter item frequencies</h2><p>Use a new Item heading for each question. You can paste multiple items.</p>
+<label for="counts">Summary counts</label><textarea id="counts" class="counts" spellcheck="false">Item 5:
+Strongly Disagree = 30
+Disagree = 23
+Neutral = 20
+Agree = 45
+Strongly Agree = 35
+Total N = 153</textarea>
+<div class="options"><label><input type="checkbox" id="reverse"> Reverse-score</label><label>SD: <select id="method"><option value="sample">Sample (N − 1)</option><option value="population">Population (N)</option></select></label></div>
+<div class="buttons"><button id="analyze" class="primary" type="button">Calculate</button><button id="sample" type="button">Restore example</button></div>
+<p id="error" class="error" role="alert" aria-live="polite"></p></section>
+<aside class="panel help"><h2>What works here?</h2><ul><li>Frequency and percentage tables</li><li>Weighted mean and standard deviation</li><li>Median, mode and top response</li><li>Calculation formulas and CSV export</li></ul>
+<h3>Important limitations</h3><p>Summary frequencies cannot support correlations, regressions, t-tests, ANOVA, or Cronbach's alpha, because answers are not paired across items.</p>
+<p class="caution">The full Python Data View, Variable View, and advanced statistical engine are <b>not hosted on this Worker</b>. This is an explicitly limited, usable Cloudflare preview.</p></aside></div>
+<section id="results" class="panel results" hidden><div class="section-head"><h2>Descriptive results</h2><button id="csv" type="button">Export summary CSV</button></div>
+<div class="table-scroll"><table><thead><tr><th>Item</th><th>N</th><th>Mean</th><th>SD</th><th>Median</th><th>Mode</th><th>Top response</th></tr></thead><tbody id="summary"></tbody></table></div><div id="details"></div></section>
+</main><footer>Privacy first · All calculations run in your browser · <a href="https://github.com/mabrig1/StatLab">View source</a></footer></body></html>

@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "statlab",
+  "main": "./cloudflare/src/index.mjs",
+  "compatibility_date": "2026-11-09",
+  "workers_dev": true,
+  "assets": {
+    "directory": "./cloudflare/public",
+    "binding": "ASSETS"
+  },
+  "vars": {
+    "INTEGRATIONS_ENABLED": "false",
+    "OPENROUTER_MODEL": "",
+    "RESEND_FROM_EMAIL": "",
+    "STATLAB_SITE_URL": ""
+  }
+}
