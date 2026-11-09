@@ -67,3 +67,26 @@ The Cloudflare-hosted interface now includes three functional tabs: **Data View*
 - **Sample presets:** synthetic machine-quality sample matching the spreadsheet reference format, and synthetic Likert survey sample. Start from a blank project if preferred.
 
 **Security and deployment boundary:** These browser-only features do not send case records to the Cloudflare Worker, to OpenRouter, or to Resend. The static app does not yet provide full Python-based regression, t-tests, ANOVA, account logins, cross-device sync, a data backend, or secure multiuser storage. The Worker integrations remain disabled by default. Cloudflare builds use `wrangler.jsonc` from the repo root and `npx wrangler deploy` as previously documented.
+
+## New: Likert Scale Studio for questionnaire research
+
+The Cloudflare edition includes a dedicated **Likert Scale Studio** tab, alongside Data View, Variable View and Frequency-only Analysis. This is intended to lower the learning curve for students preparing research-question descriptives for Chapter Four. All calculations take place in the browser, not through OpenRouter or Resend.
+
+1. Choose **4-, 5-, or 7-point Likert** and confirm the exact code-to-label meanings. Customize the labels when necessary.
+2. Add distinct research objectives and assign questionnaire questions to each one.
+3. Enter frequency counts in the editable grid, paste multiple items as Item 1 / Agree = 45 blocks or CSV/TSV matrices, **or** import real numeric Ordinal columns from Data View. If a codebook label conflicts with the selected scale, the import stops with a clear error instead of silently relabeling scores. An optional declared N is validated against the count sum.
+4. Choose **sample SD (N-1, default)** or population SD (N), and mark any reversed questionnaire items individually.
+5. Click **Analyze my Likert data** for per-item counts and percentages, weighted mean, SD, weighted median, modal answer(s), response bars, and plain-language descriptions. A numerical midpoint comparison is descriptive, **not** a hypothesis-test decision.
+6. Download an objective-organized **CSV** table, download a safe HTML Chapter Four draft, or copy an editable plain-text Chapter Four discussion.
+
+The objective panel shows an **unweighted mean of item means**, explicitly labeled as such; it does **not** calculate a respondent-level composite SD or manufacture paired answers. N can vary by item. Frequency-only counts cannot establish correlation, regression, reliability, t-tests or ANOVA. Do not report statistical significance or causality from counts alone.
+
+### Privacy and provenance
+
+- The starter survey uses explicitly **synthetic** 153-response frequency examples. Replace them with your actual questionnaire data before reporting findings.
+- The source field is optional: it never assumes you conducted a 2026 field survey. The report attributes any entered source label to the user and identifies it as unverified.
+- Importing actual Data View ordinal variables only derives single-item counts, respecting user-missing codes. It does not send respondent data to the Worker or reconstruct respondents from summary counts.
+- Browser Data View projects may persist in IndexedDB (subject to browser controls). Export your own backup before clearing browser data. The generated CSV report is made safe against spreadsheet formula injection in text fields.
+- The full Python inferential engine and multiuser authentication remain separate and are not deployed by this static Cloudflare Worker.
+
+The synthetic questionnaire examples and numeric calculations are covered by tests in cloudflare/tests/likert.test.mjs.
