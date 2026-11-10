@@ -9,11 +9,13 @@ import {
   canonicalCode,createValueDraft,addValueLabel,changeValueLabel,removeValueLabel,
   applyLikertPreset,orderedLabels,valueDraftPatch
 } from "./value-labels.mjs";
+import {addQuestionnaireColumns,previewBulkLikert,applyBulkLikert} from "./likert-bulk.mjs";
 
 const el=id=>document.getElementById(id);
 const state={data:industrialWorkspace(),undo:[],redo:[],page:0,selected:null,
   search:"",labels:false,active:"data",editVar:null,ready:false,db:null};
 const valueEditor={draft:null,selected:null,presetApplied:false};
+const bulkEditor={indices:new Set(),lastCreated:0};
 const PAGE_SIZE=50;
 let saveChain=Promise.resolve();
 
@@ -56,10 +58,12 @@ function updateAction(fn) {
     state.data=next;renderAll();queueSave();
     showStatus("data-message","Changes applied.");
     showStatus("variable-message","");
+    return true;
   }catch(error){
     showStatus("data-message",error.message,true);
     showStatus("variable-message",error.message,true);
     renderAll();
+    return false;
   }
 }
 function undoRedo(direction) {
@@ -326,6 +330,133 @@ function openVariableDialog(index){
   }catch(error){showStatus("variable-message",error.message,true);}
 }
 
+function bulkCurrentOptions(){
+  return {
+    indices:[...bulkEditor.indices].sort((a,b)=>a-b),
+    source:el("bulk-source").value,
+    mode:el("bulk-mode").value,
+    ordinal:el("bulk-ordinal").checked
+  };
+}
+function bulkShowError(message=""){el("bulk-error").textContent=message;}
+function isQuestionName(name){return /^Q(?:[1-9]|[1-3]\d|40)$/i.test(name);}
+function bulkChoose(kind){
+  bulkEditor.indices=new Set();
+  state.data.variables.forEach((v,index)=>{
+    if(v.type==="numeric"&&(
+      kind==="numeric"||
+      (kind==="questions"&&isQuestionName(v.name))
+    ))bulkEditor.indices.add(index);
+  });
+  bulkDrawTargets();bulkPreview();
+}
+function bulkDrawTargets(){
+  const list=el("bulk-target-list");list.replaceChildren();
+  for(const [index,v] of state.data.variables.entries()){
+    const row=make("label","","bulk-target");
+    const check=make("input");
+    check.type="checkbox";check.value=String(index);
+    check.checked=bulkEditor.indices.has(index);
+    check.disabled=v.type!=="numeric";
+    check.setAttribute("aria-label","Apply Likert coding to "+v.name);
+    check.addEventListener("change",()=>{
+      if(check.checked)bulkEditor.indices.add(index);else bulkEditor.indices.delete(index);
+      bulkPreview();
+    });
+    row.append(check);
+    const label=make("span",v.name+" · "+(v.label||v.type));
+    row.append(label);
+    row.append(make("small",v.type!=="numeric"?"Not numeric":
+      Object.keys(v.values).length?"Already coded":"No value labels"));
+    list.append(row);
+  }
+}
+function bulkDrawSources(){
+  const select=el("bulk-source"),previous=select.value;
+  select.replaceChildren();
+  for(const [value,caption] of [
+    ["preset:5","5-point: 1 = Strongly Disagree → 5 = Strongly Agree"],
+    ["preset:4","4-point: 1 = Strongly Disagree → 4 = Strongly Agree"],
+    ["preset:7","7-point: 1 = Strongly Disagree → 7 = Strongly Agree"]
+  ])select.append(option(value,caption));
+  for(const v of state.data.variables){
+    if(v.type==="numeric"&&Object.keys(v.values).length>=2&&Object.keys(v.values).length<=11)
+      select.append(option("copy:"+v.name,"Copy existing labels from "+v.name));
+  }
+  if([...select.options].some(o=>o.value===previous))select.value=previous;
+  else select.value="preset:5";
+}
+function bulkPreview(){
+  const panel=el("bulk-preview");panel.replaceChildren();
+  bulkShowError();
+  const selected=bulkEditor.indices.size;
+  if(!selected){
+    panel.append(make("strong","Select one or more Numeric variables to continue."));
+    el("bulk-apply").disabled=true;return;
+  }
+  try{
+    const plan=previewBulkLikert(state.data,bulkCurrentOptions());
+    panel.append(make("strong",plan.eligible.length+" ready · "+plan.skipped.length+
+      " skipped · "+selected+" selected"));
+    panel.append(make("p","Source: "+plan.description+". "+
+      (plan.replacements.length?"Existing codebooks to be replaced: "+
+        plan.replacements.join(", ")+". ":"")+
+      "Recorded respondent values will not be changed."));
+    if(plan.skipped.length){
+      const list=make("ul");
+      plan.skipped.slice(0,15).forEach(info=>list.append(make("li",info.name+": "+info.reason)));
+      if(plan.skipped.length>15)list.append(make("li","...and "+(plan.skipped.length-15)+" more skipped variables."));
+      panel.append(list);
+    }
+    el("bulk-apply").disabled=plan.eligible.length===0;
+  }catch(error){
+    bulkShowError(error.message);
+    el("bulk-apply").disabled=true;
+  }
+}
+function bulkOpen(){
+  bulkEditor.lastCreated=0;
+  bulkEditor.indices=new Set();
+  el("bulk-mode").value="skip";
+  el("bulk-ordinal").checked=true;
+  bulkDrawSources();bulkChoose("questions");
+  el("bulk-likert-dialog").showModal();
+}
+function bulkCreate(){
+  try{
+    const draft=addQuestionnaireColumns(state.data,{count:40,points:5});
+    if(draft.added.length===0){
+      bulkShowError("Q1–Q40 already exist. Use the selection and codebook options to update them.");
+      return;
+    }
+    if(!confirm("Create "+draft.added.length+" blank questionnaire column(s) Q1–Q40, "+
+      "using a 5-point preset? Existing variables and respondent values will not change."))return;
+    if(!updateAction(()=>draft.project))return;
+    bulkEditor.lastCreated=draft.added.length;
+    bulkDrawSources();bulkChoose("questions");
+    const info=make("p",draft.added.length+" new question(s) created with 5-point value labels. "+
+      draft.kept.length+" existing question(s) were left unchanged.","bulk-created");
+    el("bulk-preview").prepend(info);
+  }catch(error){bulkShowError(error.message);}
+}
+function bulkApply(){
+  try{
+    const options=bulkCurrentOptions();
+    const preview=previewBulkLikert(state.data,options);
+    if(!preview.eligible.length)throw Error("No variables are eligible. See preview details.");
+    const replacementText=preview.replacements.length?
+      "\nReplace existing value labels on: "+preview.replacements.join(", ")+".":"";
+    if(!confirm("Apply "+preview.description+" to "+preview.eligible.length+" variable(s)?"+
+      replacementText+"\nStored respondent values will not change. Continue?"))return;
+    const outcome=applyBulkLikert(state.data,options);
+    if(!updateAction(()=>outcome.project))return;
+    el("bulk-likert-dialog").close();
+    showStatus("variable-message","Applied "+preview.description+" to "+
+      preview.eligible.length+" variable(s); "+preview.skipped.length+
+      " skipped. Data View values are unchanged.");
+  }catch(error){bulkShowError(error.message);}
+}
+
 function openDb(){
   return new Promise((resolve,reject)=>{
     if(!("indexedDB" in window))return reject(Error("IndexedDB is unavailable."));
@@ -402,6 +533,16 @@ function wire(){
   el("add-ten").addEventListener("click",()=>updateAction(data=>addRows(data,10)));
   el("add-column").addEventListener("click",()=>{updateAction(data=>addVariable(data));setTab("variables");});
   el("add-variable").addEventListener("click",()=>updateAction(data=>addVariable(data)));
+  el("open-bulk-likert").addEventListener("click",bulkOpen);
+  el("bulk-cancel").addEventListener("click",()=>el("bulk-likert-dialog").close());
+  el("bulk-create-questions").addEventListener("click",bulkCreate);
+  el("bulk-pick-questions").addEventListener("click",()=>bulkChoose("questions"));
+  el("bulk-pick-numeric").addEventListener("click",()=>bulkChoose("numeric"));
+  el("bulk-pick-none").addEventListener("click",()=>{bulkEditor.indices.clear();bulkDrawTargets();bulkPreview();});
+  el("bulk-source").addEventListener("change",bulkPreview);
+  el("bulk-mode").addEventListener("change",bulkPreview);
+  el("bulk-ordinal").addEventListener("change",bulkPreview);
+  el("bulk-apply").addEventListener("click",bulkApply);
   el("delete-case").addEventListener("click",()=>{
     if(state.selected!==null && confirm("Delete case "+(state.selected+1)+"?")){
       const row=state.selected;state.selected=null;updateAction(data=>removeRow(data,row));
