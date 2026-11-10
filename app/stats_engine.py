@@ -287,4 +287,10 @@ def analyze(df: pd.DataFrame, request:dict, variable_specs: dict[str, dict] | No
     if mode=="ttest_paired":return paired_t(df,a,b)
     if mode=="anova":return anova(df,a,b)
     if mode=="normality":return normality(df,columns)
+    if mode=="efa":
+        from .factor_analysis import exploratory_factor
+        return exploratory_factor(df, columns,
+                                  n_factors=request.get("factor_count", 2),
+                                  rotation=request.get("factor_rotation", "varimax"),
+                                  variable_specs=variable_specs)
     raise AnalysisError("Unknown analysis. Choose a supported statistical procedure.")
