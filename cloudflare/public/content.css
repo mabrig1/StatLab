@@ -109,3 +109,44 @@
 @media(max-width:1050px){.ca-layout,.ca-viz-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.ca-hero{padding:22px;align-items:stretch;flex-direction:column}.ca-privacy{width:auto}.ca-review-heading{flex-direction:column;align-items:stretch}.ca-review-heading input,.ca-review-heading select{max-width:none;width:100%}.ca-toolbar button{flex:1}.ca-split{grid-template-columns:1fr}.ca-review-checks{grid-template-columns:1fr}.ca-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.ca-pagination{flex-wrap:wrap}}
 @media print{.ca-toolbar,.ca-layout,.ca-analyze-bar,.ca-review-panel,.workspace-tabs{display:none!important}}
+
+
+/* Assisted theme exploration — all discovery and AI prompt drafting are browser-local */
+.ca-assisted-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.ca-assisted-heading>div{flex:1;min-width:210px}
+.ca-assisted-heading h3{font-size:18px;margin:5px 0 7px;color:#154e52}
+.ca-assisted-heading p{font-size:12px;line-height:1.7;color:#5d7a80;margin:0;max-width:900px}
+.ca-local-badge{font-size:11px;font-weight:800;padding:8px 12px;border-radius:22px;background:#e3f7ee;color:#13705f;white-space:nowrap}
+.ca-discovery{margin:18px 0;background:#fafffd}
+.ca-discovery .ca-eyebrow,.ca-ai-prep .ca-eyebrow{color:#0a8d7b}
+.ca-discovery-options{display:grid;grid-template-columns:repeat(3,minmax(140px,1fr));gap:10px;margin:19px 0 13px}
+.ca-discovery-options label{font-size:12px;font-weight:750;color:#34636c}
+.ca-discovery-options input[type=number],.ca-discovery-options select{display:block;width:100%;margin-top:6px;background:#fff;border:1px solid #bfd8dc;border-radius:7px;padding:10px;font:13px system-ui,sans-serif;color:#254c57}
+.ca-discovery-options .ca-tick{grid-column:1/-1;margin-top:2px}
+.ca-tick{display:flex;gap:9px;align-items:center;font-size:12px!important;color:#426a73;font-weight:700;cursor:pointer}
+.ca-tick input{accent-color:#078f7c}
+.ca-discovery-status{font-size:12px;line-height:1.6;color:#57747c;margin:10px 0}
+.ca-candidate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px;margin-top:16px}
+.ca-candidate{padding:16px;border:1px solid #d4e6e5;background:#fff;border-radius:11px;box-shadow:0 3px 11px #0a35380a}
+.ca-candidate h4{font-size:16px;color:#136353;margin:2px 0 6px;overflow-wrap:anywhere}
+.ca-candidate small{font-size:11px;color:#69868d;line-height:1.5}
+.ca-candidate .ca-candidate-stats{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+.ca-candidate-stats span{font-size:11px;font-weight:750;background:#eaf6f3;color:#216c64;border-radius:30px;padding:5px 8px}
+.ca-candidate button{font-size:12px;padding:8px 11px;margin:9px 0 2px}
+.ca-candidate details{border-top:1px solid #e5eeed;margin-top:9px;padding-top:9px}
+.ca-candidate summary{font-size:11px;color:#187f72;font-weight:850;cursor:pointer}
+.ca-evidence{padding:11px;border-left:3px solid #1aa289;background:#f4fbf8;margin:9px 0;border-radius:5px}
+.ca-evidence b{font-size:11px;color:#256a68}
+.ca-evidence p{font-size:11px;color:#466974;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;margin:5px 0}
+.ca-matrix,.ca-ai-prep{margin:18px 0}
+.ca-matrix table{width:100%;border-collapse:collapse;font-size:12px;min-width:550px}
+.ca-matrix th,.ca-matrix td{padding:10px;border-bottom:1px solid #deeaeb;text-align:left;white-space:nowrap}
+.ca-matrix th{position:sticky;top:0;color:#28646a;background:#eaf7f4;font-weight:800}
+.ca-matrix td{color:#355f65}
+.ca-ai-prep{background:#f7f9ff;border-color:#d6e0f5}
+.ca-ai-prep .ca-local-badge{background:#e7eefe;color:#425e9e}
+.ca-ai-prep .ca-tick{margin:15px 0}
+.ca-ai-prep textarea{min-height:240px;background:#fff;font:12px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}
+.ca-ai-prep .ca-note{padding:11px;border-left:3px solid #d29b3b;background:#fffaf0;border-radius:5px}
+@media(max-width:700px){.ca-discovery-options{grid-template-columns:1fr 1fr}.ca-local-badge{white-space:normal}.ca-assisted-heading{align-items:stretch;flex-direction:column}.ca-ai-prep textarea{min-height:290px}}
+@media(max-width:440px){.ca-discovery-options{grid-template-columns:1fr}.ca-discovery-options .ca-tick{grid-column:1}}
