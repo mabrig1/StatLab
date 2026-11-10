@@ -78,7 +78,7 @@ function clearHistory(){
   state.undo=[];state.redo=[];state.page=0;state.selected=null;
 }
 function setTab(name){
-  if(!["data","variables","frequency","likert","business"].includes(name))return;
+  if(!["data","variables","frequency","likert","business","content"].includes(name))return;
   state.active=name;
   for(const b of document.querySelectorAll("[data-workspace-view]")){
     const active=b.dataset.workspaceView===name;
@@ -578,6 +578,7 @@ function wire(){
   el("menu-sample").addEventListener("click",()=>el("load-demo").click());
   el("menu-likert").addEventListener("click",()=>setTab("likert"));
   el("menu-business").addEventListener("click",()=>setTab("business"));
+  el("menu-content").addEventListener("click",()=>setTab("content"));
   el("import-data").addEventListener("click",()=>el("file-picker").click());
   el("file-picker").addEventListener("change",event=>loadFromFile(event.target.files[0]));
   el("export-data").addEventListener("click",()=>downloadText("statlab-data.csv",exportCsv(state.data),"text/csv;charset=utf-8"));
