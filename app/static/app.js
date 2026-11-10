@@ -521,9 +521,18 @@ function buildControls(){
       <label class="field-label" for="efa-rotation">Rotation</label>
       <select class="input-select" id="efa-rotation">
         <option value="varimax" selected>Varimax (orthogonal)</option>
+        <option value="oblimin">Oblimin / quartimin (oblique; correlated factors)</option>
         <option value="none">None (unrotated)</option>
       </select>
-      <p class="method-note">Pearson correlation-based principal-axis factor analysis. Do not interpret it as polychoric EFA, PCA or confirmatory factor analysis. Results include item communalities and KMO/Bartlett diagnostics; do not automatically name factors.</p>`;
+      <label class="field-label" for="efa-parallel-simulations">Parallel analysis · simulated null datasets</label>
+      <select class="input-select" id="efa-parallel-simulations">
+        <option value="50">50 (faster, noisier)</option>
+        <option value="100" selected>100 (default)</option>
+        <option value="200">200 (more stable)</option>
+      </select>
+      <label class="field-label" for="efa-parallel-seed">Reproducibility seed</label>
+      <input id="efa-parallel-seed" class="input-select" type="number" min="0" max="4294967295" step="1" value="20261110" required>
+      <p class="method-note"><strong>Factor-retention guide:</strong> Horn-style comparison uses simulated <em>Pearson correlation component eigenvalues</em>, not an exact common-factor parallel analysis. The suggested count does not override your chosen number of principal-axis factors. Oblimin adds a pattern matrix, separate structure matrix, and factor correlations; it does not establish causality. Polychoric EFA and CFA remain unavailable.</p>`;
    $('dynamic-controls').append(settings);
  }
  const a=$('field-a'),b=$('field-b');if(a&&b&&a.value===b.value){const alternative=[...b.options].find(o=>o.value&&o.value!==a.value);if(alternative)b.value=alternative.value}
@@ -548,6 +557,12 @@ function readForm(){
  if(state.mode==='efa'){
     out.factor_count=Number($('efa-count').value);
     out.factor_rotation=$('efa-rotation').value;
+    out.parallel_simulations=Number($('efa-parallel-simulations').value);
+    const seedInput=$('efa-parallel-seed');
+    if(!seedInput.value.trim()||!seedInput.checkValidity()){
+      throw new Error('Enter a valid integer parallel-analysis seed.');
+    }
+    out.parallel_seed=Number(seedInput.value);
  }
  return out;
 }
