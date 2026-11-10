@@ -19,11 +19,12 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, File, HTTPException, UploadFile, Query
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse, HTMLResponse
 from pydantic import BaseModel, Field
 from typing import Literal
 
 from .stats_engine import AnalysisError, analyze
+from .power_analysis import PowerPlanRequest, PowerPlanningError, plan_sample_size, power_plan_html
 from .aggregate_descriptives import SummaryError, analyze_frequencies, summary_csv
 from .chapter_four import ChapterFourError, build_chapter_four, chapter_four_html, chapter_four_csv, chapter_four_docx
 from .data_editor import (DataError, history_reset, history_state, rows_page, set_cells,
@@ -64,6 +65,29 @@ def _frequency_analysis(payload: FrequencyOnlyRequest):
         return analyze_frequencies(**payload.model_dump())
     except SummaryError as exc:
         raise HTTPException(422, str(exc)) from exc
+
+
+@app.post("/api/power/sample-size")
+def plan_study_sample_size(request: PowerPlanRequest):
+    """Local-only a priori planning. No participant data, observed p-values or datasets."""
+    try:
+        return plan_sample_size(request)
+    except (PowerPlanningError, ValueError, OverflowError, ArithmeticError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc)[:250]) from exc
+
+
+@app.post("/api/power/report.html")
+def plan_study_html(request: PowerPlanRequest):
+    """Recalculate from assumptions and download a script-free, printable memo."""
+    try:
+        result = plan_sample_size(request)
+    except (PowerPlanningError, ValueError, OverflowError, ArithmeticError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc)[:250]) from exc
+    return HTMLResponse(power_plan_html(result), headers={
+        "Content-Disposition": 'attachment; filename="statlab-a-priori-power-plan.html"',
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+    })
 
 
 @app.post("/api/frequency-only/analyze")
@@ -332,7 +356,7 @@ def home():
 
 @app.get("/static/{path}")
 def static(path: str):
-    if path not in ("app.js", "styles.css", "frequency.js", "frequency.css", "chapter_four.js", "projects.js", "projects.css", "output_history.js", "output_history.css"):
+    if path not in ("app.js", "styles.css", "frequency.js", "frequency.css", "chapter_four.js", "power.js", "power.css", "projects.js", "projects.css", "output_history.js", "output_history.css"):
         raise HTTPException(404, "Not found")
     return FileResponse(APP_DIR / "static" / path)
 
@@ -355,8 +379,9 @@ def capabilities():
             "case_level": ["descriptives", "correlations", "regression",
                            "crosstabs", "cronbach_alpha", "t_tests", "anova"],
             "aggregate_only": ["frequency_descriptives", "chapter_four_reports"],
+            "study_design": ["a_priori_sample_size_power_planning"],
         },
-        "unavailable": ["factor_analysis", "power_analysis", "desktop_package",
+        "unavailable": ["factor_analysis", "advanced_power_analysis", "desktop_package",
                         "multi_device_encrypted_sync", "public_multiuser_auth"],
         "privacy": {
             "no_mandatory_cloud_database": True,
