@@ -22,6 +22,10 @@ The Python version still reports `0.9.0`. The present feature branch adds **v1.0
 
 StatLab now exposes a **local** Statsmodels-backed power/sample-size planner for a bounded set of two-sided designs: one-sample and paired t, pooled-variance independent t, balanced one-way ANOVA, and independent two-proportion z approximations. It takes only planning assumptions, refuses missing effect sizes, rounds and verifies sample sizes, and provides a separate attrition-adjusted recruitment target. No dataset sessions are created and no raw respondents or margins are processed. The `GET /api/capabilities` endpoint identifies this explicitly; the Cloudflare browser still cannot execute it. Advanced methods and exploratory factor analysis remain planned. See `docs/POWER_ANALYSIS_GUIDE.md`.
 
+### Addendum: case-level exploratory common-factor analysis
+
+The local FastAPI edition now supports a limited **principal-axis factor analysis** with researcher-chosen factor count, optional orthogonal varimax, overall/per-item KMO, Bartlett's sphericity approximation, Pearson correlation scree eigenvalues and factor loadings. It uses only actual respondent-level complete cases and honors user-missing codes through `analysis_frame`. The `GET /api/capabilities` response lists local EFA separately from still-unavailable CFA and polychoric EFA. The Cloudflare browser cannot execute any of this Statsmodels logic. For methods, warnings and constraints, see `docs/EXPLORATORY_FACTOR_ANALYSIS.md`.
+
 ## 2. Architecture principles
 
 1. **Data minimization:** Analyze in the user's browser or localhost process by default. Cloud sync and third-party AI are opt-in only, not prerequisite services.
