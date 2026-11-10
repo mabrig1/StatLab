@@ -244,3 +244,7 @@ In **Likert Scale Studio**, run an analysis, then choose **Download APA-style ta
 The respondent-level Python API remains local and does not run on Cloudflare. Existing chapters, research project JSON formats, Data View, Variable View, frequency-only, business dashboard and qualitative coding tools remain available. The frontend uses static JS and DOM rather than a new framework. No secrets, Cloudflare settings or existing statistical methods were changed in this slice.
 
 See `docs/STATLAB_V1_ARCHITECTURE.md` and `docs/STATLAB_ROADMAP_V1_V15.md` in the repository root. CI checks new JavaScript syntax, business metric calculations, APA export and FastAPI capabilities. A green Wrangler **dry-run is not verification that the production URL has been updated**.
+
+## Power analysis belongs to the separate local Python edition
+
+The Cloudflare Worker uses static HTML and JavaScript and **does not host Statsmodels or FastAPI**. A new a priori sample-size planning module exists only in the local Python edition (start `uvicorn app.main:app --host 127.0.0.1 --port 8000` on a trusted machine). The browser Academic home accurately marks it **Local Python only**; do not claim it works at the public Cloudflare URL. See `docs/POWER_ANALYSIS_GUIDE.md` in the repository root. Frequency-only marginals remain pure, and no respondent records are required for planned sample-size calculations.
