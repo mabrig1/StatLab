@@ -27,5 +27,8 @@ jobs:
       - run: node --check cloudflare/public/workspace-ui.mjs
       - run: node --check cloudflare/public/value-labels.mjs
       - run: node --check cloudflare/public/likert-bulk.mjs
+      - run: node --check cloudflare/public/business-analytics.mjs
+      - run: node --check cloudflare/public/business-infographic.mjs
+      - run: node --check cloudflare/public/business-ui.mjs
       - run: node --test cloudflare/tests/*.test.mjs
       - run: npx --yes wrangler deploy --dry-run --outdir /tmp/statlab-cloudflare-dist

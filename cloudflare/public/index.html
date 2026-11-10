@@ -8,9 +8,11 @@
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/workspace.css">
 <link rel="stylesheet" href="/likert.css">
+<link rel="stylesheet" href="/business.css">
 <script type="module" src="/app.mjs"></script>
 <script type="module" src="/workspace-ui.mjs"></script>
 <script type="module" src="/likert-ui.mjs"></script>
+<script type="module" src="/business-ui.mjs"></script>
 </head>
 <body>
 <header class="statlab-header"><div class="header-left"><a class="brand" href="/" aria-label="MABRIG StatLab home">M. <b>MABRIG StatLab</b></a><span class="header-divider"></span><strong class="header-page">Statistics Calculator</strong></div><span class="tag">Browser workspace · Cloudflare</span></header>
@@ -23,12 +25,14 @@
 <button type="button" id="menu-prepare">prepare data</button>
 <button type="button" id="menu-sample">example dataset</button>
 <button type="button" id="menu-likert">★ Likert Studio</button>
+<button type="button" id="menu-business">▥ Business Analytics</button>
 <span class="privacy-caption">☁ no data is sent to the cloud</span>
 </div>
 <nav class="workspace-tabs" aria-label="StatLab workspaces">
 <button type="button" class="workspace-tab active" data-workspace-view="data" aria-current="page">▦ Data View</button>
 <button type="button" class="workspace-tab" data-workspace-view="variables">▤ Variable View</button>
 <button type="button" class="workspace-tab likert-featured" data-workspace-view="likert">★ Likert Scale Studio</button>
+<button type="button" class="workspace-tab ba-featured" data-workspace-view="business">▥ Business Analytics</button>
 <button type="button" class="workspace-tab" data-workspace-view="frequency">▥ Frequency-only Analysis</button>
 </nav>
 
@@ -174,6 +178,74 @@ Total N = 153"></textarea>
     <h3>Research objective summaries</h3><div id="li-group-cards" class="li-group-cards"></div>
     <div class="li-limits"><h3>Important statistical notes</h3><ul id="li-warnings"></ul></div>
     <p id="li-copy-result" role="status" aria-live="polite"></p>
+  </section>
+</section>
+
+
+<section id="workspace-business" class="workspace-section" aria-label="Business Analytics Mode" hidden>
+  <section class="ba-hero">
+    <div><span class="ba-eyebrow">★ MABRIG BUSINESS INTELLIGENCE</span>
+      <h2>Business Analytics Studio</h2>
+      <p>Turn your sales records into useful insights and a shareable infographic. Designed for shops, printing services, freelancers and growing businesses.</p>
+      <div class="ba-chips"><span>₦ Naira-first</span><span>Sales & profit</span><span>Charts & infographic</span><span>Private browser analysis</span></div>
+    </div><div class="ba-hero-mark" aria-hidden="true">↗<small>DECISIONS<br>FROM DATA</small></div>
+  </section>
+  <section class="ba-input-grid">
+    <div class="ba-panel">
+      <div class="ba-number-title"><span>01</span><div><h3>Bring your business data</h3><p>Import a spreadsheet export or paste your business CSV.</p></div></div>
+      <div class="ba-mode-picker" role="group" aria-label="Business data type">
+        <label><input type="radio" name="ba-mode" value="transactions" checked><span><b>Sales transactions</b><small>One row per sale line; includes price, cost, quantity.</small></span></label>
+        <label><input type="radio" name="ba-mode" value="monthly"><span><b>Monthly summary</b><small>Only totals for each period, with optional grouping.</small></span></label>
+      </div>
+      <div class="ba-buttons">
+        <button id="ba-import" type="button" class="primary">Upload CSV</button>
+        <button id="ba-template" type="button" class="secondary">Download CSV template</button>
+        <button id="ba-demo" type="button" class="secondary">Load synthetic example</button>
+        <input type="file" id="ba-file" accept=".csv,text/csv" hidden>
+      </div>
+      <details class="ba-paste" id="ba-paste-panel"><summary>Or paste CSV data here</summary>
+        <textarea id="ba-raw" spellcheck="false" rows="6" placeholder="date,product,category,region,channel,quantity,unit_price,unit_cost"></textarea>
+        <button type="button" id="ba-use-pasted" class="secondary">Use pasted data</button></details>
+      <div id="ba-import-summary" class="ba-import-summary" role="status">Synthetic example loaded for demonstration only.</div>
+    </div>
+    <div class="ba-panel">
+      <div class="ba-number-title"><span>02</span><div><h3>Choose what to explore</h3><p>Filter the records and display currency (no conversion).</p></div></div>
+      <div class="ba-controls">
+        <label>Display currency <select id="ba-currency"><option value="NGN">NGN · ₦ Nigerian naira</option><option value="USD">USD · $</option><option value="GBP">GBP · £</option><option value="EUR">EUR · €</option><option value="GHS">GHS · GH₵</option><option value="KES">KES · KSh</option><option value="ZAR">ZAR · R</option></select></label>
+        <label>Category <select id="ba-category"><option value="all">All categories</option></select></label>
+        <label>Sales channel <select id="ba-channel"><option value="all">All channels</option></select></label>
+        <label>Region <select id="ba-region"><option value="all">All regions</option></select></label>
+        <label>From month <input type="month" id="ba-from"></label>
+        <label>To month <input type="month" id="ba-to"></label>
+      </div>
+      <div class="ba-buttons"><button id="ba-analyze" type="button" class="primary">Generate business dashboard →</button>
+      <button id="ba-clear-filters" type="button" class="secondary">Reset filters</button></div>
+      <p id="ba-error" class="ba-error" role="alert" aria-live="polite"></p>
+    </div>
+  </section>
+  <section id="ba-results" class="ba-results" hidden>
+    <div class="ba-dashboard-head"><div><span class="ba-eyebrow">03 · YOUR BUSINESS REPORT</span>
+      <h2>Business performance at a glance</h2><p id="ba-result-source">Synthetic sample</p></div>
+      <div class="ba-export-buttons"><button id="ba-export-svg" type="button">Download infographic SVG</button>
+        <button id="ba-export-png" type="button">Download PNG</button><button id="ba-export-csv" type="button">Export KPI CSV</button></div>
+    </div>
+    <div class="ba-kpis" id="ba-kpis"></div>
+    <div class="ba-info-grid">
+      <div class="ba-infographic-panel">
+        <div class="ba-panel-heading"><h3>Your infographic</h3><small>Designed locally from your data — ready to share or print.</small></div>
+        <img id="ba-infographic" alt="Infographic showing business revenue, gross profit, gross margin, monthly sales and top categories" loading="lazy">
+      </div>
+      <div class="ba-insights-panel">
+        <h3>Key findings</h3><ul id="ba-insights"></ul>
+        <h3>What the figures mean</h3><div id="ba-caveats"></div>
+      </div>
+    </div>
+    <div class="ba-summary-grids">
+      <div class="ba-panel"><h3>Revenue by month</h3><div class="ba-table-wrap"><table><thead><tr><th>Month</th><th>Revenue</th><th>Gross profit</th><th>Margin</th></tr></thead><tbody id="ba-month-rows"></tbody></table></div></div>
+      <div class="ba-panel"><h3>Top categories</h3><div class="ba-table-wrap"><table><thead><tr><th>Category</th><th>Revenue</th><th>Gross profit</th></tr></thead><tbody id="ba-category-rows"></tbody></table></div></div>
+      <div class="ba-panel"><h3>Sales channels</h3><div class="ba-table-wrap"><table><thead><tr><th>Channel</th><th>Revenue</th><th>Share</th></tr></thead><tbody id="ba-channel-rows"></tbody></table></div></div>
+      <div class="ba-panel"><h3>Top products</h3><div class="ba-table-wrap"><table><thead><tr><th>Product</th><th>Revenue</th><th>Gross profit</th></tr></thead><tbody id="ba-product-rows"></tbody></table></div><small>Monthly summaries cannot identify products unless product-level data were supplied.</small></div>
+    </div>
   </section>
 </section>
 
