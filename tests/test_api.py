@@ -75,7 +75,8 @@ def test_capabilities_separate_local_python_from_cloudflare_and_future():
     assert payload["browser_cloudflare_is_separate"] is True
     assert "correlations" in payload["features"]["case_level"]
     assert "factor_analysis" in payload["unavailable"]
-    assert "power_analysis" in payload["unavailable"]
+    assert "a_priori_sample_size_power_planning" in payload["features"]["study_design"]
+    assert "power_analysis" not in payload["unavailable"]
     assert "desktop_package" in payload["unavailable"]
     assert payload["integrity"]["frequency_only_never_reconstructs_cases"] is True
     assert payload["integrity"]["browser_worker_does_not_host_python_engine"] is True
