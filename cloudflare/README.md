@@ -194,3 +194,31 @@ All source text and coding operations run **locally in the browser**; no source 
 ### Validation and deployment
 
 CI runs the existing Python regression suite, Node unit tests and Wrangler Worker dry-run. Content-specific tests cover document segmentation, Unicode boundaries, codebook validation, review/rejection, synthetic provenance, quoted CSV, portable project backups, sanitization and Chapter Four export. The full Python backend is not part of the Worker.
+
+## Content Analysis Studio — assisted theme discovery and privacy-reviewed AI prompts
+
+The Content Analysis Studio now offers additional **local research assistance**. It does not silently upload transcripts or provide a falsely labelled 'AI model' in the browser.
+
+### Recurring phrase explorer
+
+- Click **Discover candidate phrases** after running content analysis. The tool finds recurring literal one-, two-, or three-word sequences with adjustable minimum coding-unit and document coverage.
+- The explorer highlights how many segments, distinct source documents and literal occurrences support each phrase, and displays up to three short supporting excerpts. Entries already defined as codebook keywords can be hidden.
+- A researcher can select **Add draft code** for a useful phrase. This adds a code with a provisional definition and a literal keyword, which creates suggestions for matching passages. The researcher must refine the definition and manually review passages. The operation does not mark suggestions as validated findings or change the original text.
+- Download an **unreviewed candidate CSV** for reference. Strings in CSV files are protected against common spreadsheet formula injection.
+
+### Source × code matrix
+
+Compare how many coding units in each individual document were assigned to each code, including manual overrides of keyword suggestions and a count of manually reviewed units. Export a separate source-code matrix CSV. The matrix reports coding units, **not people** or inferential group differences.
+
+### Optional AI interpretation prompt
+
+- Click **Prepare prompt for review** to create an **editable prompt locally** using only document counts, coding-unit counts and researcher-defined code names with their descriptive frequencies. No complete source texts, excerpts or document titles are included by default.
+- A separate explicit checkbox allows including some **unreviewed recurring phrases** after a warning that those phrases may reveal sensitive wording. The prompt is displayed for inspection and editing; nothing is sent to an external model automatically.
+- The user may choose to **Copy reviewed prompt** after a confirmation or download it as a text file. Exporting/copying is a separate, intentional user action. No API secret is exposed.
+- This is a **prompt-preparation helper**, not an integrated AI inference endpoint. The existing Cloudflare OpenRouter gateway remains disabled by default and administrator-protected; browser users cannot call it directly. Enabling publicly accessible AI interpretation later requires authenticated users, quota controls, provider configuration, explicit data-transmission consent and a production privacy review.
+
+### Research and privacy boundaries
+
+Repeated phrasing is not necessarily a coherent theme; it may reflect common wording or source style. Multi-code percentages can exceed 100%. Users are responsible for reviewing source excerpts and documenting coding decisions. Removing personally identifying information is not automatic, and code names or recurring phrases themselves may be sensitive. **Review every word before sending a copied prompt externally.** No semantic model, confidence score, automated reliability estimate, sentiment analysis or inferential test is represented as implemented.
+
+Verification: `node --test cloudflare/tests/*.test.mjs` and `npx wrangler deploy --dry-run`. Specific tests live in `cloudflare/tests/content-discovery.test.mjs`.

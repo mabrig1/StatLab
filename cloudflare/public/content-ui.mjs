@@ -4,6 +4,10 @@ import {
   importContentCsv,exportContentProject,importContentProject,
   codedUnitsCsv,codesSummaryCsv,chapterFourContentHtml
 } from "./content-analysis.mjs";
+import {
+  discoverPhrases,addDiscoveredPhraseAsCode,sourceCodeMatrix,sourceMatrixCsv,
+  discoveredPhrasesCsv,buildOptionalAiPrompt
+} from "./content-discovery.mjs";
 
 const el=id=>document.getElementById(id);
 function element(tag,text=null,cls=""){
@@ -15,7 +19,7 @@ function button(text,fn,cls="secondary"){
   const b=element("button",text,cls);b.type="button";b.addEventListener("click",fn);return b;
 }
 const state={project:contentDemo(),report:null,selectedCode:null,selectedUnit:null,
-  page:0,search:"",filter:"all"};
+  page:0,search:"",filter:"all",discovery:null};
 const PAGE_SIZE=16;
 function showError(message=""){el("ca-error").textContent=message;}
 function reviewError(message=""){el("ca-review-error").textContent=message;}
@@ -32,8 +36,11 @@ function download(filename,content,type){
   setTimeout(()=>URL.revokeObjectURL(url),1300);
 }
 function stale(){
-  state.report=null;state.page=0;
+  state.report=null;state.page=0;state.discovery=null;
   el("ca-results").hidden=true;
+  el("ca-discovery-csv").disabled=true;
+  el("ca-ai-text").value="";
+  el("ca-ai-copy").disabled=true;el("ca-ai-save").disabled=true;
   el("ca-save-status").textContent="Unsaved browser session · export JSON to preserve changes";
 }
 function commit(next,{analyze=false}={}){
@@ -219,6 +226,123 @@ function addTableRow(container,values){
   values.forEach(v=>row.append(element("td",v)));
   container.append(row);
 }
+
+function matrixTable(report){
+  const matrix=sourceCodeMatrix(report),head=el("ca-matrix-head"),
+    body=el("ca-matrix-body");
+  head.replaceChildren();body.replaceChildren();
+  const header=element("tr");
+  for(const text of ["Source ID","Document title","Units","Reviewed",
+    ...matrix.codes.map(c=>c.name)]){
+    const th=element("th",text);th.scope="col";header.append(th);
+  }
+  head.append(header);
+  for(const doc of matrix.rows){
+    const tr=element("tr");
+    for(const value of [doc.documentId,doc.title,doc.units,doc.reviewed,
+      ...matrix.codes.map(c=>doc.counts[c.id]??0)])
+      tr.append(element("td",value));
+    body.append(tr);
+  }
+  if(!matrix.rows.length){
+    const row=element("tr"),td=element("td","No sources loaded.");
+    td.colSpan=4+matrix.codes.length;row.append(td);body.append(row);
+  }
+}
+function discoveryOptions(){
+  return {minUnits:Number(el("ca-min-units").value),
+    minDocuments:Number(el("ca-min-documents").value),
+    maxWords:Number(el("ca-max-words").value),
+    excludeExisting:el("ca-exclude-existing").checked,limit:24};
+}
+function showCandidateEvidence(candidate){
+  const details=element("details");
+  details.append(element("summary","Review supporting source excerpts"));
+  for(const evidence of candidate.evidence){
+    const box=element("div",null,"ca-evidence");
+    box.append(element("b",evidence.source+" · "+evidence.unitId));
+    box.append(element("p",evidence.excerpt));
+    details.append(box);
+  }
+  return details;
+}
+function useCandidate(candidate){
+  if(!confirm("Add the literal phrase '"+candidate.phrase+
+    "' as a DRAFT research code? You must define its meaning and review matching passages."))return;
+  try{
+    const result=addDiscoveredPhraseAsCode(state.project,candidate);
+    if(commit(result.project,{analyze:true})){
+      selectCode(result.code.id);
+      el("ca-discovery-status").textContent="Draft code "+result.code.id+
+        " created. Edit its definition, then review supporting passages.";
+      el("ca-codebook").scrollIntoView({behavior:"smooth",block:"nearest"});
+    }
+  }catch(error){showError(error.message);}
+}
+function renderCandidates(discovery){
+  const list=el("ca-candidates");list.replaceChildren();
+  el("ca-discovery-status").textContent=discovery.candidates.length+
+    " literal candidate phrase(s) shown across "+discovery.scannedUnits+
+    " coding units."+(discovery.partialScan?" Phrase limit reached; results may be incomplete.":"")+
+    " Suggestions must be validated by a researcher.";
+  if(!discovery.candidates.length){
+    list.append(element("p","No repeated phrases satisfy these filters. Try fewer required units, "+
+      "or check that your documents contain enough text.","ca-muted"));
+    return;
+  }
+  for(const candidate of discovery.candidates){
+    const card=element("article",null,"ca-candidate");
+    card.append(element("h4",candidate.phrase),
+      element("small","Unreviewed literal phrase · not a verified theme"));
+    const stats=element("div",null,"ca-candidate-stats");
+    for(const value of [candidate.unitCount+" units",candidate.documentCount+" documents",
+      candidate.occurrences+" matches"])
+      stats.append(element("span",value));
+    card.append(stats,showCandidateEvidence(candidate));
+    card.append(button("+ Add draft code",()=>useCandidate(candidate),"primary"));
+    list.append(card);
+  }
+}
+function findPhrases(){
+  try{
+    if(!state.report)throw Error("Analyze documents first.");
+    state.discovery=discoverPhrases(state.report,discoveryOptions());
+    renderCandidates(state.discovery);
+    el("ca-discovery-csv").disabled=!state.discovery.candidates.length;
+    showError("");
+  }catch(error){
+    state.discovery=null;el("ca-discovery-csv").disabled=true;
+    el("ca-discovery-status").textContent=error.message;
+    el("ca-candidates").replaceChildren();
+  }
+}
+function createPrompt(){
+  if(!state.report){el("ca-ai-status").textContent="Analyze documents first.";return;}
+  try{
+    const includePhrases=el("ca-ai-include-phrases").checked;
+    if(includePhrases){
+      if(!state.discovery)throw Error("Discover recurring phrases before including them in the prompt.");
+      if(!confirm("Recurring phrases may contain names or sensitive wording from source documents. "+
+        "They will appear in the editable prompt. Nothing is sent automatically. Continue?"))return;
+    }
+    el("ca-ai-text").value=buildOptionalAiPrompt(state.report,{
+      includePhrases,discovery:state.discovery});
+    el("ca-ai-copy").disabled=false;el("ca-ai-save").disabled=false;
+    el("ca-ai-status").textContent="Prompt prepared locally. Inspect and edit before copying or sharing. "+
+      "No OpenRouter request was made.";
+  }catch(error){el("ca-ai-status").textContent=error.message;}
+}
+async function copyPrompt(){
+  const value=el("ca-ai-text").value.trim();
+  if(!value){el("ca-ai-status").textContent="Prepare and review a prompt first.";return;}
+  if(!confirm("Copy this prompt to your clipboard? You control if and where it is shared. "+
+    "Check it for confidential or identifying details before sending to any external AI provider."))return;
+  try{
+    await navigator.clipboard.writeText(value);
+    el("ca-ai-status").textContent="Copied locally to clipboard. No AI service was contacted.";
+  }catch{el("ca-ai-status").textContent="Clipboard unavailable. Use Download text prompt instead.";}
+}
+
 function renderReport(){
   try{
     const report=analyzeContent(state.project);
@@ -247,6 +371,14 @@ function renderReport(){
     const notes=el("ca-notes");notes.replaceChildren();
     report.notes.forEach(n=>notes.append(element("li",n)));
     el("ca-results").hidden=false;
+    matrixTable(report);
+    state.discovery=null;
+    el("ca-candidates").replaceChildren();
+    el("ca-discovery-csv").disabled=true;
+    el("ca-discovery-status").textContent="Choose your criteria and scan the current coding units.";
+    el("ca-ai-text").value="";
+    el("ca-ai-copy").disabled=true;el("ca-ai-save").disabled=true;
+    el("ca-ai-status").textContent="";
     renderPassages();
     showError("");
   }catch(error){
@@ -338,6 +470,26 @@ function setup(){
   el("ca-update-code").addEventListener("click",updateCode);
   el("ca-reset-code").addEventListener("click",clearCodeFields);
   el("ca-analyze").addEventListener("click",renderReport);
+  el("ca-discover").addEventListener("click",findPhrases);
+  el("ca-discovery-csv").addEventListener("click",()=>{
+    if(state.discovery)download("statlab-unreviewed-content-phrases.csv",
+      discoveredPhrasesCsv(state.discovery),"text/csv;charset=utf-8");
+  });
+  el("ca-matrix-csv").addEventListener("click",()=>{
+    if(state.report)download("statlab-source-code-matrix.csv",
+      sourceMatrixCsv(state.report),"text/csv;charset=utf-8");
+  });
+  el("ca-ai-draft").addEventListener("click",createPrompt);
+  el("ca-ai-copy").addEventListener("click",copyPrompt);
+  el("ca-ai-save").addEventListener("click",()=>{
+    const value=el("ca-ai-text").value;
+    if(value.trim())download("statlab-optional-ai-prompt.txt",value,"text/plain;charset=utf-8");
+  });
+  el("ca-ai-text").addEventListener("input",()=>{
+    const valid=Boolean(el("ca-ai-text").value.trim());
+    el("ca-ai-copy").disabled=!valid;el("ca-ai-save").disabled=!valid;
+    el("ca-ai-status").textContent="Edited locally; verify all details before sharing.";
+  });
   el("ca-template").addEventListener("click",()=>
     download("statlab-content-documents-template.csv",
       "id,title,text\r\nD1,Interview One,\"Paste interview transcript here\"\r\n",

@@ -245,6 +245,51 @@ Total N = 153"></textarea>
       <article class="ca-card"><h3>Theme frequency by coding unit</h3><p>One passage may have multiple codes. Counts represent assigned coding units, not individual people.</p><div id="ca-bars" class="ca-bars"></div></article>
       <article class="ca-card"><h3>Most frequent content words</h3><p>Simple word counts with common stopwords excluded; not a sentiment model.</p><div id="ca-words" class="ca-word-cloud"></div></article>
     </div>
+
+    <section class="ca-card ca-discovery">
+      <div class="ca-assisted-heading">
+        <div><span class="ca-eyebrow">04 · LOCAL THEME EXPLORER</span>
+          <h3>Find recurring phrases across your documents</h3>
+          <p>Discover frequently repeated literal phrases, inspect supporting excerpts and add useful candidates to your codebook. These are <b>unreviewed suggestions</b>—not AI-generated themes.</p></div>
+        <span class="ca-local-badge">● Runs only in your browser</span>
+      </div>
+      <div class="ca-discovery-options">
+        <label>Minimum coding units <input id="ca-min-units" type="number" min="1" max="1000" value="2"></label>
+        <label>Minimum source documents <input id="ca-min-documents" type="number" min="1" max="150" value="1"></label>
+        <label>Phrase length <select id="ca-max-words"><option value="1">Single words</option><option value="2">Up to two words</option><option value="3" selected>Up to three words</option></select></label>
+        <label class="ca-tick"><input id="ca-exclude-existing" type="checkbox" checked> Hide phrases already in codebook</label>
+      </div>
+      <div class="ca-actions">
+        <button id="ca-discover" type="button" class="primary">⌕ Discover candidate phrases</button>
+        <button id="ca-discovery-csv" type="button" class="secondary" disabled>Export candidate CSV</button>
+      </div>
+      <p id="ca-discovery-status" class="ca-discovery-status" aria-live="polite">Choose your criteria and scan the current coding units.</p>
+      <div id="ca-candidates" class="ca-candidate-grid"></div>
+    </section>
+    <section class="ca-card ca-matrix">
+      <div class="ca-assisted-heading"><div><h3>Source × code comparison matrix</h3>
+        <p>Compare how many coded units from each document were assigned to each research code.</p></div>
+        <button id="ca-matrix-csv" type="button" class="secondary">Download matrix CSV</button></div>
+      <div class="ca-table-scroll"><table>
+        <thead id="ca-matrix-head"></thead><tbody id="ca-matrix-body"></tbody>
+      </table></div>
+      <p class="ca-note">This table counts coding units, not people. Source-code comparisons describe where codes occur; they do not prove group differences.</p>
+    </section>
+    <section class="ca-card ca-ai-prep">
+      <div class="ca-assisted-heading"><div><span class="ca-eyebrow">OPTIONAL AI RESEARCH ASSISTANCE</span>
+        <h3>Prepare a privacy-reviewed AI interpretation prompt</h3>
+        <p>Create an editable prompt from aggregate code counts. <b>Nothing is transmitted to OpenRouter or another service.</b> You choose whether and where to share it.</p></div>
+        <span class="ca-local-badge">No AI call made</span></div>
+      <label class="ca-tick"><input id="ca-ai-include-phrases" type="checkbox"> Include recurring phrases (may reveal sensitive source wording; inspect carefully)</label>
+      <div class="ca-actions">
+        <button id="ca-ai-draft" type="button" class="primary">Prepare prompt for review</button>
+        <button id="ca-ai-copy" type="button" class="secondary" disabled>Copy reviewed prompt</button>
+        <button id="ca-ai-save" type="button" class="secondary" disabled>Download text prompt</button>
+      </div>
+      <label class="ca-field" for="ca-ai-text">Preview and edit before sharing<textarea id="ca-ai-text" rows="9" spellcheck="false" placeholder="Click Prepare prompt. Edit or remove sensitive details before copying."></textarea></label>
+      <p class="ca-note">Do not share interview transcripts, personal data, confidential information or identifiable phrases without appropriate consent and safeguards. Generated responses must be checked against actual sources.</p>
+      <p id="ca-ai-status" class="ca-discovery-status" role="status" aria-live="polite"></p>
+    </section>
     <article class="ca-card ca-result-table"><h3>Code frequency table</h3><div class="ca-table-scroll"><table><thead><tr><th>Code</th><th>Assigned units</th><th>% of units</th><th>Documents</th><th>Literal keyword hits</th><th>Reviewed units</th></tr></thead><tbody id="ca-code-stats"></tbody></table></div></article>
     <article class="ca-card ca-review-panel">
       <div class="ca-review-heading"><div><h3>Review and confirm coded passages</h3><p>Choose a passage to accept, reject or revise the automatic suggestions and write your analytic memo.</p></div>
