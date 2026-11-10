@@ -342,6 +342,35 @@ def health():
     return {"ok":True,"app":"MABRIG StatLab","version":"0.9.0", "local_only":True}
 
 
+@app.get("/api/capabilities")
+def capabilities():
+    """Truthful local-Python capability boundary; no datasets or secrets in payload."""
+    return {
+        "app": "MABRIG StatLab",
+        "environment": "local-fastapi",
+        "version": "0.9.0",
+        "browser_cloudflare_is_separate": True,
+        "features": {
+            "data_import": ["CSV", "TSV", "XLSX", "SAV"],
+            "case_level": ["descriptives", "correlations", "regression",
+                           "crosstabs", "cronbach_alpha", "t_tests", "anova"],
+            "aggregate_only": ["frequency_descriptives", "chapter_four_reports"],
+        },
+        "unavailable": ["factor_analysis", "power_analysis", "desktop_package",
+                        "multi_device_encrypted_sync", "public_multiuser_auth"],
+        "privacy": {
+            "no_mandatory_cloud_database": True,
+            "uploaded_dataset_sessions_expire": True,
+            "do_not_expose_unprotected_api_publicly": True,
+        },
+        "integrity": {
+            "frequency_only_never_reconstructs_cases": True,
+            "statistics_require_observed_inputs": True,
+            "browser_worker_does_not_host_python_engine": True,
+        },
+    }
+
+
 @app.post("/api/datasets")
 async def upload_dataset(file: UploadFile = File(...)):
     cleanup()
