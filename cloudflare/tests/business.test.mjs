@@ -28,7 +28,7 @@ test("transaction import computes line totals, distinct orders and gross margins
   assert.ok(Math.abs(r.metrics.margin-2000/4500)<1e-10);
   assert.equal(r.metrics.aov,2250);
   assert.deepEqual(r.byMonth.map(x=>x.name),["2026-09","2026-10"]);
-  assert.equal(r.byProduct[0].name,"Notebooks");
+  assert.equal(r.byProduct[0].name,"Printing"); // 1,500 + 1,000 > 2,000
 });
 
 test("monthly summary mode uses provided totals without inventing transactions",()=>{
@@ -141,7 +141,7 @@ test("KPI export sanitizes spreadsheet formulas",()=>{
   data.source="=HYPERLINK(1,2)";
   const csv=businessReportCsv(analyzeBusiness(data));
   assert.ok(csv.includes("'=HYPERLINK"));
-  assert.ok(csv.includes("'=1+1"));
+  assert.ok(csv.includes("byCategory / =1+1")); // Exported label is prefixed by a safe category label
 });
 
 test("import/export templates work for both transaction and monthly formats",()=>{
