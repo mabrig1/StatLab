@@ -25,5 +25,6 @@ jobs:
       - run: node --check cloudflare/public/likert-ui.mjs
       - run: node --check cloudflare/public/likert-student.mjs
       - run: node --check cloudflare/public/workspace-ui.mjs
+      - run: node --check cloudflare/public/value-labels.mjs
       - run: node --test cloudflare/tests/*.test.mjs
       - run: npx --yes wrangler deploy --dry-run --outdir /tmp/statlab-cloudflare-dist

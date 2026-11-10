@@ -160,3 +160,47 @@ footer{color:#667d84}
 .workspace-tabs{gap:14px}
 .workspace-tabs .workspace-tab{font-size:12px;padding:9px 2px}
 }
+
+
+/* SPSS-inspired, beginner-friendly Value Labels editor */
+.value-labels-dialog{width:min(670px,96vw);max-height:min(90vh,820px);overflow:auto;padding:25px}
+.value-labels-dialog h2{font-size:21px;margin:0 0 6px}
+.value-labels-dialog .vl-help{font-size:12px;color:#55717e;margin:0 0 14px;line-height:1.5}
+.vl-input-row{display:grid;grid-template-columns:125px minmax(0,1fr);gap:15px;align-items:end;margin-bottom:15px}
+.value-labels-dialog .vl-input-row label{font-size:13px;display:flex;flex-direction:column;gap:6px;margin:0;color:#2c5362}
+.value-labels-dialog input[type="text"]{width:100%;border:1px solid #a9c3d0;border-radius:6px;padding:11px;background:#fff;color:#1b3e4b;font-size:13px;min-width:0}
+.value-labels-dialog input:focus,.value-labels-dialog select:focus{outline:2px solid #5dc1a9;outline-offset:1px}
+.vl-main{display:grid;grid-template-columns:120px minmax(0,1fr);gap:13px;align-items:stretch}
+.vl-actions{display:flex;flex-direction:column;gap:9px;padding-top:24px}
+.vl-actions button{padding:10px 15px;font-size:13px;text-align:center}
+.vl-actions button:disabled{opacity:.48;cursor:not-allowed}
+.vl-list-area{min-width:0}
+.value-labels-dialog .vl-list-area label{margin:0 0 6px;font-size:13px;font-weight:750;color:#2c5362}
+.vl-list-area select{width:100%;height:190px;min-height:140px;border:1px solid #adcbd5;border-radius:6px;background:#fbfefe;padding:5px;font:13px/1.5 system-ui,sans-serif;color:#1b4050}
+.vl-list-area option{padding:7px 8px;white-space:normal}
+.vl-list-area option:checked{background:#d3eee7;color:#063f36}
+.vl-list-area small{display:block;margin-top:5px;font-size:11px;color:#718b95}
+.vl-presets{background:#f1faf7;border:1px solid #cfe8e0;border-radius:9px;padding:13px;margin:15px 0 8px}
+.vl-presets strong,.vl-presets small{display:block}
+.vl-presets strong{font-size:13px;color:#176758}
+.vl-presets small{font-size:11px;color:#64847c;margin-top:3px}
+.vl-preset-actions{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+.vl-preset-actions button{font-size:12px;padding:9px 11px;background:#fff;border:1px solid #8fcaba;color:#146f61}
+.value-labels-dialog .vl-check{display:flex;align-items:center;gap:8px;margin:10px 0 0;font-size:12px;font-weight:600;color:#426a62}
+.vl-check input{accent-color:#078672}
+.vl-advanced{padding:10px 13px;border:1px solid #e0e9ec;border-radius:8px;margin:12px 0;background:#fbfcfd}
+.vl-advanced summary{font-size:12px;font-weight:700;color:#3c6471;cursor:pointer}
+.value-labels-dialog .vl-advanced label{font-size:12px;margin:12px 0 6px}
+.vl-advanced small{font-size:11px;color:#637d88;display:block;margin:6px 0}
+.value-labels-dialog .vl-error{min-height:0;color:#bb3038;font-size:12px;font-weight:700;margin:8px 0}
+.vl-error:empty{display:none}
+.value-labels-dialog .dialog-actions{border-top:1px solid #e8eef1;padding-top:16px;margin-top:16px}
+.value-labels-dialog .dialog-actions button{padding:11px 16px;font-size:13px}
+@media(max-width:550px){
+  .value-labels-dialog{padding:18px}
+  .vl-input-row{grid-template-columns:1fr;gap:9px}
+  .vl-main{grid-template-columns:1fr}
+  .vl-actions{padding-top:0;flex-direction:row;flex-wrap:wrap}
+  .vl-actions button{flex:1;min-width:80px}
+  .vl-list-area select{height:170px}
+}

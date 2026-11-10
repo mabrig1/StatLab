@@ -198,12 +198,50 @@ Total N = 153</textarea>
 <div class="table-scroll"><table><thead><tr><th>Item</th><th>N</th><th>Mean</th><th>SD</th><th>Median</th><th>Mode</th><th>Top response</th></tr></thead><tbody id="summary"></tbody></table></div><div id="details"></div>
 </section></section>
 
-<dialog id="variable-dialog" class="variable-dialog">
-<form id="variable-details-form" method="dialog"><h2 id="dialog-heading">Define coded responses</h2>
-<p>One value label per line, e.g., <code>1 = Strongly Disagree</code>. For missing values, enter comma-separated codes (such as 99 or -9).</p>
-<label for="value-label-editor">Value labels</label><textarea id="value-label-editor" placeholder="1 = Strongly Disagree&#10;2 = Disagree&#10;3 = Neutral"></textarea>
-<label for="missing-editor">User-defined missing codes</label><input id="missing-editor" type="text" placeholder="99, -9">
-<div class="dialog-actions"><button id="cancel-details" type="button" class="secondary">Cancel</button><button type="submit" class="primary">Save definitions</button></div>
+<dialog id="variable-dialog" class="variable-dialog value-labels-dialog" aria-labelledby="dialog-heading">
+<form id="variable-details-form">
+  <h2 id="dialog-heading">Value Labels</h2>
+  <p class="vl-help">Assign a number or code to a readable response. Stored case values stay unchanged.</p>
+  <div class="vl-input-row">
+    <label for="value-code-editor">Value
+      <input type="text" id="value-code-editor" maxlength="100" placeholder="e.g. 1" autocomplete="off" spellcheck="false">
+    </label>
+    <label for="value-text-editor">Label
+      <input type="text" id="value-text-editor" maxlength="200" placeholder="e.g. Strongly Disagree" autocomplete="off">
+    </label>
+  </div>
+  <div class="vl-main">
+    <div class="vl-actions" role="group" aria-label="Manage value labels">
+      <button type="button" class="secondary" id="value-add">Add</button>
+      <button type="button" class="secondary" id="value-change" disabled>Change</button>
+      <button type="button" class="secondary" id="value-remove" disabled>Remove</button>
+    </div>
+    <div class="vl-list-area">
+      <label for="value-list-editor">Defined value labels</label>
+      <select id="value-list-editor" size="7" aria-label="Select a saved value label to change or remove"></select>
+      <small>Select any existing entry to edit it.</small>
+    </div>
+  </div>
+  <div class="vl-presets">
+    <div><strong>Questionnaire shortcut</strong><small>Enter a complete Likert scale in one click.</small></div>
+    <div class="vl-preset-actions">
+      <button type="button" id="value-preset-four" class="secondary">4-point</button>
+      <button type="button" id="value-preset-five" class="secondary">5-point Likert</button>
+      <button type="button" id="value-preset-seven" class="secondary">7-point</button>
+    </div>
+    <label class="vl-check"><input type="checkbox" id="value-ordinal"> Mark variable as Ordinal on OK</label>
+  </div>
+  <details class="vl-advanced">
+    <summary>Optional: user-defined missing values</summary>
+    <label for="missing-editor">Missing response codes (comma-separated)</label>
+    <input id="missing-editor" type="text" placeholder="e.g. 99, -9" autocomplete="off">
+    <small>Missing codes remain visible in Data View but are excluded from questionnaire summaries.</small>
+  </details>
+  <p id="value-label-error" class="vl-error" role="alert" aria-live="polite"></p>
+  <div class="dialog-actions">
+    <button id="cancel-details" type="button" class="secondary">Cancel</button>
+    <button id="save-details" type="submit" class="primary">OK — Save labels</button>
+  </div>
 </form></dialog>
 </main>
 <footer>All case data stay in this browser unless you explicitly export them. Saved browser projects are not encrypted—avoid shared devices for confidential surveys. · <a href="https://github.com/mabrig1/StatLab">View source</a></footer>
