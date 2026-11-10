@@ -166,3 +166,31 @@ Do not upload another organization's confidential records without permission. Th
     npx wrangler deploy --dry-run
 
 Tests cover numeric totals, missing order IDs, monthly aggregation, filters, dates, invalid CSV, currency labeling, CSV formula safety, generated SVG escaping and the UI integration. Existing StatLab Data View, Variable View and Likert Studio remain separate.
+
+## Content Analysis Studio — research text coding (Cloudflare browser edition)
+
+StatLab now includes a **Content Analysis** workspace alongside Data View, Variable View, Likert Scale Studio, Frequency Analysis and Business Analytics.
+
+### What is implemented
+
+- Import an ordinary **TXT** or **Markdown** source, paste source text as a new document, or import a **CSV** document collection with `id,title,text` columns. Quoted multiline transcripts are supported. PDF and DOCX extraction are **not** implemented in this browser edition.
+- Define a unit of analysis: **document**, **paragraph** (blank-line boundaries) or **sentence** (approximate punctuation boundaries). Changing the unit clears existing manual reviews to prevent misattribution.
+- Create an explicit codebook with named category IDs, operational descriptions and zero or more matching keywords/phrases. Keyword matching is case-insensitive, Unicode-aware, whole-token and avoids double-counting overlapping phrases.
+- Calculate number of documents, coding units, unique coded units, reviewed units, literal matched phrases, frequency and percentage of coding units assigned each code, distinct document coverage, frequent words and co-occurrence counts.
+- **Manual passage review:** researchers can accept/reject automatic suggestions, assign additional codes, or confirm an uncoded unit and write a memo. Manual reviewed assignments override suggestions and retain clear provenance.
+- Browse/search coded excerpts with review-status filters. Export full coded-units CSV, code-frequency CSV, or an HTML Chapter Four descriptive report with illustrative extracts. Export/save a JSON backup containing original source text and review decisions, and reopen it locally.
+- A **synthetic** sample of digital-learning feedback demonstrates codebook and reviewing; this is never represented as original field data.
+
+### Statistical interpretation and research integrity
+
+Auto keyword matching is a transparent **suggestion mechanism**, not latent qualitative thematic inference, validated sentiment analysis or researcher-confirmed findings. A passage may have more than one code, so unit percentages can sum above 100%. 'Keyword hits' are not respondents; manual coding can assign a theme even when no keyword occurs. The report distinguishes reviewed units from unreviewed automatic suggestions.
+
+Do not claim inter-coder agreement, Cronbach's alpha, causal effects, or statistical significance from these tables. Qualitative interpretation and independent reliability evaluation require an explicit study design, codebook and human coders. Sentence segmentation is intentionally approximate.
+
+### Privacy, security and operating constraints
+
+All source text and coding operations run **locally in the browser**; no source texts are transmitted to OpenRouter, Resend or a Cloudflare database, and nothing is automatically saved to the server. The JSON export intentionally includes the original transcripts; store exported files privately. Source limit: 150 documents, 35 codes, 5,500 coding units, up to 20,000 characters per document and 450,000 source characters total. CSV imports are limited to 600 KB and project backups to 1 MB.
+
+### Validation and deployment
+
+CI runs the existing Python regression suite, Node unit tests and Wrangler Worker dry-run. Content-specific tests cover document segmentation, Unicode boundaries, codebook validation, review/rejection, synthetic provenance, quoted CSV, portable project backups, sanitization and Chapter Four export. The full Python backend is not part of the Worker.
