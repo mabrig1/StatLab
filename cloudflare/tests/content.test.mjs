@@ -134,7 +134,8 @@ test("exports escape HTML and neutralize CSV formula injection",()=>{
   const p=demo();
   p.documents[0].text='=HYPERLINK("fake",1) <script>danger()</script>.';
   p.documents[0].title='=PAYLOAD';
-  const report=analyzeContent(p);
+  // Explicitly review the excerpt so it is included among exported coded extracts.
+  const report=analyzeContent(saveUnitReview(p,"D1::1",["ACCESS"]));
   const csv=codedUnitsCsv(report);
   assert.ok(csv.includes("'=PAYLOAD"));
   assert.ok(csv.includes("'=HYPERLINK"));
