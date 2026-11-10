@@ -158,4 +158,5 @@ def test_local_nav_capabilities_and_frontend_available_without_public_cloud_pyth
     cap=client.get("/api/capabilities").json()
     assert "a_priori_sample_size_power_planning" in cap["features"]["study_design"]
     assert "power_analysis" not in cap["unavailable"]
-    assert "factor_analysis" in cap["unavailable"]
+    assert "exploratory_principal_axis_factor_analysis" in cap["features"]["dimensionality"]
+    assert "confirmatory_factor_analysis" in cap["unavailable"]
