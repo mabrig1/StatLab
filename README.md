@@ -4,6 +4,10 @@ An independent, browser-based SPSS-style **prototype**, not IBM SPSS code and no
 
 ![status](https://img.shields.io/badge/status-local%20prototype-0e987f) ![Python](https://img.shields.io/badge/Python-3.12-blue)
 
+## New: local a priori Power & Sample Size Planner (November 2026)
+
+The separate Python/FastAPI workstation now includes a **Power & Sample Size** workflow. A researcher chooses the planned test and supplies a *justified assumed effect size*, target power, alpha, allocation ratio/group count and expected attrition. Supported two-sided designs: one-sample t, paired t, pooled independent-group t, balanced one-way ANOVA, and approximate independent two-proportion z tests. Statsmodels performs the calculations and rounded integer sample sizes are checked against target power. The UI provides a printable methodology memo and explicit caveats; no data are uploaded or fabricated. **It is local-FastAPI-only; Cloudflare does not host these methods.** See [power analysis documentation](docs/POWER_ANALYSIS_GUIDE.md).
+
 ## Current product direction — v1.0 foundation (November 2026)
 
 StatLab has **two separate apps in one repository**. The local Python 3.12/FastAPI edition includes real respondent-level statistical procedures; the Cloudflare static browser workstation focuses on editable tables, frequency-only and Likert descriptives, business indicators and content coding. **Do not mistake Cloudflare's static interface for the complete FastAPI engine.**

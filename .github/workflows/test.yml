@@ -12,3 +12,4 @@ jobs:
           python-version: '3.12'
       - run: pip install -r requirements-dev.txt
       - run: pytest -q
+      - run: node --check app/static/power.js

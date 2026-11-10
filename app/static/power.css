@@ -1,0 +1,48 @@
+/* A priori power & sample-size planning, local FastAPI workstation only. */
+.power-view .page-title{align-items:center}
+.power-view .page-title h1{color:#1d394e}
+.power-disclosure{border:1px solid #c8e5de;border-left:4px solid #228a7a;background:#eff8f5;color:#3d6967;border-radius:9px;padding:17px 19px;font-size:13px;line-height:1.6;margin:4px 0 18px}
+.power-disclosure strong{color:#145b50}
+.power-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(240px,.85fr);gap:18px}
+.power-form-panel{padding:23px}
+.power-form-panel .panel-heading h2{font-size:19px;margin-bottom:5px}
+.power-form-panel .panel-heading p{font-size:12px;color:#647e8a;line-height:1.6}
+.power-form-panel label.field-label{display:block;font-size:12px;font-weight:750;margin:18px 0 8px;color:#2e5260}
+.power-form-panel .input-select{width:100%;padding:12px;border-radius:8px;border:1px solid #bcd0d8;background:#fff;color:#233d52;font:14px system-ui,sans-serif}
+.power-method{color:#3f6676;font-size:12px;line-height:1.65;border-radius:9px;background:#f2f8fa;padding:13px;margin:14px 0}
+.power-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0 19px}
+.power-field{display:flex;flex-direction:column;gap:8px;font-size:12px;line-height:1.5;color:#385967;font-weight:750}
+.power-field small{font-size:11px;line-height:1.45;color:#718894;font-weight:400}
+.power-field input{width:100%;border:1px solid #c0d4dc;border-radius:8px;padding:11px;background:#fff;color:#233f50;font:14px system-ui,sans-serif;min-width:0}
+.power-field input:focus-visible{outline:3px solid #5ac4ae;outline-offset:1px}
+.power-field[hidden]{display:none!important}
+.power-error{font-size:12px;color:#ad2339;font-weight:700;line-height:1.55;margin:12px 0}
+.power-error:empty{display:none}
+.power-methodology{display:flex;flex-direction:column;gap:14px}
+.power-methodology .helper-card{margin:0}
+.power-methodology .helper-card strong{font-size:14px}
+.power-methodology .helper-card p{font-size:12px;line-height:1.7}
+.power-results{margin:24px 0 12px;padding:25px}
+.power-results[hidden]{display:none!important}
+.power-results-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:15px}
+.power-results-heading h2{font-size:22px;color:#204957;margin:6px 0}
+.power-results-heading p{font-size:12px;color:#66808c}
+.power-results-heading button{font-size:12px}
+.power-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:21px 0}
+.power-kpi{background:#f5faf9;border:1px solid #d9ebe6;padding:17px;border-radius:10px;min-height:120px}
+.power-kpi small,.power-kpi strong,.power-kpi span{display:block}
+.power-kpi small{font-size:11px;text-transform:uppercase;color:#4a777b;font-weight:850}
+.power-kpi strong{font-size:25px;color:#1d7466;margin:11px 0 6px;overflow-wrap:anywhere}
+.power-kpi span{font-size:11px;color:#63818a;line-height:1.5}
+.power-group-summary{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.power-group-summary h4{grid-column:1/-1;color:#2b5260;font-size:14px;margin:14px 0 5px}
+.power-distribution{margin:0;display:grid;grid-template-columns:1fr auto;gap:6px 12px;background:#f7f9fa;border:1px solid #e1e8eb;padding:16px;border-radius:9px}
+.power-distribution dt{font-size:12px;color:#52717c}
+.power-distribution dd{margin:0;text-align:right;font-size:12px;font-weight:850;color:#285462}
+.power-results>h3{font-size:16px;color:#22495c;margin-top:24px}
+.power-warnings{font-size:12px;color:#496b79;line-height:1.75;padding-left:21px}
+.power-warnings li{margin:7px 0}
+.power-integrity{border-left:3px solid #b18c47;background:#fbf8f1;padding:12px 16px;font-size:12px;line-height:1.7;color:#646044}
+@media(max-width:990px){.power-layout{grid-template-columns:1fr}.power-methodology{display:grid;grid-template-columns:repeat(3,1fr)}.power-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.power-grid,.power-group-summary{grid-template-columns:1fr}.power-methodology{grid-template-columns:1fr}.power-results{padding:16px}.power-form-panel{padding:16px}.power-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.power-results-heading{align-items:flex-start;flex-direction:column}}
+@media print{.power-form-panel,.power-methodology,.sidebar{display:none!important}.power-results{break-inside:avoid}}

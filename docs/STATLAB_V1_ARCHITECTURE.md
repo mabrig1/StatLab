@@ -18,6 +18,10 @@ The repository has **two different execution environments** which must not be pr
 
 The Python version still reports `0.9.0`. The present feature branch adds **v1.0-foundation UI and guarded exports**, not a blanket version bump or packaging release. The browser workstation is not guaranteed offline without installing and caching it appropriately.
 
+### Addendum: a priori sample-size design (local FastAPI only)
+
+StatLab now exposes a **local** Statsmodels-backed power/sample-size planner for a bounded set of two-sided designs: one-sample and paired t, pooled-variance independent t, balanced one-way ANOVA, and independent two-proportion z approximations. It takes only planning assumptions, refuses missing effect sizes, rounds and verifies sample sizes, and provides a separate attrition-adjusted recruitment target. No dataset sessions are created and no raw respondents or margins are processed. The `GET /api/capabilities` endpoint identifies this explicitly; the Cloudflare browser still cannot execute it. Advanced methods and exploratory factor analysis remain planned. See `docs/POWER_ANALYSIS_GUIDE.md`.
+
 ## 2. Architecture principles
 
 1. **Data minimization:** Analyze in the user's browser or localhost process by default. Cloud sync and third-party AI are opt-in only, not prerequisite services.

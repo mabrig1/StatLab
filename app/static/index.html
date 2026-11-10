@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="/static/frequency.css" />
 <link rel="stylesheet" href="/static/projects.css" />
 <link rel="stylesheet" href="/static/output_history.css" />
+<link rel="stylesheet" href="/static/power.css" />
 </head>
 <body>
 <div class="app-shell">
@@ -22,6 +23,7 @@
     <button class="nav-item" data-view="data"><span class="nav-symbol">▤</span> Data & variables</button>
     <button class="nav-item" data-view="analyze"><span class="nav-symbol">⌁</span> Analysis workbench</button>
     <button class="nav-item" data-view="frequency"><span class="nav-symbol">▦</span> Frequencies only <span class="badge badge-muted">NEW</span></button>
+    <button class="nav-item" data-view="power"><span class="nav-symbol">◇</span> Power &amp; sample size <span class="badge badge-muted">DESIGN</span></button>
     <button class="nav-item" data-view="projects"><span class="nav-symbol">▣</span> Research projects <span class="badge badge-muted">NEW</span></button>
     <button class="nav-item" data-view="results"><span class="nav-symbol">▣</span> Output viewer</button>
   </nav>
@@ -139,6 +141,88 @@ Total N = 153" maxlength="100000" required spellcheck="false" aria-describedby="
       </section>
     </div>
 
+    
+    <div class="view power-view" id="view-power">
+      <div class="page-title">
+        <div><div class="eyebrow eyebrow-dark">STUDY DESIGN · BEFORE DATA COLLECTION</div>
+          <h1>Power &amp; Sample Size Planner</h1>
+          <p>Plan how many completed observations your proposed statistical design needs. Calculations use Statsmodels and your <strong>explicitly assumed</strong> effect, not observed results.</p>
+        </div>
+        <span class="data-pill">Local Python edition</span>
+      </div>
+      <div class="power-disclosure" role="note">
+        <strong>A priori planning only.</strong> A sample-size calculation cannot establish that your study will discover an effect.
+        You must justify your chosen effect size, alpha, power target, study design and expected attrition <em>before</em> collecting results.
+      </div>
+      <div class="power-layout">
+        <section class="panel power-form-panel">
+          <div class="panel-heading"><div><h2>Define your proposed study</h2>
+            <p>No questionnaire file, respondent-level dataset or frequency counts are required or accepted.</p></div><span class="label-tag">DESIGN</span></div>
+          <form id="power-form" novalidate>
+            <label class="field-label" for="power-family">Planned test</label>
+            <select id="power-family" class="input-select" required>
+              <option value="one_sample_t">One-sample t test (Cohen's d)</option>
+              <option value="paired_t">Paired / before-after t test (Cohen's d_z)</option>
+              <option value="independent_t" selected>Two independent groups (pooled-variance t test)</option>
+              <option value="anova_one_way">One-way ANOVA (balanced groups, Cohen's f)</option>
+              <option value="two_proportions">Two independent proportions (normal z approximation)</option>
+            </select>
+            <p class="power-method" id="power-method-help"></p>
+            <div class="power-grid">
+              <label class="power-field" id="power-effect-wrap">Assumed standardized effect size
+                <input id="power-effect" type="number" min="0.000001" max="3" step="any" inputmode="decimal" placeholder="e.g. 0.5" required>
+                <small id="power-effect-help">Document the source for Cohen's d/f; there is no default effect.</small>
+              </label>
+              <label class="power-field" id="power-proportion-1-wrap" hidden>Assumed proportion in Group 1
+                <input id="power-proportion-1" type="number" min="0.05" max="0.95" step="any" inputmode="decimal" placeholder="e.g. 0.50">
+                <small>A probability from 0.05 to 0.95, not a frequency.</small>
+              </label>
+              <label class="power-field" id="power-proportion-2-wrap" hidden>Assumed proportion in Group 2
+                <input id="power-proportion-2" type="number" min="0.05" max="0.95" step="any" inputmode="decimal" placeholder="e.g. 0.65">
+                <small>Must differ from Group 1, and reflect study design assumptions.</small>
+              </label>
+              <label class="power-field">Significance level (α)
+                <input id="power-alpha" type="number" min="0.0001" max="0.2" step="any" inputmode="decimal" value="0.05" required>
+              </label>
+              <label class="power-field">Target statistical power (1 − β)
+                <input id="power-target" type="number" min="0.5" max="0.99" step="any" inputmode="decimal" value="0.80" required>
+              </label>
+              <label class="power-field" id="power-ratio-wrap">Group 2 / Group 1 allocation ratio
+                <input id="power-ratio" type="number" min="0.25" max="4" step="any" inputmode="decimal" value="1" required>
+                <small>1 means equal allocation; applies to independent two-group plans.</small>
+              </label>
+              <label class="power-field" id="power-groups-wrap" hidden>Number of ANOVA groups
+                <input id="power-groups" type="number" min="2" max="10" step="1" inputmode="numeric" value="3" required>
+              </label>
+              <label class="power-field">Expected attrition / unusable data (%)
+                <input id="power-attrition" type="number" min="0" max="50" step="any" inputmode="decimal" value="0" required>
+                <small>Recruitment targets are inflated separately, not treated as guaranteed completions.</small>
+              </label>
+            </div>
+            <button type="submit" id="power-calculate" class="button button-run">Calculate proposed sample size →</button>
+            <p class="power-error" role="alert" aria-live="polite" id="power-error"></p>
+          </form>
+        </section>
+        <aside class="power-methodology">
+          <div class="helper-card"><strong>What these numbers mean</strong><p>Power is a planning probability under your assumed population effect and test. It does not predict a particular study's p-value or substitute for sampling representativeness.</p></div>
+          <div class="helper-card helper-card-light"><strong>Choose your effect before collecting data</strong><p>Prefer prior evidence, a justified minimum scientifically important effect, or a pilot estimate with uncertainty. Do not use a fabricated value merely to obtain a smaller sample.</p></div>
+          <div class="helper-card helper-card-light"><strong>Methods and limits</strong><p>Independent t planning assumes pooled equal variance; the analysis workbench's Welch test is different. Proportion planning uses a large-sample normal approximation. ANOVA assumes balanced groups.</p></div>
+        </aside>
+      </div>
+      <section class="panel power-results" id="power-results" hidden aria-labelledby="power-results-title">
+        <div class="power-results-heading"><div><div class="eyebrow eyebrow-dark">RESEARCH DESIGN PLAN</div>
+            <h2 id="power-results-title">Calculated completed sample</h2>
+            <p id="power-assumptions-summary"></p></div>
+          <button id="power-download" type="button" class="button button-outline button-small">⇩ Download planning memo (HTML)</button>
+        </div>
+        <div class="power-kpis" id="power-kpis"></div>
+        <div id="power-group-summary" class="power-group-summary"></div>
+        <h3>Assumptions and warnings for your methodology</h3>
+        <ul id="power-warnings" class="power-warnings"></ul>
+        <p class="power-integrity"><strong>Academic integrity:</strong> This output is a conditional, a priori study-design estimate, not a finding from field data or evidence for hypothesis acceptance.</p>
+      </section>
+    </div>
+
     <div class="view" id="view-projects">
       <div class="page-title"><div><div class="eyebrow eyebrow-dark">SAVE · REOPEN · BACK UP</div><h1>Research Project Manager</h1><p>Keep questionnaire counts, scale coding, research objectives, variable definitions, and drafted reports together. Reopen them without entering the frequencies again.</p></div><span class="data-pill">Local-first · v0.9</span></div>
       <div class="project-notice" role="note"><strong>Where your work is saved:</strong> Projects saved below use this browser's local IndexedDB storage on this device — not a cloud account. Other devices and browsers cannot see them. For dependable backup, download a project file. Clearing browser data may erase locally saved projects.</div>
@@ -225,5 +309,6 @@ Total N = 153" maxlength="100000" required spellcheck="false" aria-describedby="
 <script defer src="/static/chapter_four.js"></script>
 <script defer src="/static/projects.js"></script>
 <script defer src="/static/output_history.js"></script>
+<script defer src="/static/power.js"></script>
 </body>
 </html>
