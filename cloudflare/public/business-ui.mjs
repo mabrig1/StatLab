@@ -195,7 +195,7 @@ function setup(){
   el("ba-analyze").addEventListener("click",()=>{
     if(!state.dataset){error("Import data or load a synthetic example first.");return;}
     try{render();el("ba-results").scrollIntoView({behavior:"smooth",block:"start"});}
-    catch(err){error(err.message);}
+    catch(err){state.report=null;state.svg="";el("ba-results").hidden=true;error(err.message);}
   });
   el("ba-clear-filters").addEventListener("click",()=>{
     resetFilters();if(state.dataset)render();
@@ -203,7 +203,7 @@ function setup(){
   for(const id of ["ba-currency","ba-category","ba-channel","ba-region","ba-from","ba-to"]){
     el(id).addEventListener("change",()=>{
       if(!state.dataset)return;
-      try{render();}catch(err){error(err.message);}
+      try{render();}catch(err){state.report=null;state.svg="";el("ba-results").hidden=true;error(err.message);}
     });
   }
   el("ba-export-svg").addEventListener("click",()=>{
