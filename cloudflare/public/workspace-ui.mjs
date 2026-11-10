@@ -5,10 +5,15 @@ import {
   exportDictionary, exportProject, importProject, displayValue, isUserMissing,
   frequencyFromColumn
 } from "./workspace.mjs";
+import {
+  canonicalCode,createValueDraft,addValueLabel,changeValueLabel,removeValueLabel,
+  applyLikertPreset,orderedLabels,valueDraftPatch
+} from "./value-labels.mjs";
 
 const el=id=>document.getElementById(id);
 const state={data:industrialWorkspace(),undo:[],redo:[],page:0,selected:null,
   search:"",labels:false,active:"data",editVar:null,ready:false,db:null};
+const valueEditor={draft:null,selected:null,presetApplied:false};
 const PAGE_SIZE=50;
 let saveChain=Promise.resolve();
 
@@ -183,7 +188,7 @@ function renderData(){
   el("send-to-frequency").disabled=!options.options.length;
 }
 function variableValueSummary(v){
-  return Object.keys(v.values).length?Object.keys(v.values).length+" labels":"Define...";
+  return Object.keys(v.values).length?Object.keys(v.values).length+" labels · Edit":"Add labels...";
 }
 function patchVar(index,patch){updateAction(data=>updateVariable(data,index,patch));}
 function renderVariables(){
@@ -230,24 +235,97 @@ function renderVariables(){
 }
 function renderAll(){renderData();renderVariables();}
 
-function parseLabelLines(text){
-  const values={};
-  for(const raw of text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean)){
-    const match=raw.match(/^([^=:]+)\s*(?:=|:)\s*(.+)$/);
-    if(!match)throw Error('Value labels must look like "1 = Strongly Agree".');
-    const code=match[1].trim(),label=match[2].trim();
-    if(!code||!label||Object.hasOwn(values,code))throw Error("Value codes must be unique and labelled.");
-    values[code]=label;
+function valueError(message=""){
+  el("value-label-error").textContent=message;
+}
+function refreshValueControls(){
+  const active=valueEditor.selected!==null;
+  el("value-change").disabled=!active;
+  el("value-remove").disabled=!active;
+  el("value-add").disabled=!el("value-code-editor").value.trim()||
+    !el("value-text-editor").value.trim();
+}
+function renderValueList(){
+  const list=el("value-list-editor");list.replaceChildren();
+  for(const entry of orderedLabels(valueEditor.draft)){
+    const opt=option(entry.code,entry.code+" = "+entry.label);list.append(opt);
   }
-  return values;
+  const valid=valueEditor.selected!==null &&
+    valueEditor.draft.entries.some(x=>x.code===valueEditor.selected);
+  if(valid)list.value=valueEditor.selected;
+  else {valueEditor.selected=null;list.selectedIndex=-1;}
+  refreshValueControls();
+}
+function resetValueEntry({focus=false}={}){
+  valueEditor.selected=null;
+  el("value-code-editor").value="";
+  el("value-text-editor").value="";
+  renderValueList();
+  if(focus)el("value-code-editor").focus();
+}
+function selectLabelEntry(){
+  const selected=el("value-list-editor").value;
+  const record=valueEditor.draft.entries.find(item=>item.code===selected);
+  if(!record){valueEditor.selected=null;refreshValueControls();return;}
+  valueEditor.selected=record.code;
+  el("value-code-editor").value=record.code;
+  el("value-text-editor").value=record.label;
+  valueError();
+  refreshValueControls();
+}
+function addLabelEntry(){
+  try{
+    valueEditor.draft=addValueLabel(valueEditor.draft,
+      el("value-code-editor").value,el("value-text-editor").value);
+    valueError();
+    resetValueEntry({focus:true});
+  }catch(error){valueError(error.message);}
+}
+function changeLabelEntry(){
+  try{
+    const code=canonicalCode(el("value-code-editor").value,valueEditor.draft.type);
+    valueEditor.draft=changeValueLabel(valueEditor.draft,valueEditor.selected,
+      code,el("value-text-editor").value);
+    valueEditor.selected=code;
+    renderValueList();valueError();
+  }catch(error){valueError(error.message);}
+}
+function removeLabelEntry(){
+  try{
+    valueEditor.draft=removeValueLabel(valueEditor.draft,valueEditor.selected);
+    valueError();resetValueEntry({focus:true});
+  }catch(error){valueError(error.message);}
+}
+function useLikertPreset(points){
+  try{
+    if(valueEditor.draft.entries.length &&
+      !confirm("Replace the value labels in this editor with a "+points+
+        "-point Likert scale? Click Cancel in the dialog to discard all unsaved changes."))return;
+    valueEditor.draft=applyLikertPreset(valueEditor.draft,points);
+    valueEditor.presetApplied=true;
+    el("value-ordinal").checked=true;
+    valueError();resetValueEntry();
+  }catch(error){valueError(error.message);}
 }
 function openVariableDialog(index){
-  state.editVar=index;const v=state.data.variables[index];
-  el("dialog-heading").textContent="Define codes for "+v.name;
-  el("value-label-editor").value=Object.entries(v.values).map(([code,label])=>code+" = "+label).join("\n");
-  el("missing-editor").value=v.missing.join(", ");
-  el("variable-dialog").showModal();
+  state.editVar=index;
+  const variable=state.data.variables[index];
+  try{
+    valueEditor.draft=createValueDraft(variable);
+    valueEditor.selected=null;
+    valueEditor.presetApplied=false;
+    el("dialog-heading").textContent="Value Labels — "+variable.name;
+    el("missing-editor").value=variable.missing.join(", ");
+    el("value-ordinal").checked=variable.measure==="ordinal";
+    el("value-code-editor").value="";
+    el("value-text-editor").value="";
+    valueError();
+    renderValueList();
+    el("variable-dialog").showModal();
+    el("value-code-editor").focus();
+  }catch(error){showStatus("variable-message",error.message,true);}
 }
+
 function openDb(){
   return new Promise((resolve,reject)=>{
     if(!("indexedDB" in window))return reject(Error("IndexedDB is unavailable."));
@@ -374,14 +452,38 @@ function wire(){
     }catch(e){showStatus("data-message",e.message,true);}
   });
   el("cancel-details").addEventListener("click",()=>el("variable-dialog").close());
+  el("value-list-editor").addEventListener("change",selectLabelEntry);
+  el("value-code-editor").addEventListener("input",refreshValueControls);
+  el("value-text-editor").addEventListener("input",refreshValueControls);
+  el("value-code-editor").addEventListener("keydown",event=>{
+    if(event.key==="Enter"){event.preventDefault();el("value-text-editor").focus();}
+  });
+  el("value-text-editor").addEventListener("keydown",event=>{
+    if(event.key==="Enter"){
+      event.preventDefault();
+      if(valueEditor.selected!==null)changeLabelEntry();else addLabelEntry();
+    }
+  });
+  el("value-add").addEventListener("click",addLabelEntry);
+  el("value-change").addEventListener("click",changeLabelEntry);
+  el("value-remove").addEventListener("click",removeLabelEntry);
+  for(const points of [4,5,7]){
+    const name={4:"four",5:"five",7:"seven"}[points];
+    el("value-preset-"+name).addEventListener("click",()=>useLikertPreset(points));
+  }
   el("variable-details-form").addEventListener("submit",event=>{
     event.preventDefault();
     try{
-      const values=parseLabelLines(el("value-label-editor").value);
-      const missing=el("missing-editor").value.split(",").map(x=>x.trim()).filter(Boolean);
-      const updated=updateVariable(state.data,state.editVar,{values,missing});
-      updateAction(()=>updated);el("variable-dialog").close();
-    }catch(e){showStatus("variable-message",e.message,true);}
+      if(!valueEditor.draft||state.editVar===null)throw Error("Choose a variable first.");
+      const patch=valueDraftPatch(valueEditor.draft,el("missing-editor").value,{
+        likertPreset:el("value-ordinal").checked
+      });
+      // Verify the entire updated variable and its existing case values before closing.
+      const checked=updateVariable(state.data,state.editVar,patch);
+      updateAction(()=>checked);
+      el("variable-dialog").close();
+      valueEditor.draft=null;valueEditor.selected=null;
+    }catch(error){valueError(error.message);}
   });
   el("send-to-frequency").addEventListener("click",()=>{
     try{
