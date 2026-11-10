@@ -1,3 +1,11 @@
+## Unreleased — EFA factor retention and correlated-factor rotation
+
+- Added reproducible 95th-percentile Horn-style **Pearson correlation component eigenvalue** parallel benchmarks (50–200 null simulations, recorded seed) as a factor-retention guide, explicitly not exact principal-axis factor parallel analysis.
+- Added oblique **oblimin/quartimin** rotation and separate pattern, structure and factor-correlation (Φ) matrices; existing varimax and unrotated results continue working.
+- Preserved user-defined factor selection, complete-case provenance, KMO/Bartlett gates, respondent-level integrity and frequency-only purity.
+- Added sample-limited simulations, strict validated API/UI settings and reproducibility/reference regression tests.
+- All functions are **local FastAPI only**; Cloudflare does not host Python EFA.
+
 ## Unreleased — local exploratory factor analysis
 
 - Added local FastAPI **principal-axis EFA**: 4–25 variables, 1–6 researcher-selected factors, 50+ complete records and at least five complete cases per item, maximum 10,000 complete records.

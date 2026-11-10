@@ -6,6 +6,9 @@ An independent, browser-based SPSS-style **prototype**, not IBM SPSS code and no
 
 ## New: exploratory principal-axis factor analysis (local Python only)
 
+**Extended EFA tools:** reproducible Horn-style component-eigenvalue parallel analysis (95th-percentile null thresholds, 50–200 runs, documented seed), and oblique oblimin/quartimin rotation with separate factor pattern/structure/Φ matrices. The researcher still chooses the PAF factor count. This parallel guide is **not** exact principal-axis common-factor parallel analysis, and does not run in Cloudflare. [Complete EFA methods](docs/EXPLORATORY_FACTOR_ANALYSIS.md).
+
+
 The Python/FastAPI Analysis Workbench now includes **Exploratory Factor Analysis (EFA)** for selected real respondent-level numeric/ordered questionnaire items. It computes KMO (overall and item-level MSA), Bartlett's approximate χ², eigenvalues of the observed Pearson correlation matrix, **principal-axis factor loadings**, communalities and uniquenesses, with optional orthogonal varimax. Users choose the factor count explicitly; low KMO, singular matrices, insufficient complete cases and nominal variables are rejected. Missing cases and model assumptions are disclosed. This is **not** PCA, CFA or polychoric EFA, and does not reconstruct cases from frequency-only tables.
 
 [Guide and methodological limits](docs/EXPLORATORY_FACTOR_ANALYSIS.md). **Cloudflare does not run this Python analysis.**

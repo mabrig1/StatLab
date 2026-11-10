@@ -521,9 +521,18 @@ function buildControls(){
       <label class="field-label" for="efa-rotation">Rotation</label>
       <select class="input-select" id="efa-rotation">
         <option value="varimax" selected>Varimax (orthogonal)</option>
+        <option value="oblimin">Oblimin / quartimin (oblique; correlated factors)</option>
         <option value="none">None (unrotated)</option>
       </select>
-      <p class="method-note">Pearson correlation-based principal-axis factor analysis. Do not interpret it as polychoric EFA, PCA or confirmatory factor analysis. Results include item communalities and KMO/Bartlett diagnostics; do not automatically name factors.</p>`;
+      <label class="field-label" for="efa-parallel-simulations">Parallel analysis · simulated null datasets</label>
+      <select class="input-select" id="efa-parallel-simulations">
+        <option value="50">50 (faster, noisier)</option>
+        <option value="100" selected>100 (default)</option>
+        <option value="200">200 (more stable)</option>
+      </select>
+      <label class="field-label" for="efa-parallel-seed">Reproducibility seed</label>
+      <input id="efa-parallel-seed" class="input-select" type="number" min="0" max="4294967295" step="1" value="20261110" required>
+      <p class="method-note"><strong>Factor-retention guide:</strong> Horn-style comparison uses simulated <em>Pearson correlation component eigenvalues</em>, not an exact common-factor parallel analysis. The suggested count does not override your chosen number of principal-axis factors. Oblimin adds a pattern matrix, separate structure matrix, and factor correlations; it does not establish causality. Polychoric EFA and CFA remain unavailable.</p>`;
    $('dynamic-controls').append(settings);
  }
  const a=$('field-a'),b=$('field-b');if(a&&b&&a.value===b.value){const alternative=[...b.options].find(o=>o.value&&o.value!==a.value);if(alternative)b.value=alternative.value}
@@ -548,13 +557,19 @@ function readForm(){
  if(state.mode==='efa'){
     out.factor_count=Number($('efa-count').value);
     out.factor_rotation=$('efa-rotation').value;
+    out.parallel_simulations=Number($('efa-parallel-simulations').value);
+    const seedInput=$('efa-parallel-seed');
+    if(!seedInput.value.trim()||!seedInput.checkValidity()){
+      throw new Error('Enter a valid integer parallel-analysis seed.');
+    }
+    out.parallel_seed=Number(seedInput.value);
  }
  return out;
 }
 async function importFile(){if(!state.file)return toast('Select a file first.',true);if(state.data&&!window.confirm('Replace the current dataset? Export edited observations before importing a new file.'))return;const button=$('submit-import');button.disabled=true;button.textContent='Importing…';try{const fd=new FormData();fd.append('file',state.file);const res=await api('/api/datasets',{method:'POST',body:fd});if(state.data){try{await api(`/api/datasets/${encodeURIComponent(state.data.dataset_id)}`,{method:'DELETE'})}catch{}}
   state.data=res;state.run=null;state.history=[];resetCases();updateData();renderResults();closeUpload();showView('data');toast(`Imported ${res.rows.toLocaleString()} cases and ${res.columns} variables.`)}catch(e){toast(e.message,true)}finally{button.textContent='Import dataset →';button.disabled=!state.file}}
 async function discardData(){if(!state.data)return;const id=state.data.dataset_id;try{await api(`/api/datasets/${encodeURIComponent(id)}`,{method:'DELETE'})}catch(e){toast(e.message,true)}state.data=null;state.run=null;state.history=[];resetCases();updateData();renderResults();toast('Dataset cleared from temporary memory.')}
-async function runAnalysis(e){e.preventDefault();if(!state.data)return toast('Import a dataset first.',true);const recipe=readForm();if(state.mode==='descriptives'&&(!recipe.columns.length||recipe.columns.length>30))return toast('Choose between 1 and 30 variables to summarize.',true);const button=$('run-analysis');button.disabled=true;button.innerHTML='Calculating…';try{const outcome=await api('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(recipe)});state.run={result:outcome,recipe};state.history.push(state.run);if(state.history.length>30)state.history.shift();$('count-runs').textContent=state.history.length;renderResults();window.dispatchEvent(new CustomEvent('statlab:case-result',{detail:{result:outcome,recipe,html:reportMarkup()}}));showView('results');toast('Analysis complete — results are ready.')}catch(error){toast(error.message,true)}finally{button.disabled=!state.data;button.innerHTML='Run analysis <span>→</span>';if(state.mode==='descriptives')summaryUpdateCount();if(state.mode==='questionnaire')questionnaireUpdate()}}
+async function runAnalysis(e){e.preventDefault();if(!state.data)return toast('Import a dataset first.',true);let recipe;try{recipe=readForm()}catch(error){return toast(error.message,true)}if(state.mode==='descriptives'&&(!recipe.columns.length||recipe.columns.length>30))return toast('Choose between 1 and 30 variables to summarize.',true);const button=$('run-analysis');button.disabled=true;button.innerHTML='Calculating…';try{const outcome=await api('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(recipe)});state.run={result:outcome,recipe};state.history.push(state.run);if(state.history.length>30)state.history.shift();$('count-runs').textContent=state.history.length;renderResults();window.dispatchEvent(new CustomEvent('statlab:case-result',{detail:{result:outcome,recipe,html:reportMarkup()}}));showView('results');toast('Analysis complete — results are ready.')}catch(error){toast(error.message,true)}finally{button.disabled=!state.data;button.innerHTML='Run analysis <span>→</span>';if(state.mode==='descriptives')summaryUpdateCount();if(state.mode==='questionnaire')questionnaireUpdate()}}
 function renderFriendlySummary(r){
  const cards=$('results-summary');
  cards.hidden=!(r.summary_cards?.length);
