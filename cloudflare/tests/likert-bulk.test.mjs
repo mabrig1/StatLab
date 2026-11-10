@@ -87,9 +87,9 @@ test("explicit Replace can change old labels but leaves recorded numeric codes a
   assert.equal(project.variables[3].values["1"],"Never");
 });
 test("non-numeric variables are skipped without altering the project",()=>{
-  const project=exampleWorkspace();
+  const project=addVariable(exampleWorkspace(),{name:"Shift",type:"string",measure:"nominal"});
   const source=JSON.stringify(project);
-  const plan=previewBulkLikert(project,{indices:[1,3],source:"preset:5"});
+  const plan=previewBulkLikert(project,{indices:[5,3],source:"preset:5"});
   assert.equal(plan.skipped.length,2);
   assert.match(plan.skipped[0].reason,/String\/Date/);
   assert.equal(JSON.stringify(project),source);
