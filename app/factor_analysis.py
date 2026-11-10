@@ -1,8 +1,9 @@
 """Bounded, respondent-level exploratory factor analysis for local StatLab.
 
-Uses principal-axis common-factor extraction (not PCA), optional orthogonal
-varimax, Pearson correlation diagnostics, and explicit user-selected factor
-count. It NEVER derives paired data from frequency marginals.
+Uses principal-axis common-factor extraction (not PCA), orthogonal varimax or
+oblique quartimin/oblimin rotation, Pearson correlation diagnostics, optional
+reproducible component-eigenvalue parallel analysis, and an explicitly
+researcher-selected factor count. NEVER reconstructs cases from marginals.
 """
 from __future__ import annotations
 
@@ -15,6 +16,7 @@ from scipy import stats
 from statsmodels.multivariate.factor import Factor
 
 from .stats_engine import AnalysisError, fnum, p_text, get_columns, result, table
+from .factor_retention import parallel_analysis
 
 MIN_VARIABLES = 4
 MAX_VARIABLES = 25
@@ -136,16 +138,21 @@ def correlation_factorability(data: np.ndarray) -> dict:
 
 def exploratory_factor(df: pd.DataFrame, columns: list[str], n_factors: int = 2,
                        rotation: str = "varimax",
-                       variable_specs: dict[str, dict] | None = None) -> dict:
-    """Estimate respondent-level principal-axis EFA (orthogonal varimax optional).
+                       variable_specs: dict[str, dict] | None = None,
+                       parallel_runs: int = 100,
+                       parallel_seed: int = 20261110) -> dict:
+    """Estimate case-level principal-axis EFA with documented retention aids.
 
-    Factor count is always explicit. No auto factor retention, hypothesis
-    decisions, factor scores, or fabricated field reports.
+    Factor count is always researcher-specified. The optional oblique rotation
+    reports pattern, structure and factor correlations separately. The parallel
+    benchmark uses full Pearson-correlation *component* eigenvalues, not a
+    common-factor model. Neither aid validates constructs or determines the
+    requested number of factors automatically.
     """
     if not isinstance(n_factors, int) or isinstance(n_factors, bool) or not 1 <= n_factors <= MAX_FACTORS:
         raise AnalysisError(f"Select an integer number of factors between 1 and {MAX_FACTORS}.")
-    if rotation not in ("none", "varimax"):
-        raise AnalysisError("EFA rotation must be 'none' or 'varimax'.")
+    if rotation not in ("none", "varimax", "oblimin"):
+        raise AnalysisError("EFA rotation must be 'none', 'varimax' or 'oblimin'.")
     if not isinstance(columns, list):
         raise AnalysisError("EFA requires a list of selected numerical variables.")
     get_columns(df, columns, MIN_VARIABLES)
@@ -161,14 +168,18 @@ def exploratory_factor(df: pd.DataFrame, columns: list[str], n_factors: int = 2,
             "These variables are not adequately factorable. Revise items before EFA."
         )
 
+    # Reproducible Monte Carlo comparisons are computed from the same complete
+    # real-case matrix, but simulated null cases are never added to the dataset.
+    retention = parallel_analysis(matrix, simulations=parallel_runs, seed=parallel_seed)
+
     with warnings.catch_warnings(record=True) as seen:
         warnings.simplefilter("always")
         try:
             model = Factor(matrix, n_factor=n_factors, method="pa", smc=True, missing="raise")
             fit = model.fit(maxiter=200, tol=1e-8)
             selected_rotation = rotation if n_factors > 1 else "none"
-            if selected_rotation == "varimax":
-                fit.rotate("varimax")
+            if selected_rotation in ("varimax", "oblimin"):
+                fit.rotate(selected_rotation)
         except (ValueError, FloatingPointError, ArithmeticError, np.linalg.LinAlgError,
                 RuntimeError, AssertionError) as exc:
             raise AnalysisError(
@@ -179,6 +190,23 @@ def exploratory_factor(df: pd.DataFrame, columns: list[str], n_factors: int = 2,
     loadings = np.asarray(fit.loadings, dtype=float)
     communality = np.asarray(fit.communality, dtype=float)
     uniqueness = np.asarray(fit.uniqueness, dtype=float)
+    # Statsmodels' oblimin is quartimin; rotation T is the transform of
+    # canonical factors. Phi = T.T @ T is their correlation matrix and
+    # structure = pattern @ Phi. Unlike orthogonal varimax, squared pattern
+    # loadings do not in general equal communalities.
+    phi = None
+    structure_loadings = None
+    if selected_rotation == "oblimin":
+        rotation_matrix = np.asarray(fit.rotation_matrix, dtype=float)
+        phi = rotation_matrix.T @ rotation_matrix
+        phi = (phi + phi.T) / 2
+        structure_loadings = loadings @ phi
+        if (phi.shape != (n_factors, n_factors) or
+                not np.isfinite(phi).all() or
+                not np.allclose(np.diag(phi), 1, atol=1e-5) or
+                np.linalg.eigvalsh(phi).min() <= 1e-8 or
+                not np.isfinite(structure_loadings).all()):
+            raise AnalysisError("Oblique rotation produced an invalid factor-correlation matrix.")
     if (loadings.shape != (p, n_factors) or
         communality.shape != (p,) or uniqueness.shape != (p,) or
         not np.isfinite(loadings).all() or
@@ -189,7 +217,10 @@ def exploratory_factor(df: pd.DataFrame, columns: list[str], n_factors: int = 2,
     messages = [
         "Exploratory factors are proposed latent patterns, not proof of a validated instrument or causal effect.",
         f"Complete-case (listwise) deletion: {n} usable respondents; {missing} excluded from the {n + missing} original rows.",
-        "Factor count was supplied by the researcher; the scree plot and Kaiser >1 count are descriptive guides, not automatic selection criteria.",
+        "Factor count was supplied by the researcher; Kaiser >1 and parallel analysis are descriptive aids, not automatic factor-retention decisions.",
+        f"Parallel analysis used {retention['simulations']} reproducible independent Gaussian simulations "
+        f"(seed {retention['seed']}) and compared *full Pearson correlation* component eigenvalues "
+        "at the 95th percentile. This is not parallel analysis of principal-axis common-factor eigenvalues.",
         "Pearson correlations assume numeric item coding treated as approximately continuous. "
         "For strongly ordinal/non-normal Likert data, polychoric EFA may be more suitable; it is not included.",
         "Common-factor extraction uses Statsmodels principal axes (PAF, squared multiple correlation starting communalities), not principal components analysis (PCA).",
@@ -215,8 +246,17 @@ def exploratory_factor(df: pd.DataFrame, columns: list[str], n_factors: int = 2,
     if np.any(communality > 1.001) or np.any(communality < -.001) or np.any(uniqueness < -.001):
         messages.append("Heywood/improper communalities or uniqueness estimates detected. "
                         "Do not interpret this as a stable, valid factor solution.")
-    if selected_rotation == "none" and n_factors == 1 and rotation == "varimax":
-        messages.append("Rotation not applied: one-factor solutions cannot benefit from varimax.")
+    if selected_rotation == "none" and n_factors == 1 and rotation != "none":
+        messages.append("Rotation not applied: one-factor solutions do not benefit from rotation.")
+    if selected_rotation == "oblimin":
+        messages.append("Oblimin uses Statsmodels' oblique quartimin rotation. Interpret *pattern* and "
+                        "*structure* matrices separately; estimated factor correlations are not causal links.")
+    if retention["leading_count"] != n_factors:
+        messages.append(
+            f"The leading-component 95th-percentile parallel benchmark suggests "
+            f"{retention['leading_count']} component(s), while you requested {n_factors} common factor(s). "
+            "This difference requires theoretical and methodological review, not an automatic override."
+        )
     if any(isinstance(w.message, (RuntimeWarning, UserWarning)) for w in seen):
         messages.append("Numerical warnings arose during extraction. Check estimates independently before use.")
 
@@ -235,8 +275,13 @@ def exploratory_factor(df: pd.DataFrame, columns: list[str], n_factors: int = 2,
         messages.append("One or more items cross-load at |loading| ≥ .30 on two or more factors. "
                         "Review construct definition; thresholds are descriptive heuristics.")
 
-    score_rows = [[i + 1, fnum(value, 4), "Yes" if value > 1. else "No"]
-                  for i, value in enumerate(eigenvalues)]
+    score_rows = [
+        [i + 1, fnum(value, 4), fnum(retention["null_mean"][i], 4),
+         fnum(retention["null_95"][i], 4),
+         "Yes" if retention["exceeds_95"][i] else "No",
+         "Yes" if value > 1. else "No"]
+        for i, value in enumerate(eigenvalues)
+    ]
     tables = [
         table("Factorability and sample characteristics",
               ["Complete N", "Listwise omitted", "Variables", "Overall KMO",
@@ -245,18 +290,34 @@ def exploratory_factor(df: pd.DataFrame, columns: list[str], n_factors: int = 2,
                 check["bartlett_df"], fnum(check["bartlett_p"], 7), fnum(check["determinant"], 8)]],
               "KMO uses off-diagonal squared Pearson/partial correlations. "
               "Bartlett's test assesses whether the correlation matrix differs from identity."),
-        table("Pearson correlation eigenvalues (scree/retention aid)",
-              ["Index", "Eigenvalue", "Kaiser > 1"], score_rows,
-              "These eigenvalues belong to the original item correlation matrix; "
-              "they are not extracted-factor variance or PCA-derived factor scores."),
+        table("Parallel analysis and Pearson correlation eigenvalues",
+              ["Rank", "Observed eigenvalue", "Null mean", "Null 95th percentile",
+               "Above null 95th?", "Kaiser > 1"], score_rows,
+              f"Horn-style benchmark: {retention['simulations']} independent standard-normal "
+              f"simulations with {n} complete cases and {p} variables, random seed {retention['seed']}. "
+              "The original Pearson correlation matrix is compared to null component eigenvalues. "
+              "These are not extracted common-factor eigenvalues; the guide does not select a PAF model automatically."),
         table("Principal-axis factor loadings (" + selected_rotation + " rotation)",
               ["Item", *[f"Factor {i + 1}" for i in range(n_factors)],
                "Communality", "Uniqueness", "MSA", "Largest |loading| factor", "Cross-loading ≥ .30"],
               load_rows,
-              "Loadings from principal-axis common-factor extraction. Varimax is orthogonal. "
-              "Communalities/uniquenesses are estimated, not externally validated. "
-              "Signs and factor order may differ across equivalent solutions."),
+              "Principal-axis common-factor loadings. With oblimin, these are the "
+              "*pattern* coefficients, not structure correlations; squared pattern "
+              "coefficients should not be summed to estimate communalities. "
+              "Communalities/uniquenesses are model estimates. Factor order and signs are indeterminate."),
     ]
+    if phi is not None:
+        tables.append(table("Oblique factor correlation matrix (Phi)",
+                            ["Factor", *[f"Factor {i + 1}" for i in range(n_factors)]],
+                            [[f"Factor {i + 1}", *[fnum(v, 4) for v in phi[i]]]
+                             for i in range(n_factors)],
+                            "Factor associations implied by oblique quartimin rotation; "
+                            "not observed person-level correlations or causal estimates."))
+        tables.append(table("Oblique structure matrix (item–factor correlations)",
+                            ["Item", *[f"Factor {i + 1}" for i in range(n_factors)]],
+                            [[name, *[fnum(v, 4) for v in structure_loadings[i]]]
+                             for i, name in enumerate(columns)],
+                            "Structure = pattern × Phi; pattern and structure differ when factors correlate."))
     narrative = (
         f"Exploratory principal-axis analysis of {p} selected observed variables and {n} complete "
         f"respondent rows ({missing} omitted). Overall KMO = {check['kmo']:.3f}. "
@@ -264,6 +325,9 @@ def exploratory_factor(df: pd.DataFrame, columns: list[str], n_factors: int = 2,
         f"p {p_text(check['bartlett_p'])}. "
         f"The researcher specified {n_factors} factor(s), "
         f"with {selected_rotation} rotation; {kaiser} raw correlation eigenvalue(s) exceed 1. "
+        f"The 95th-percentile *component*-eigenvalue benchmark has {retention['leading_count']} "
+        "leading component(s) above their simulated null values. "
+        "These comparisons do not determine the correct common-factor count. "
         "Examine item meanings, adequacy and replication before naming the factors."
     )
     response = result("Exploratory Factor Analysis (principal axes)", tables, narrative, messages,
@@ -282,6 +346,15 @@ def exploratory_factor(df: pd.DataFrame, columns: list[str], n_factors: int = 2,
         "kmo": fnum(check["kmo"], 6),
         "bartlett_p": fnum(check["bartlett_p"], 9),
         "kaiser_count": kaiser,
+        "parallel_analysis": {
+            "simulations": retention["simulations"],
+            "seed": retention["seed"],
+            "comparison": "pearson_correlation_component_eigenvalues",
+            "percentile": 95,
+            "leading_components_above_null": retention["leading_count"],
+            "is_common_factor_parallel_analysis": False,
+        },
+        "oblique_pattern_structure_separate": phi is not None,
         "is_confirmatory_factor_analysis": False,
     }
     return response
