@@ -10,6 +10,7 @@ const METHODS = {
   regression:{name:'Multiple linear regression',desc:'Predict a continuous outcome with one or more numeric predictors.',tip:'Linear OLS requires appropriate model assumptions; coefficients are associations, not proof of causation.',fields:[['a','Dependent (outcome) variable','numeric','single'],['columns','Independent (predictor) variables','numeric','multi']]},
   crosstab:{name:'Crosstabs & chi-square',desc:'Cross-tabulate two categorical variables and test association.',tip:'Inspect expected cell counts. Chi-square approximation is less reliable for sparse tables.',fields:[['a','Row variable','all','single'],['b','Column variable','all','single']]},
   reliability:{name:"Cronbach’s alpha",desc:'Estimate internal consistency of a multi-item scale.',tip:'Ensure Likert items reflect the same construct and reverse-worded questions were correctly recoded.',fields:[['columns','Scale items (2 or more)','numeric','multi']]},
+  efa:{name:'Exploratory Factor Analysis (principal axes)',desc:'Explore latent structure among observed, paired numeric or ordered questionnaire items.',tip:'Requires 4–25 numeric scale/ordinal items and enough real complete respondent rows (at least max(50, 5 × items)). Checks KMO and Bartlett; rejects singular or unsuitable data. Principal axes ≠ PCA. Factor count is researcher-selected.',fields:[['columns','Select 4–25 observed numeric scale/ordinal items','numeric','multi']]},
   ttest_ind:{name:'Independent-samples t-test',desc:'Compare the means of two independent groups (Welch test).',tip:'The grouping variable must contain exactly two nonmissing categories.',fields:[['a','Outcome (numeric)','numeric','single'],['b','Grouping variable (2 groups)','all','single']]},
   ttest_paired:{name:'Paired-samples t-test',desc:'Compare matched measurements from the same respondents.',tip:'Use paired observations: e.g., pre-test and post-test from the same individual.',fields:[['a','First measurement','numeric','single'],['b','Second measurement','numeric','single']]},
   anova:{name:'One-way ANOVA',desc:'Compare average outcome values across two or more groups.',tip:'Classical ANOVA assumes equal variances. Post-hoc tests are not included in this version.',fields:[['a','Outcome (numeric)','numeric','single'],['b','Group/category','all','single']]},
@@ -507,6 +508,24 @@ function buildControls(){
   $('dynamic-controls').innerHTML=questionnaireControls();questionnaireUpdate();return;
  }
  $('dynamic-controls').innerHTML=m.fields.map(fieldMarkup).join('');
+ if(state.mode==='efa'){
+   const settings=document.createElement('section');
+   settings.className='analysis-efa-options';
+   settings.innerHTML=`<div class="form-note"><span>ⓘ</span><span><strong>Respondent-level EFA:</strong> select actual matched observations, not frequency-only counts. Use Variable View to mark text-free, numeric items as Scale or Ordinal; check reverse-worded items before fitting.</span></div>
+      <label class="field-label" for="efa-count">Number of factors (set before examining loadings)</label>
+      <select class="input-select" id="efa-count">
+        <option value="1">1 factor</option><option value="2" selected>2 factors</option>
+        <option value="3">3 factors</option><option value="4">4 factors</option>
+        <option value="5">5 factors</option><option value="6">6 factors</option>
+      </select>
+      <label class="field-label" for="efa-rotation">Rotation</label>
+      <select class="input-select" id="efa-rotation">
+        <option value="varimax" selected>Varimax (orthogonal)</option>
+        <option value="none">None (unrotated)</option>
+      </select>
+      <p class="method-note">Pearson correlation-based principal-axis factor analysis. Do not interpret it as polychoric EFA, PCA or confirmatory factor analysis. Results include item communalities and KMO/Bartlett diagnostics; do not automatically name factors.</p>`;
+   $('dynamic-controls').append(settings);
+ }
  const a=$('field-a'),b=$('field-b');if(a&&b&&a.value===b.value){const alternative=[...b.options].find(o=>o.value&&o.value!==a.value);if(alternative)b.value=alternative.value}
 }
 function readForm(){
@@ -526,6 +545,10 @@ function readForm(){
   return out;
  }
  for(const [key,title,type,kind] of METHODS[state.mode].fields){if(kind==='multi'){out[key]=[...document.querySelectorAll(`.multiselect[data-field="${key}"] input:checked`)].map(i=>i.value)}else{out[key]=$(`field-${key}`).value}}
+ if(state.mode==='efa'){
+    out.factor_count=Number($('efa-count').value);
+    out.factor_rotation=$('efa-rotation').value;
+ }
  return out;
 }
 async function importFile(){if(!state.file)return toast('Select a file first.',true);if(state.data&&!window.confirm('Replace the current dataset? Export edited observations before importing a new file.'))return;const button=$('submit-import');button.disabled=true;button.textContent='Importing…';try{const fd=new FormData();fd.append('file',state.file);const res=await api('/api/datasets',{method:'POST',body:fd});if(state.data){try{await api(`/api/datasets/${encodeURIComponent(state.data.dataset_id)}`,{method:'DELETE'})}catch{}}

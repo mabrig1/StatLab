@@ -248,3 +248,7 @@ See `docs/STATLAB_V1_ARCHITECTURE.md` and `docs/STATLAB_ROADMAP_V1_V15.md` in th
 ## Power analysis belongs to the separate local Python edition
 
 The Cloudflare Worker uses static HTML and JavaScript and **does not host Statsmodels or FastAPI**. A new a priori sample-size planning module exists only in the local Python edition (start `uvicorn app.main:app --host 127.0.0.1 --port 8000` on a trusted machine). The browser Academic home accurately marks it **Local Python only**; do not claim it works at the public Cloudflare URL. See `docs/POWER_ANALYSIS_GUIDE.md` in the repository root. Frequency-only marginals remain pure, and no respondent records are required for planned sample-size calculations.
+
+## EFA capability: local Python only
+
+The Cloudflare browser displays **Exploratory Factor Analysis** as **Local Python only**, not as an available in-browser method. Local FastAPI supports principal-axis extraction with KMO/Bartlett diagnostics, optional orthogonal varimax, and user-selected factor count from observed paired records. These are **not** available from the Cloudflare Worker, frequency-only marginals, or the browser's Likert Studio. The implementation does not provide CFA, polychoric correlations or parallel analysis. See `docs/EXPLORATORY_FACTOR_ANALYSIS.md`.

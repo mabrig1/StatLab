@@ -4,6 +4,12 @@ An independent, browser-based SPSS-style **prototype**, not IBM SPSS code and no
 
 ![status](https://img.shields.io/badge/status-local%20prototype-0e987f) ![Python](https://img.shields.io/badge/Python-3.12-blue)
 
+## New: exploratory principal-axis factor analysis (local Python only)
+
+The Python/FastAPI Analysis Workbench now includes **Exploratory Factor Analysis (EFA)** for selected real respondent-level numeric/ordered questionnaire items. It computes KMO (overall and item-level MSA), Bartlett's approximate χ², eigenvalues of the observed Pearson correlation matrix, **principal-axis factor loadings**, communalities and uniquenesses, with optional orthogonal varimax. Users choose the factor count explicitly; low KMO, singular matrices, insufficient complete cases and nominal variables are rejected. Missing cases and model assumptions are disclosed. This is **not** PCA, CFA or polychoric EFA, and does not reconstruct cases from frequency-only tables.
+
+[Guide and methodological limits](docs/EXPLORATORY_FACTOR_ANALYSIS.md). **Cloudflare does not run this Python analysis.**
+
 ## New: local a priori Power & Sample Size Planner (November 2026)
 
 The separate Python/FastAPI workstation now includes a **Power & Sample Size** workflow. A researcher chooses the planned test and supplies a *justified assumed effect size*, target power, alpha, allocation ratio/group count and expected attrition. Supported two-sided designs: one-sample t, paired t, pooled independent-group t, balanced one-way ANOVA, and approximate independent two-proportion z tests. Statsmodels performs the calculations and rounded integer sample sizes are checked against target power. The UI provides a printable methodology memo and explicit caveats; no data are uploaded or fabricated. **It is local-FastAPI-only; Cloudflare does not host these methods.** See [power analysis documentation](docs/POWER_ANALYSIS_GUIDE.md).
