@@ -74,7 +74,9 @@ def test_capabilities_separate_local_python_from_cloudflare_and_future():
     assert payload["environment"] == "local-fastapi"
     assert payload["browser_cloudflare_is_separate"] is True
     assert "correlations" in payload["features"]["case_level"]
-    assert "factor_analysis" in payload["unavailable"]
+    assert "exploratory_principal_axis_factor_analysis" in payload["features"]["dimensionality"]
+    assert "confirmatory_factor_analysis" in payload["unavailable"]
+    assert "polychoric_factor_analysis" in payload["unavailable"]
     assert "a_priori_sample_size_power_planning" in payload["features"]["study_design"]
     assert "power_analysis" not in payload["unavailable"]
     assert "desktop_package" in payload["unavailable"]
