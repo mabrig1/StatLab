@@ -292,5 +292,7 @@ def analyze(df: pd.DataFrame, request:dict, variable_specs: dict[str, dict] | No
         return exploratory_factor(df, columns,
                                   n_factors=request.get("factor_count", 2),
                                   rotation=request.get("factor_rotation", "varimax"),
-                                  variable_specs=variable_specs)
+                                  variable_specs=variable_specs,
+                                  parallel_runs=request.get("parallel_simulations", 100),
+                                  parallel_seed=request.get("parallel_seed", 20261110))
     raise AnalysisError("Unknown analysis. Choose a supported statistical procedure.")
