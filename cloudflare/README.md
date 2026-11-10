@@ -117,3 +117,18 @@ In **Variable View**, click the **Values** cell (for example "Add labels..." on 
 5. Click **OK — Save labels** to apply. Click **Cancel** or close the dialog to discard any uncommitted changes.
 
 The editor prevents duplicate numeric codes, empty labels, invalid numeric entries and duplicate missing codes. Changing a label updates the data dictionary only; it **does not recode or overwrite existing respondent values**. Each variable has independent labels. Turn on **Display value labels** in Data View to see words instead of coded numbers. The underlying SPSS-style Data View and frequency-only/ Likert analysis tabs remain unchanged.
+
+## Bulk Likert Quick Setup — Q1 through Q40
+
+From **Variable View**, select **Set up Q1–Q40 Likert**. The dialog provides a safe way to apply the same questionnaire codebook across many questions without opening forty separate Value Labels windows.
+
+- **Create missing Q1–Q40:** adds only questionnaire variable names that do not exist, each numeric/ordinal with a five-point value-label preset (1 = Strongly Disagree to 5 = Strongly Agree). New Data View cells are **blank** and do not represent actual respondents. Existing variables, labels and respondent values are preserved. Maximum 80 total variables applies.
+- **Select target questions:** choose Q1–Q40, all numeric variables, or individual checkboxes. String/date variables are disabled.
+- **Choose labels:** standard four-, five-, or seven-point presets, or copy the codebook of an existing Numeric variable with 2–11 defined response labels (including custom Never / Rarely / Often mappings).
+- **Protect codebooks:** default **Skip variables with existing value labels**. To replace an existing codebook, explicitly switch to **Replace**, review the preview and confirm. Case values never change.
+- **Preview and validate:** shows eligible and skipped variables and the reasons. Variables with non-missing observed scores not in the chosen coding scheme are skipped to prevent invalid analysis. Existing user-defined missing codes are retained.
+- **Set measurement level:** checked by default to mark successfully updated questions as **Ordinal**. Each successful bulk operation is one undoable edit and uses the existing browser project save mechanism.
+
+**Important:** A reverse-worded questionnaire statement may require reverse scoring in analysis; simply copying its value labels does not reverse individual response codes. Protect respondent-level source files with a backup before editing. This is a browser-local workflow and does not use OpenRouter, Resend or server-side data processing.
+
+Automated checks: `node --test cloudflare/tests/*.test.mjs` and `npx wrangler deploy --dry-run`.
