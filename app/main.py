@@ -384,7 +384,11 @@ def capabilities():
                            "crosstabs", "cronbach_alpha", "t_tests", "anova"],
             "aggregate_only": ["frequency_descriptives", "chapter_four_reports"],
             "study_design": ["a_priori_sample_size_power_planning"],
-            "dimensionality": ["exploratory_principal_axis_factor_analysis"],
+            "dimensionality": [
+                "exploratory_principal_axis_factor_analysis",
+                "horn_style_pearson_component_parallel_analysis",
+                "oblique_quartimin_pattern_structure_and_factor_correlations",
+            ],
         },
         "unavailable": ["confirmatory_factor_analysis", "polychoric_factor_analysis",
                         "advanced_power_analysis", "desktop_package",
