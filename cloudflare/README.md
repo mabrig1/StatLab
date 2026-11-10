@@ -222,3 +222,25 @@ Compare how many coding units in each individual document were assigned to each 
 Repeated phrasing is not necessarily a coherent theme; it may reflect common wording or source style. Multi-code percentages can exceed 100%. Users are responsible for reviewing source excerpts and documenting coding decisions. Removing personally identifying information is not automatic, and code names or recurring phrases themselves may be sensitive. **Review every word before sending a copied prompt externally.** No semantic model, confidence score, automated reliability estimate, sentiment analysis or inferential test is represented as implemented.
 
 Verification: `node --test cloudflare/tests/*.test.mjs` and `npx wrangler deploy --dry-run`. Specific tests live in `cloudflare/tests/content-discovery.test.mjs`.
+
+## v1.0 workstation foundation: Academic/Business home, customer metrics and APA tables
+
+The browser landing view has a professional **Academic Research / Business & Consulting** switch. Feature cards use `workstation-capabilities.mjs` to show whether a feature works **in this browser**, only in the **separately launched local FastAPI edition**, or is a **future planned feature**. This is a feature-disclosure UI, not a new hosted Python engine or a packaged desktop application.
+
+### Business: CSAT / NPS
+
+Under **Business Analytics → Customer experience**, choose `CSAT` or `NPS`. Enter every rating frequency, including zero for unused categories; the tool will refuse empty cells, fractional counts, negative counts, incorrect category lengths and all-zero samples. Both calculations are derived from supplied counts and do not create paired customer records.
+
+- **CSAT (1–5):** percent of *valid* responses choosing **Satisfied (4)** or **Very satisfied (5)**, `100*(f4+f5)/N`.
+- **NPS (0–10):** `100*(f9+f10)/N - 100*(f0+...+f6)/N`. Values range from **−100 to +100 points**, not a percent; 7–8 are passives.
+- Both support breakdown tables, downloadable descriptive CSV and an explicitly synthetic example. No confidence intervals, representativeness, cross-tabulation, tests of significance, or causal effects are implied from the marginal counts alone.
+
+### Academic: APA-inspired output
+
+In **Likert Scale Studio**, run an analysis, then choose **Download APA-style tables (HTML)**. The export reuses existing, validated frequency, N, mean, SD and objective-group results; it has minimalist horizontal rules, numbered tables, italic captions and a method/source note. This is an **editable formatting draft**, not a guarantee of university-specific or full APA 7 compliance. No fake p-values, citations or paired responses are generated.
+
+### Existing code is intentionally preserved
+
+The respondent-level Python API remains local and does not run on Cloudflare. Existing chapters, research project JSON formats, Data View, Variable View, frequency-only, business dashboard and qualitative coding tools remain available. The frontend uses static JS and DOM rather than a new framework. No secrets, Cloudflare settings or existing statistical methods were changed in this slice.
+
+See `docs/STATLAB_V1_ARCHITECTURE.md` and `docs/STATLAB_ROADMAP_V1_V15.md` in the repository root. CI checks new JavaScript syntax, business metric calculations, APA export and FastAPI capabilities. A green Wrangler **dry-run is not verification that the production URL has been updated**.
