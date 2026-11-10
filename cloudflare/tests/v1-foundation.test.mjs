@@ -17,7 +17,8 @@ test("capability statuses distinguish browser, local Python and future features"
   assert.ok(counts.local_python>0);
   assert.ok(counts.planned>0);
   assert.equal(featureById("inferential").status,"local_python");
-  assert.equal(featureById("factor").status,"planned");
+  assert.equal(featureById("factor").status,"local_python");
+  assert.ok(featureById("factor").description.includes("Cloudflare browser cannot"));
   assert.equal(featureById("business").view,"business");
   assert.ok(capabilitiesFor("academic").some(x=>x.id==="frequency"));
   assert.ok(capabilitiesFor("business").some(x=>x.id==="customer"));
