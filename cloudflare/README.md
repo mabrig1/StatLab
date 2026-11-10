@@ -132,3 +132,37 @@ From **Variable View**, select **Set up Q1–Q40 Likert**. The dialog provides a
 **Important:** A reverse-worded questionnaire statement may require reverse scoring in analysis; simply copying its value labels does not reverse individual response codes. Protect respondent-level source files with a backup before editing. This is a browser-local workflow and does not use OpenRouter, Resend or server-side data processing.
 
 Automated checks: `node --test cloudflare/tests/*.test.mjs` and `npx wrangler deploy --dry-run`.
+
+## Business Analytics Studio — Cloudflare browser edition
+
+**Business Analytics** is a separate workspace tab. It works entirely in the user's browser and does not transmit imported sales records to Cloudflare, OpenRouter, Resend or the Python API. The module is independently implemented for this repository, inspired by common open-source BI design patterns.
+
+### Included business functions
+
+- CSV transaction import: date, product, category, region, sales channel, quantity, unit price, unit cost; optional `order_id`. One row is a **sales line item**, not necessarily an order.
+- CSV monthly summary import: month (YYYY-MM), revenue, cost; optional category, region, channel, units, orders. Summary rows must be independent, **non-overlapping** groups; importing a monthly total alongside its components would double count.
+- Input templates for both modes; a clearly labelled **synthetic** Nigerian small-business sample; upload or paste CSV; strict row/amount/date validation.
+- Filters by category, sales channel, region, start/end month; display-only currency labels NGN, USD, GBP, EUR, GHS, KES and ZAR. Display selection **does not convert** the underlying values.
+- KPIs: revenue, recorded costs, gross profit, gross margin, units (when provided), order count (when identifiable) and average order value (only when order information is actually supplied). Charts group revenue by month, category, channel and product (if products exist).
+- Original, generated branded **SVG infographic** with a recorded-month trend, KPI cards and breakdown charts. Download SVG for editing/publishing or PNG from an in-browser canvas. No remote graphing API or external runtime packages are required.
+- Export a spreadsheet-safe KPI CSV and explanatory notes. The dashboard distinguishes **gross** profit from net income; it does not invent overhead, taxes, discounts, returns, customers, forecasts or statistical causal conclusions.
+
+### Open-source research and licensing boundary
+
+Design inspiration was reviewed from:
+
+- **Apache ECharts**, `https://github.com/apache/echarts`, Apache License 2.0: declarative visualizations, chart dashboards, visual hierarchy and responsive chart composition.
+- **Metabase**, `https://github.com/metabase/metabase`, open-source source files generally AGPL and separate commercial code: metric cards, filters, pivot/grouped reporting and understandable BI navigation.
+
+These are **feature concepts only**. No application source from either repository was copied or vendored. The business implementation uses native HTML, JavaScript and SVG so StatLab's existing Cloudflare Worker can deploy unchanged without a bundler, a dashboard server or GPL/AGPL code reuse. If the request for 'REA' refers to a specific third-party GitHub repository, its full repository URL would be needed to verify licensing and match its exact design.
+
+### Data privacy and limitations
+
+Do not upload another organization's confidential records without permission. This edition parses records **locally in the browser** and only exports results when the user clicks an export control. Business inputs are **not saved remotely**, and the demo data are not actual customers or transactions. Browser and device security still matter. Reported costs cannot be treated as fully inclusive unless the input accounts for all expenses. The infographic reports descriptive data, not audited financial results or investment advice.
+
+### Local verification
+
+    node --test cloudflare/tests/*.test.mjs
+    npx wrangler deploy --dry-run
+
+Tests cover numeric totals, missing order IDs, monthly aggregation, filters, dates, invalid CSV, currency labeling, CSV formula safety, generated SVG escaping and the UI integration. Existing StatLab Data View, Variable View and Likert Studio remain separate.
