@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MABRIG StatLab — Data & Variable View</title>
+<title>MABRIG StatLab — Research and Business Workstation</title>
 <meta name="theme-color" content="#102741">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'">
 <link rel="stylesheet" href="/styles.css">
@@ -10,16 +10,20 @@
 <link rel="stylesheet" href="/likert.css">
 <link rel="stylesheet" href="/business.css">
 <link rel="stylesheet" href="/content.css">
+<link rel="stylesheet" href="/workstation-home.css">
+<link rel="stylesheet" href="/customer-metrics.css">
 <script type="module" src="/app.mjs"></script>
 <script type="module" src="/workspace-ui.mjs"></script>
 <script type="module" src="/likert-ui.mjs"></script>
 <script type="module" src="/business-ui.mjs"></script>
 <script type="module" src="/content-ui.mjs"></script>
+<script type="module" src="/workstation-home.mjs"></script>
+<script type="module" src="/customer-metrics-ui.mjs"></script>
 </head>
 <body>
-<header class="statlab-header"><div class="header-left"><a class="brand" href="/" aria-label="MABRIG StatLab home">M. <b>MABRIG StatLab</b></a><span class="header-divider"></span><strong class="header-page">Statistics Calculator</strong></div><span class="tag">Browser workspace · Cloudflare</span></header>
+<header class="statlab-header"><div class="header-left"><a class="brand" href="/" aria-label="MABRIG StatLab home">M. <b>MABRIG StatLab</b></a><span class="header-divider"></span><strong class="header-page">Research & Business Workstation</strong></div><span class="tag">Browser workspace · Cloudflare</span></header>
 <main class="statlab-main">
-<h1 class="screen-title">Statistics Calculator</h1>
+<h1 class="screen-title">Research & Business Workstation</h1>
 <div class="quick-menu" role="group" aria-label="Research data tools">
 <button type="button" id="menu-new">enter new data</button>
 <button type="button" id="menu-import">import</button>
@@ -29,16 +33,56 @@
 <button type="button" id="menu-likert">★ Likert Studio</button>
 <button type="button" id="menu-business">▥ Business Analytics</button>
 <button type="button" id="menu-content">⌕ Content Analysis</button>
+<button type="button" id="menu-home">⌂ Workspace home</button>
 <span class="privacy-caption">☁ no data is sent to the cloud</span>
 </div>
 <nav class="workspace-tabs" aria-label="StatLab workspaces">
-<button type="button" class="workspace-tab active" data-workspace-view="data" aria-current="page">▦ Data View</button>
+<button type="button" class="workspace-tab active" data-workspace-view="home" aria-current="page">⌂ Home</button>
+<button type="button" class="workspace-tab" data-workspace-view="data">▦ Data View</button>
 <button type="button" class="workspace-tab" data-workspace-view="variables">▤ Variable View</button>
 <button type="button" class="workspace-tab likert-featured" data-workspace-view="likert">★ Likert Scale Studio</button>
 <button type="button" class="workspace-tab ba-featured" data-workspace-view="business">▥ Business Analytics</button>
 <button type="button" class="workspace-tab ca-featured" data-workspace-view="content">⌕ Content Analysis</button>
 <button type="button" class="workspace-tab" data-workspace-view="frequency">▥ Frequency-only Analysis</button>
 </nav>
+
+
+<section id="workspace-home" class="workspace-section" aria-label="Workstation home">
+  <div class="ws-welcome">
+    <div><span class="ws-eyebrow">MABRIG STATLAB · WORKSTATION</span>
+      <h2>One workspace. Clear methods. Defensible results.</h2>
+      <p>Analyze questionnaire responses, review qualitative evidence or understand your business performance—without confusing browser tools with the separate local statistical engine.</p>
+      <p class="ws-identity">Independent research software · Not IBM SPSS · No mandatory cloud database</p>
+    </div>
+    <div class="ws-environment"><span class="ws-environment-title">CURRENT ENVIRONMENT</span>
+      <strong>Browser-based edition</strong>
+      <p>Data and analyses in the tools shown here are processed locally in this browser. Download backups before clearing your browser's storage.</p>
+    </div>
+  </div>
+  <div class="ws-choice-title"><h3>What are you working on?</h3><p>Choose the research or business tools you need.</p></div>
+  <div class="ws-choices" role="group" aria-label="Choose a workstation focus">
+    <button type="button" id="ws-academic" class="ws-choice active" aria-pressed="true">
+      <span class="ws-choice-icon" aria-hidden="true">▦</span>
+      <strong>Academic Research</strong>
+      <small>Questionnaires, qualitative analysis, thesis tables, transparent statistics</small>
+      <span class="ws-choice-tail">Explore research tools →</span>
+    </button>
+    <button type="button" id="ws-business" class="ws-choice" aria-pressed="false">
+      <span class="ws-choice-icon" aria-hidden="true">▤</span>
+      <strong>Business & Consulting</strong>
+      <small>Sales dashboards, client infographics, customer satisfaction metrics</small>
+      <span class="ws-choice-tail">Explore business tools →</span>
+    </button>
+  </div>
+  <div class="ws-tools-header"><div><h3 id="ws-tools-title">Research tools</h3>
+    <p id="ws-tools-description">Only features available in this browser can be opened here.</p></div>
+    <span class="ws-status-key"><b class="ws-dot"></b> Available here · Local Python · Planned</span></div>
+  <div id="ws-capabilities" class="ws-capability-grid" aria-live="polite"></div>
+  <div class="ws-trust-panel"><strong>Privacy and research integrity</strong><p>
+    Frequency-only totals are never expanded into individual cases. Statistical tests requiring paired responses are not included in the Cloudflare browser build. The local Python edition has additional methods, but requires a separate trusted installation. Synthetic examples are not real field data; calculations must be verified before publication.</p>
+    <a href="https://github.com/mabrig1/StatLab" target="_blank" rel="noopener noreferrer">Review StatLab source & methodology</a>
+  </div>
+</section>
 
 <section id="workspace-data" class="workspace-section" aria-label="Data View">
 <div class="panel data-panel">
@@ -177,7 +221,8 @@ Total N = 153"></textarea>
       <label>Column order <select id="li-table-order"><option value="high">Strong agreement → disagreement</option><option value="low">Disagreement → strong agreement</option></select></label></div>
     <div id="li-thesis-tables" class="li-thesis-tables"></div>
     <div class="li-export-actions"><button type="button" id="li-tables-html">Download formatted Chapter Four tables (HTML)</button>
-       <button type="button" id="li-tables-csv">Download thesis tables (CSV)</button></div>
+       <button type="button" id="li-tables-csv">Download thesis tables (CSV)</button>
+       <button type="button" id="li-apa-html">Download APA-style tables (HTML)</button></div>
     <h3>Item-by-item frequency distribution</h3><div id="li-item-cards" class="li-item-cards"></div>
     <h3>Research objective summaries</h3><div id="li-group-cards" class="li-group-cards"></div>
     <div class="li-limits"><h3>Important statistical notes</h3><ul id="li-warnings"></ul></div>
@@ -313,6 +358,37 @@ Total N = 153"></textarea>
 </dialog>
 
 <section id="workspace-business" class="workspace-section" aria-label="Business Analytics Mode" hidden>
+
+<section class="cm-panel" id="customer-metrics" aria-labelledby="cm-heading">
+  <div class="cm-title"><div><span class="ba-eyebrow">CUSTOMER EXPERIENCE</span>
+    <h3 id="cm-heading">CSAT & NPS scorecards from response counts</h3>
+    <p>Use only the frequencies you actually collected. These scores cannot identify who gave which answers or prove what caused satisfaction.</p></div>
+    <span class="cm-badge">No respondent records required</span>
+  </div>
+  <div class="cm-switch" role="group" aria-label="Customer feedback score type">
+    <label><input type="radio" name="cm-mode" value="csat" checked> CSAT · 1–5 satisfaction</label>
+    <label><input type="radio" name="cm-mode" value="nps"> NPS · 0–10 likelihood to recommend</label>
+  </div>
+  <div class="cm-entry">
+    <p id="cm-explain">Count responses from Very dissatisfied (1) to Very satisfied (5).</p>
+    <div class="cm-entry-grid" id="cm-entry-grid"></div>
+    <div class="cm-form-actions"><button id="cm-calculate" type="button" class="primary">Calculate customer score</button>
+      <button id="cm-clear" type="button" class="secondary">Clear all counts</button>
+      <button id="cm-example" type="button" class="secondary">Load synthetic example</button>
+    </div>
+    <p id="cm-error" class="cm-error" role="alert" aria-live="polite"></p>
+  </div>
+  <div id="cm-results" class="cm-results" hidden>
+    <div class="cm-result-head"><div><span>DESCRIPTIVE CUSTOMER FEEDBACK</span>
+      <h4 id="cm-result-title"></h4><p id="cm-result-interpretation"></p></div>
+      <button type="button" id="cm-export" class="secondary">Download breakdown CSV</button>
+    </div>
+    <div class="cm-metrics" id="cm-metrics"></div>
+    <div class="cm-results-table"><table><thead><tr><th>Rating</th><th>Response label</th><th>Frequency</th><th>Percentage</th></tr></thead><tbody id="cm-breakdown"></tbody></table></div>
+    <p class="cm-limitations" id="cm-limitations"></p>
+  </div>
+</section>
+
   <section class="ba-hero">
     <div><span class="ba-eyebrow">★ MABRIG BUSINESS INTELLIGENCE</span>
       <h2>Business Analytics Studio</h2>

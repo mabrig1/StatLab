@@ -1,0 +1,36 @@
+/* Browser-only customer feedback calculator: unobtrusive business dashboard section */
+.cm-panel{background:#fff;border:1px solid #dae8e8;border-radius:12px;margin:18px 0;padding:22px}
+.cm-title{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;flex-wrap:wrap}
+.cm-title .ba-eyebrow{color:#087c72}
+.cm-title h3{font-size:20px;color:#174750;margin:7px 0}
+.cm-title p{color:#5f7c82;font-size:12px;line-height:1.6;max-width:770px}
+.cm-badge{font-size:11px;background:#f0f8f5;color:#0d6d61;padding:8px 10px;border:1px solid #b6dbd1;border-radius:22px}
+.cm-switch{display:flex;gap:10px;flex-wrap:wrap;margin:15px 0}
+.cm-switch label{border:1px solid #d5e3e4;border-radius:8px;padding:12px 15px;font-size:12px;color:#28535a;cursor:pointer;flex:1;min-width:160px}
+.cm-switch label:has(input:checked){background:#eef8f5;border-color:#0e8876;font-weight:750}
+.cm-switch input{accent-color:#077c6c}
+.cm-entry>p{font-size:12px;color:#5b757e;line-height:1.55}
+.cm-entry-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,180px),1fr));gap:10px}
+.cm-field{display:flex;flex-direction:column;gap:7px;border:1px solid #e0eaec;border-radius:8px;padding:11px;font-size:12px;color:#355a62;font-weight:750}
+.cm-field input{width:100%;padding:9px;border:1px solid #bcd2d8;border-radius:6px;background:#fff;font-size:13px;color:#173b48}
+.cm-form-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px}
+.cm-form-actions button{font-size:12px;padding:10px 14px}
+.cm-error{color:#ac2735;font-size:12px;font-weight:700}
+.cm-error:empty{display:none}
+.cm-results{border-top:1px solid #dae9e8;margin-top:22px;padding-top:19px}
+.cm-result-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.cm-result-head span{color:#167967;font-size:11px;font-weight:800;letter-spacing:.5px}
+.cm-result-head h4{font-size:25px;color:#19544d;margin:5px 0}
+.cm-result-head p{font-size:12px;color:#57777f;line-height:1.5}
+.cm-result-head button{font-size:12px}
+.cm-metrics{display:grid;grid-template-columns:repeat(4,minmax(110px,1fr));gap:10px;margin:13px 0}
+.cm-metric{padding:14px;border-radius:9px;background:#f2faf7;border:1px solid #e0eee9}
+.cm-metric span,.cm-metric strong{display:block}
+.cm-metric span{font-size:11px;color:#558177}
+.cm-metric strong{font-size:20px;color:#136b5d;margin-top:5px}
+.cm-results-table{overflow:auto}
+.cm-results-table table{width:100%;border-collapse:collapse;font-size:12px}
+.cm-results-table td,.cm-results-table th{padding:9px;border-bottom:1px solid #e0eceb;text-align:left}
+.cm-results-table th{background:#eff7f5;color:#275a58}
+.cm-limitations{font-size:11px;color:#627f83;line-height:1.7;background:#fbfaf5;border-left:3px solid #b58c43;padding:10px}
+@media(max-width:650px){.cm-panel{padding:15px}.cm-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.cm-field{min-width:0}}

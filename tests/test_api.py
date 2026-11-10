@@ -65,3 +65,19 @@ def test_missing_sav_support_message_or_parser():
     r=upload(b'not-a-real-sav',"sample.sav")
     assert r.status_code==400
     assert "pyreadstat" in r.text or "parse" in r.text
+
+
+def test_capabilities_separate_local_python_from_cloudflare_and_future():
+    r = client.get("/api/capabilities")
+    assert r.status_code == 200
+    payload = r.json()
+    assert payload["environment"] == "local-fastapi"
+    assert payload["browser_cloudflare_is_separate"] is True
+    assert "correlations" in payload["features"]["case_level"]
+    assert "factor_analysis" in payload["unavailable"]
+    assert "power_analysis" in payload["unavailable"]
+    assert "desktop_package" in payload["unavailable"]
+    assert payload["integrity"]["frequency_only_never_reconstructs_cases"] is True
+    assert payload["integrity"]["browser_worker_does_not_host_python_engine"] is True
+    assert "dataset_id" not in payload
+    assert "secret" not in str(payload).lower()

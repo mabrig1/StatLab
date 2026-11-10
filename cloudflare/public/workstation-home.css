@@ -1,0 +1,42 @@
+/* StatLab workstation home — professional, restrained navigation and capability honesty */
+.ws-welcome{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(245px,.7fr);gap:30px;align-items:center;border-radius:15px;padding:31px;background:linear-gradient(115deg,#112e45,#195e61);color:#f2f9fc}
+.ws-eyebrow{font-size:10px;letter-spacing:1.7px;color:#a2e6d9;font-weight:800}
+.ws-welcome h2{font-size:clamp(24px,3vw,35px);margin:10px 0;line-height:1.25;font-weight:760}
+.ws-welcome p{font-size:14px;line-height:1.7;color:#d9ebee;max-width:750px}
+.ws-welcome .ws-identity{font-size:11px;color:#c0e0dc;border-top:1px solid #ffffff35;padding-top:12px;margin-bottom:0}
+.ws-environment{background:#ffffff13;border:1px solid #d4f7f24a;border-radius:11px;padding:17px}
+.ws-environment-title{font-size:10px;letter-spacing:1.3px;color:#bbe9dd;font-weight:800}
+.ws-environment strong{font-size:19px;display:block;margin:9px 0 5px}
+.ws-environment p{font-size:12px;margin:0}
+.ws-choice-title,.ws-tools-header{display:flex;align-items:flex-end;justify-content:space-between;gap:15px;margin:25px 0 12px}
+.ws-choice-title h3,.ws-tools-header h3{font-size:20px;margin:0;color:#1f4954}
+.ws-choice-title p,.ws-tools-header p{font-size:12px;color:#607c85;margin:5px 0 0}
+.ws-choices{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.ws-choice{text-align:left;border:1px solid #d5e4e8;border-radius:13px;padding:23px 21px;background:#fff;color:#16414f;cursor:pointer;display:flex;flex-direction:column;gap:8px;min-height:200px;transition:border-color .15s,background .15s}
+.ws-choice.active{background:#f0f9f7;border-color:#239887;box-shadow:0 0 0 1px #23988730}
+.ws-choice:focus-visible,.ws-launch:focus-visible{outline:3px solid #0d977d;outline-offset:3px}
+.ws-choice-icon{font-size:26px;color:#098172}
+.ws-choice strong{font-size:20px}
+.ws-choice small{font-size:12px;line-height:1.6;color:#5e7882;flex:1}
+.ws-choice-tail{font-size:12px;color:#087966;font-weight:800}
+.ws-status-key{font-size:11px;color:#52767b}
+.ws-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#139477;margin-right:4px}
+.ws-capability-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:15px}
+.ws-feature{background:#fff;border:1px solid #dbe7ea;border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.ws-feature-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.ws-feature-title{font-size:15px;font-weight:800;color:#244957}
+.ws-feature-badge{border-radius:20px;padding:5px 9px;font-size:10px;font-weight:800}
+.ws-available{background:#e9f8f0;color:#146b5a}
+.ws-local{background:#eaf2fe;color:#2a5e92}
+.ws-planned{background:#f2f4f5;color:#607480}
+.ws-feature-description{font-size:12px;color:#5e7b83;line-height:1.6;margin:0;flex:1}
+.ws-launch{align-self:flex-start;border:1px solid #b8ddd5;border-radius:7px;padding:9px 12px;color:#066d5c;background:#f1fbf8;font-size:12px;font-weight:800}
+.ws-launch:hover{background:#e2f7ef}
+.ws-feature-notice{font-size:11px;color:#71848a;line-height:1.6}
+.ws-version-note{grid-column:1/-1;font-size:11px;color:#677f87;margin:3px}
+.ws-trust-panel{background:#f7fafb;border-radius:10px;padding:20px;border-left:4px solid #378f7f;margin-top:18px}
+.ws-trust-panel strong{color:#2f5660;font-size:14px}
+.ws-trust-panel p{font-size:12px;line-height:1.7;color:#597682}
+.ws-trust-panel a{font-size:12px;color:#075e83}
+@media(max-width:800px){.ws-welcome{grid-template-columns:1fr;gap:15px}.ws-environment{max-width:none}.ws-capability-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.ws-choices{grid-template-columns:1fr}.ws-welcome{padding:22px}.ws-choice{min-height:160px}.ws-choice-title,.ws-tools-header{align-items:flex-start;flex-direction:column}}

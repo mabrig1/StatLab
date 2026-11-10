@@ -4,6 +4,14 @@ An independent, browser-based SPSS-style **prototype**, not IBM SPSS code and no
 
 ![status](https://img.shields.io/badge/status-local%20prototype-0e987f) ![Python](https://img.shields.io/badge/Python-3.12-blue)
 
+## Current product direction — v1.0 foundation (November 2026)
+
+StatLab has **two separate apps in one repository**. The local Python 3.12/FastAPI edition includes real respondent-level statistical procedures; the Cloudflare static browser workstation focuses on editable tables, frequency-only and Likert descriptives, business indicators and content coding. **Do not mistake Cloudflare's static interface for the complete FastAPI engine.**
+
+The first v1.0 foundation adds a **calm Academic/Business home screen**, an explicit browser/local-Python/planned capability guide, **CSAT and NPS** from aggregate response frequencies in Business Analytics, and **APA-inspired Likert HTML tables** without changing statistical results. The Python edition now exposes a read-only `GET /api/capabilities` endpoint. These are incremental changes, **not a full v1.0 release** and not an offline desktop package.
+
+Read the [architecture decision](docs/STATLAB_V1_ARCHITECTURE.md) and [prioritized v1.0–v1.5 roadmap](docs/STATLAB_ROADMAP_V1_V15.md). Product pillars: private local analysis, accurate provenance, preservation of original data, transparent method assumptions and explicit feature availability. No AI model invents statistics. Frequency-only mode never fabricates respondent rows.
+
 ## What's implemented in v0.9
 
 - Browser UI: import, **editable Data View**, **detailed Variable View**, analysis workbench, output viewer, and **Research Project Manager**.

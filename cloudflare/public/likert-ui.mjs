@@ -6,6 +6,7 @@ import {
 import {
   exportLikertDraft, importLikertDraft, objectiveTables, objectiveTablesCsv, objectiveTablesHtml
 } from "./likert-student.mjs";
+import {apaLikertHtml} from "./apa-likert.mjs";
 
 const e=id=>document.getElementById(id);
 const state={points:5,items:exampleItems(),objectives:[...EXAMPLE_OBJECTIVES],
@@ -408,6 +409,12 @@ function wire(){
     download("statlab-chapter-four-tables.csv",
       objectiveTablesCsv(state.report,{highestFirst:e("li-table-order").value==="high"}),
       "text/csv;charset=utf-8");
+  });
+  e("li-apa-html").addEventListener("click",()=>{
+    if(!state.report)return;
+    const high=e("li-table-order").value==="high";
+    download("statlab-apa-style-likert-tables.html",
+      apaLikertHtml(state.report,{highestFirst:high}),"text/html;charset=utf-8");
   });
   e("li-source-label").addEventListener("input",markStale);
   e("li-sd").addEventListener("change",markStale);
