@@ -204,3 +204,54 @@ footer{color:#667d84}
   .vl-actions button{flex:1;min-width:80px}
   .vl-list-area select{height:170px}
 }
+
+
+/* Student shortcut: readable bulk Q1-Q40 setup for mobile and desktop */
+.variable-heading-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.variable-heading-actions button{font-size:12px;padding:10px 14px;white-space:nowrap}
+.bulk-likert-dialog{width:min(800px,96vw);max-height:min(91vh,960px);border-radius:14px;border:1px solid #cce4df;padding:23px;color:#1e4050;box-shadow:0 24px 85px #001b3244;overflow-y:auto}
+.bulk-likert-dialog::backdrop{background:#061b2bad}
+.bulk-likert-dialog h2{font-size:22px;margin:6px 0}
+.bulk-header p,.bulk-note{font-size:12px;color:#647c85;line-height:1.65;margin:5px 0 13px}
+.bulk-create-panel{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px;background:#f0faf7;border:1px solid #cee9df;border-radius:9px;margin:12px 0}
+.bulk-create-panel div{flex:1}
+.bulk-create-panel strong,.bulk-create-panel small{display:block}
+.bulk-create-panel strong{font-size:13px;color:#116f60}
+.bulk-create-panel small{font-size:11px;color:#527c73;margin-top:4px;line-height:1.55}
+.bulk-create-panel button{white-space:nowrap;font-size:12px}
+.bulk-options{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;border:1px solid #d6e5e9;border-radius:9px;padding:15px;margin:14px 0;background:#fbfdfd}
+.bulk-options legend{padding:0 5px;font-size:13px;color:#205c62;font-weight:750}
+.bulk-options>label:not(.bulk-checkbox){font-size:12px;color:#456870;font-weight:700}
+.bulk-options select{width:100%;min-width:0;border:1px solid #b7d1d6;padding:10px;border-radius:7px;background:#fff;font-size:12px;color:#294854}
+.bulk-options .bulk-checkbox{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:12px;margin:10px 0 0;color:#476b71}
+.bulk-options .bulk-checkbox input{accent-color:#098678}
+.bulk-pick-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin:12px 0}
+.bulk-pick-head h3{font-size:15px;margin:0}
+.bulk-pick-head>div{display:flex;gap:7px;flex-wrap:wrap}
+.bulk-pick-head button{font-size:12px;padding:8px 10px}
+.bulk-target-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:5px;border:1px solid #d3e3e5;background:#f9fcfc;border-radius:8px;padding:10px;max-height:240px;overflow-y:auto}
+.bulk-target{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:3px 9px;border:1px solid #edf2f2;background:#fff;border-radius:6px;padding:9px;cursor:pointer}
+.bulk-target:has(input:checked){border-color:#27a28c;background:#eaf9f4}
+.bulk-target input{grid-row:span 2;accent-color:#057e72}
+.bulk-target span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:12px;font-weight:750}
+.bulk-target small{grid-column:2;font-size:10px;color:#718b94}
+.bulk-target:has(input:disabled){opacity:.65;cursor:not-allowed}
+.bulk-preview{margin:13px 0;border-radius:8px;border:1px solid #cfe6e0;background:#f2faf7;padding:12px;font-size:12px;line-height:1.6}
+.bulk-preview strong{color:#125f57;font-size:14px}
+.bulk-preview p{font-size:12px;color:#4b6f6e;margin:6px 0}
+.bulk-preview ul{padding-left:18px;max-height:150px;overflow:auto;color:#695e34;background:#fff9eb;border-radius:5px}
+.bulk-preview li{margin:4px 0}
+.bulk-created{color:#086f63;font-size:12px;font-weight:700}
+.bulk-likert-dialog .dialog-actions{display:flex;justify-content:flex-end;gap:9px;border-top:1px solid #e1eaed;padding-top:14px;margin-top:15px}
+.bulk-likert-dialog .dialog-actions button{font-size:12px}
+.bulk-likert-dialog .vl-error{color:#bc3138;font-size:12px;font-weight:700}
+.bulk-likert-dialog .vl-error:empty{display:none}
+@media(max-width:700px){
+  .bulk-create-panel{flex-direction:column;align-items:stretch}
+  .bulk-options{grid-template-columns:1fr}
+  .bulk-options .bulk-checkbox{grid-column:1}
+  .bulk-target-list{grid-template-columns:repeat(2,minmax(110px,1fr))}
+  .bulk-likert-dialog{padding:14px}
+  .bulk-likert-dialog .dialog-actions{flex-wrap:wrap}
+  .bulk-likert-dialog .dialog-actions button{flex:1}
+}
