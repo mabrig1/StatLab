@@ -146,6 +146,17 @@ def test_small_sample_and_fewer_than_four_items_rejected(synthetic_two_factor):
         exploratory_factor(synthetic_two_factor,["Q1","Q2","Q3","Q4"],n_factors=4)
 
 
+def test_low_kmo_random_independent_items_are_blocked():
+    # Seeded, independent Gaussian items produce poor shared variance.
+    independent=np.random.default_rng(7).normal(size=(200,5))
+    columns=[f"X{i}" for i in range(5)]
+    frame=pd.DataFrame(independent,columns=columns)
+    check=correlation_factorability(independent)
+    assert check["kmo"]<.5
+    with pytest.raises(AnalysisError,match="below 0.50"):
+        exploratory_factor(frame,columns,n_factors=2)
+
+
 def test_efa_dispatch_uses_only_observed_case_rows(synthetic_two_factor):
     response=analyze(synthetic_two_factor,{"analysis":"efa","columns":list(synthetic_two_factor),
                            "factor_count":2,"factor_rotation":"varimax"})
