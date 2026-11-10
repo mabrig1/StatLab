@@ -1,3 +1,10 @@
+## Unreleased — local exploratory factor analysis
+
+- Added local FastAPI **principal-axis EFA**: 4–25 variables, 1–6 researcher-selected factors, 50+ complete records and at least five complete cases per item, maximum 10,000 complete records.
+- KMO overall and item-level sampling adequacy, Bartlett χ²/df/p, Pearson correlation eigenvalue scree, common-factor loadings, communalities, uniquenesses, cross-loadings, listwise deletion diagnostics and optional orthogonal varimax.
+- Rejects missing/unpaired respondent files, invalid numeric/text/nominal coding, low overall KMO (<0.50), singular correlation matrices, constant items and insufficient N. Does not reconstruct frequency-only marginals.
+- Updated local Analysis Workbench UI, capability disclosure, reproducible numerical tests and documentation. CFA, polychoric ordinal analysis, oblique rotation and parallel analysis remain unavailable.
+
 ## Unreleased — validated a priori power planning (local Python)
 
 - New power/sample-size planner for one-sample/paired/pooled-independent t, balanced ANOVA and approximate independent proportions, using Statsmodels with input limits and verification after rounding.
