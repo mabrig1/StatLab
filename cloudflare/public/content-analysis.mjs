@@ -115,18 +115,25 @@ function escapeRegex(s){
   return [...s].map(c=>special.includes(c)?"\\"+c:c).join("");
 }
 export function keywordMatches(text,keywords){
-  const seen=new Set(),hits=[];
+  const hits=[];
   for(const phrase of keywords){
     const expression=escapeRegex(phrase.trim()).replace(/\s+/g,"\\s+");
     const regex=new RegExp("(?<![\\p{L}\\p{N}_])"+expression+"(?![\\p{L}\\p{N}_])","giu");
     for(const m of text.matchAll(regex)){
-      const key=m.index+":"+m[0].length;
-      if(seen.has(key))continue;
-      seen.add(key);hits.push({start:m.index,match:m[0],keyword:phrase});
-      if(hits.length>=500)break;
+      hits.push({start:m.index,match:m[0],keyword:phrase});
+      if(hits.length>=2500)break;
     }
+    if(hits.length>=2500)break;
   }
-  return hits.sort((a,b)=>a.start-b.start);
+  // Prefer the longest matching phrase when different keywords overlap.
+  hits.sort((a,b)=>a.start-b.start||b.match.length-a.match.length);
+  const nonoverlap=[];let lastEnd=-1;
+  for(const hit of hits){
+    if(hit.start<lastEnd)continue;
+    nonoverlap.push(hit);lastEnd=hit.start+hit.match.length;
+    if(nonoverlap.length>=500)break;
+  }
+  return nonoverlap;
 }
 export function analyzeContent(rawProject){
   const project=validateContentProject(rawProject),units=segmentDocuments(project.documents,project.unit);
