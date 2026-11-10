@@ -242,7 +242,9 @@ class AnalysisRequest(BaseModel):
     higher_is_favourable: bool | None = None
     min_answered_pct: int = 50
     factor_count: int = Field(default=2, ge=1, le=6)
-    factor_rotation: Literal["none", "varimax"] = "varimax"
+    factor_rotation: Literal["none", "varimax", "oblimin"] = "varimax"
+    parallel_simulations: int = Field(default=100, ge=50, le=200)
+    parallel_seed: int = Field(default=20261110, ge=0, le=4294967295)
 
 
 def sanitize_value(x):
