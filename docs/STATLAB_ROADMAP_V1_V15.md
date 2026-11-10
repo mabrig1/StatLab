@@ -1,3 +1,5 @@
+> **Updated 10 November 2026:** A **limited, validated a priori power/sample-size planning module** is now implemented **only in local FastAPI**. The v1.1 milestone below refers to extending design coverage, sensitivity analysis and reference validation—not implementing this first module. See [POWER_ANALYSIS_GUIDE.md](POWER_ANALYSIS_GUIDE.md). Exploratory factor analysis remains unimplemented.
+
 # MABRIG StatLab — Prioritized product roadmap
 
 **Product:** independent privacy-first academic and business statistical workstation. State of repository verified 2026-11-10. This is a roadmap, not a claim that every planned feature already exists.
