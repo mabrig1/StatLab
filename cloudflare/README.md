@@ -105,3 +105,15 @@ Likert Scale Studio now supports **unfinished-project backups** and **objective-
 StatLab does not fabricate field observations, response rates, or correlations from marginal frequency counts. Numerical means for ordered responses assume approximately equally spaced rating codes. The user must provide any survey source label, which remains unverified.
 
 To review this feature locally: run `node --test cloudflare/tests/*.test.mjs` and open the static frontend through Wrangler. Files: `cloudflare/public/likert-student.mjs`, `cloudflare/tests/likert-student.test.mjs`.
+
+## SPSS-style Value Labels popup
+
+In **Variable View**, click the **Values** cell (for example "Add labels..." on Q1). A small dialog now follows the familiar SPSS workflow:
+
+1. Enter a **Value** code, e.g. `1`, and a **Label**, e.g. `Strongly Disagree`.
+2. Click **Add**; repeat for each code. Selecting an existing entry populates the fields for **Change** or **Remove**.
+3. For questionnaires, choose **5-point Likert** to fill the standard `1 = Strongly Disagree` through `5 = Strongly Agree` mapping instantly; 4- and 7-point presets are also available. Existing draft labels are replaced only with confirmation.
+4. Optionally mark the variable **Ordinal** and define user-missing codes such as `99`.
+5. Click **OK — Save labels** to apply. Click **Cancel** or close the dialog to discard any uncommitted changes.
+
+The editor prevents duplicate numeric codes, empty labels, invalid numeric entries and duplicate missing codes. Changing a label updates the data dictionary only; it **does not recode or overwrite existing respondent values**. Each variable has independent labels. Turn on **Display value labels** in Data View to see words instead of coded numbers. The underlying SPSS-style Data View and frequency-only/ Likert analysis tabs remain unchanged.
