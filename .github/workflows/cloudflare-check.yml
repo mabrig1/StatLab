@@ -33,5 +33,10 @@ jobs:
       - run: node --check cloudflare/public/content-analysis.mjs
       - run: node --check cloudflare/public/content-ui.mjs
       - run: node --check cloudflare/public/content-discovery.mjs
+      - run: node --check cloudflare/public/workstation-capabilities.mjs
+      - run: node --check cloudflare/public/workstation-home.mjs
+      - run: node --check cloudflare/public/customer-metrics.mjs
+      - run: node --check cloudflare/public/customer-metrics-ui.mjs
+      - run: node --check cloudflare/public/apa-likert.mjs
       - run: node --test cloudflare/tests/*.test.mjs
       - run: npx --yes wrangler deploy --dry-run --outdir /tmp/statlab-cloudflare-dist
