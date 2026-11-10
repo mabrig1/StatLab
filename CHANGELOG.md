@@ -1,3 +1,10 @@
+## Unreleased — validated a priori power planning (local Python)
+
+- New power/sample-size planner for one-sample/paired/pooled-independent t, balanced ANOVA and approximate independent proportions, using Statsmodels with input limits and verification after rounding.
+- Local FastAPI endpoints `POST /api/power/sample-size`, `POST /api/power/report.html`, and updated `GET /api/capabilities`.
+- Local UI for planning, per-arm attrition adjustments and printable methodology memo. No data uploads, no invented effects or test results.
+- Added independent regression tests. Cloudflare feature registry states **Local Python only**; it is not a Cloudflare web feature or desktop installation.
+
 # 0.9.0 — Unified Output Viewer and Analysis History (9 November 2026)
 
 - Central Output Viewer now tracks case-level statistical analyses, frequency-only survey statistics and generated Chapter Four drafts in one searchable, filterable history.
