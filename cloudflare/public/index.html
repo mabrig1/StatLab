@@ -9,10 +9,12 @@
 <link rel="stylesheet" href="/workspace.css">
 <link rel="stylesheet" href="/likert.css">
 <link rel="stylesheet" href="/business.css">
+<link rel="stylesheet" href="/content.css">
 <script type="module" src="/app.mjs"></script>
 <script type="module" src="/workspace-ui.mjs"></script>
 <script type="module" src="/likert-ui.mjs"></script>
 <script type="module" src="/business-ui.mjs"></script>
+<script type="module" src="/content-ui.mjs"></script>
 </head>
 <body>
 <header class="statlab-header"><div class="header-left"><a class="brand" href="/" aria-label="MABRIG StatLab home">M. <b>MABRIG StatLab</b></a><span class="header-divider"></span><strong class="header-page">Statistics Calculator</strong></div><span class="tag">Browser workspace · Cloudflare</span></header>
@@ -26,6 +28,7 @@
 <button type="button" id="menu-sample">example dataset</button>
 <button type="button" id="menu-likert">★ Likert Studio</button>
 <button type="button" id="menu-business">▥ Business Analytics</button>
+<button type="button" id="menu-content">⌕ Content Analysis</button>
 <span class="privacy-caption">☁ no data is sent to the cloud</span>
 </div>
 <nav class="workspace-tabs" aria-label="StatLab workspaces">
@@ -33,6 +36,7 @@
 <button type="button" class="workspace-tab" data-workspace-view="variables">▤ Variable View</button>
 <button type="button" class="workspace-tab likert-featured" data-workspace-view="likert">★ Likert Scale Studio</button>
 <button type="button" class="workspace-tab ba-featured" data-workspace-view="business">▥ Business Analytics</button>
+<button type="button" class="workspace-tab ca-featured" data-workspace-view="content">⌕ Content Analysis</button>
 <button type="button" class="workspace-tab" data-workspace-view="frequency">▥ Frequency-only Analysis</button>
 </nav>
 
@@ -181,6 +185,87 @@ Total N = 153"></textarea>
   </section>
 </section>
 
+
+
+<section id="workspace-content" class="workspace-section" aria-label="Content Analysis Studio" hidden>
+  <section class="ca-hero">
+    <div>
+      <span class="ca-eyebrow">★ QUALITATIVE & QUANTITATIVE RESEARCH</span>
+      <h2>Content Analysis Studio</h2>
+      <p>Organize interviews, policy documents, articles and social-media text. Build a codebook, inspect suggested matches, review passages manually and export research-ready evidence tables.</p>
+      <div class="ca-tags"><span>Document coding</span><span>Keyword-assisted themes</span><span>Frequency tables</span><span>Manual review</span><span>Chapter Four export</span></div>
+    </div>
+    <aside class="ca-privacy"><strong>🔒 Browser-only analysis</strong><small>Source text is not sent to OpenRouter or any remote analysis service.</small></aside>
+  </section>
+  <div class="ca-toolbar">
+    <div><span id="ca-save-status">Unsaved browser session</span><small>Save a private JSON backup to continue on another device. Draft content is not stored remotely.</small></div>
+    <button type="button" id="ca-demo" class="secondary">Load synthetic example</button>
+    <button type="button" id="ca-new" class="secondary">New blank study</button>
+    <button type="button" id="ca-backup" class="secondary">Save project JSON</button>
+    <button type="button" id="ca-open" class="secondary">Open project JSON</button>
+    <input id="ca-project-file" type="file" accept=".json,application/json" hidden>
+  </div>
+  <div class="ca-layout">
+    <section class="ca-card">
+      <div class="ca-step"><span>1</span><div><h3>Build your document collection</h3><p>Add pasted passages, import TXT/Markdown, or load a document CSV.</p></div></div>
+      <label class="ca-field">Study title<input id="ca-title" maxlength="220" type="text" placeholder="e.g. Content Analysis of Newspaper Coverage of Rural Education"></label>
+      <div class="ca-split">
+        <label class="ca-field">Unit of analysis<select id="ca-unit"><option value="paragraph">Paragraph</option><option value="sentence">Sentence (approximate)</option><option value="document">Entire document</option></select></label>
+        <label class="ca-field">Document ID<input id="ca-doc-id" type="text" maxlength="70" placeholder="D4"></label>
+      </div>
+      <label class="ca-field">Document / interview title<input id="ca-doc-title" type="text" maxlength="180" placeholder="Interview with participant A"></label>
+      <label class="ca-field">Text to analyze<textarea id="ca-text" rows="7" maxlength="20000" placeholder="Paste an interview transcript, article, policy excerpt or social-media post. A blank line separates paragraphs."></textarea></label>
+      <div class="ca-actions"><button type="button" id="ca-add-doc" class="primary">+ Add document</button><button type="button" id="ca-upload-text" class="secondary">Import TXT/MD</button><button type="button" id="ca-upload-csv" class="secondary">Import document CSV</button><button type="button" id="ca-template" class="secondary">CSV template</button></div>
+      <input type="file" id="ca-source-file" accept=".txt,.md,.csv,text/plain,text/csv,text/markdown" hidden>
+      <div id="ca-documents" class="ca-document-list" aria-label="Loaded source documents"></div>
+      <p class="ca-note">Upload support: TXT, MD or CSV with <code>id,title,text</code>. PDF/DOCX extraction is not supported in this browser edition.</p>
+    </section>
+    <section class="ca-card">
+      <div class="ca-step"><span>2</span><div><h3>Define your content codebook</h3><p>Create themes or categories and specify phrases that suggest them.</p></div></div>
+      <div class="ca-split"><label class="ca-field">Code ID<input id="ca-code-id" type="text" maxlength="70" placeholder="ACCESS"></label>
+        <label class="ca-field">Code / theme name<input id="ca-code-name" type="text" maxlength="100" placeholder="Accessibility"></label></div>
+      <label class="ca-field">Code definition<input id="ca-code-description" type="text" maxlength="350" placeholder="What does this category mean?"></label>
+      <label class="ca-field">Keyword / phrase suggestions (comma or newline separated)<textarea id="ca-keywords" rows="3" placeholder="internet access, connectivity, network"></textarea></label>
+      <div class="ca-actions"><button type="button" class="primary" id="ca-add-code">+ Add code</button><button type="button" id="ca-update-code" class="secondary" disabled>Update selected code</button><button type="button" id="ca-reset-code" class="secondary">Clear fields</button></div>
+      <div id="ca-codebook" class="ca-code-list" aria-label="Content analysis codebook"></div>
+      <p class="ca-note">Keyword matches are suggestions, not proof of meaning. A researcher must inspect and confirm or reject assigned codes.</p>
+    </section>
+  </div>
+  <div class="ca-analyze-bar"><div><strong>3 · Run transparent content analysis</strong>
+    <small>Count coding units, documents, suggested themes and keyword mentions. Review evidence before drawing conclusions.</small></div>
+    <button id="ca-analyze" type="button" class="primary">Analyze documents →</button>
+  </div>
+  <p class="ca-error" id="ca-error" role="alert" aria-live="polite"></p>
+  <section id="ca-results" class="ca-results" hidden>
+    <div class="ca-results-head"><div><span class="ca-eyebrow">RESULTS & RESEARCH EVIDENCE</span><h2>Content analysis findings</h2><p id="ca-source-summary"></p></div>
+      <div class="ca-actions"><button id="ca-export-codes" type="button">Export code frequencies CSV</button><button id="ca-export-units" type="button">Export coded passages CSV</button><button id="ca-export-chapter" type="button">Export Chapter Four HTML</button></div>
+    </div>
+    <div class="ca-kpis" id="ca-kpis"></div>
+    <div class="ca-viz-grid">
+      <article class="ca-card"><h3>Theme frequency by coding unit</h3><p>One passage may have multiple codes. Counts represent assigned coding units, not individual people.</p><div id="ca-bars" class="ca-bars"></div></article>
+      <article class="ca-card"><h3>Most frequent content words</h3><p>Simple word counts with common stopwords excluded; not a sentiment model.</p><div id="ca-words" class="ca-word-cloud"></div></article>
+    </div>
+    <article class="ca-card ca-result-table"><h3>Code frequency table</h3><div class="ca-table-scroll"><table><thead><tr><th>Code</th><th>Assigned units</th><th>% of units</th><th>Documents</th><th>Literal keyword hits</th><th>Reviewed units</th></tr></thead><tbody id="ca-code-stats"></tbody></table></div></article>
+    <article class="ca-card ca-review-panel">
+      <div class="ca-review-heading"><div><h3>Review and confirm coded passages</h3><p>Choose a passage to accept, reject or revise the automatic suggestions and write your analytic memo.</p></div>
+      <label>Find passage <input id="ca-search" type="search" placeholder="Search text or document title"></label>
+      <label>Review status<select id="ca-filter"><option value="all">All passages</option><option value="unreviewed">Not reviewed</option><option value="reviewed">Reviewed</option><option value="coded">Assigned a code</option></select></label></div>
+      <div id="ca-passages" class="ca-passages"></div>
+      <div class="ca-pagination"><button id="ca-prev" type="button" class="secondary">← Previous</button><span id="ca-page"></span><button id="ca-next" type="button" class="secondary">Next →</button></div>
+    </article>
+    <div class="ca-viz-grid"><article class="ca-card"><h3>Code co-occurrence</h3><p>Number of coding units assigned both codes (descriptive only).</p><div id="ca-pairs"></div></article>
+      <article class="ca-card ca-limits"><h3>How to interpret results responsibly</h3><ul id="ca-notes"></ul></article></div>
+  </section>
+</section>
+<dialog id="ca-review-dialog" class="ca-review-dialog" aria-labelledby="ca-review-title">
+  <div><span class="ca-eyebrow">MANUAL CODING</span><h2 id="ca-review-title">Review passage</h2><p id="ca-review-context"></p></div>
+  <blockquote id="ca-review-text"></blockquote>
+  <div id="ca-review-checks" class="ca-review-checks" role="group" aria-label="Assign codes to this passage"></div>
+  <label class="ca-field">Research memo / interpretation (optional)<textarea id="ca-review-memo" maxlength="1200" rows="4" placeholder="Explain why this excerpt belongs to the selected category, or why a keyword match is irrelevant."></textarea></label>
+  <p class="ca-note">Saving confirms your chosen code assignment, even if you choose no codes.</p>
+  <p id="ca-review-error" class="ca-error" role="alert" aria-live="polite"></p>
+  <div class="ca-dialog-actions"><button type="button" id="ca-review-cancel" class="secondary">Cancel</button><button type="button" id="ca-review-revert" class="secondary">Reset to suggestions</button><button type="button" id="ca-review-save" class="primary">Save reviewed coding</button></div>
+</dialog>
 
 <section id="workspace-business" class="workspace-section" aria-label="Business Analytics Mode" hidden>
   <section class="ba-hero">
