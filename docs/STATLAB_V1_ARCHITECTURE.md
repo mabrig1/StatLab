@@ -95,3 +95,7 @@ Decision requires a reproducible build, per-platform installation/upgrade/uninst
 - `qualitative_text`: lexical matches are provisional codes; human review, source traceability, privacy and methodology determine valid interpretation.
 
 **Security:** The current local sessions and browser local storage are not encrypted. Avoid shared devices for confidential projects; an encrypted, opt-in sync architecture must not silently upload existing projects. Power analysis is about **planned study design**, not post-hoc invented significance.
+
+### EFA retention and oblique rotation addendum
+
+The local EFA analysis can now generate reproducible Horn-style parallel-analysis **Pearson component eigenvalue** reference cutoffs (50–200 simulations, explicit seed) and use orthogonal varimax or oblique oblimin/quartimin. Oblique models report **pattern**, **structure** and rotated **factor correlation (Φ)** as separate outputs and do not treat pattern loadings as direct item–factor correlations. The Monte Carlo comparison is an empirical factor-retention **aid**; it is not principal-axis common-factor parallel analysis, and the researcher must select/justify factor count. Complete observed respondent cases are required, while frequency-only marginals remain incapable of EFA. No Cloudflare Worker method availability is claimed.
