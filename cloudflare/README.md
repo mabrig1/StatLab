@@ -252,3 +252,7 @@ The Cloudflare Worker uses static HTML and JavaScript and **does not host Statsm
 ## EFA capability: local Python only
 
 The Cloudflare browser displays **Exploratory Factor Analysis** as **Local Python only**, not as an available in-browser method. Local FastAPI supports principal-axis extraction with KMO/Bartlett diagnostics, optional orthogonal varimax, and user-selected factor count from observed paired records. These are **not** available from the Cloudflare Worker, frequency-only marginals, or the browser's Likert Studio. The implementation does not provide CFA, polychoric correlations or parallel analysis. See `docs/EXPLORATORY_FACTOR_ANALYSIS.md`.
+
+## Local-only EFA retention and oblique rotation
+
+The local FastAPI edition now supports oblimin/quartimin correlated-factor rotation and a Horn-style 95th-percentile **Pearson component eigenvalue** parallel-analysis *guide*. The browser workstation still presents EFA as **Local Python only**. Do not suggest Cloudflare's static worker can calculate EFA, oblique rotations, PAF factor parallel analysis, CFA or polychoric correlations; it cannot. See `docs/EXPLORATORY_FACTOR_ANALYSIS.md` for scope and assumptions.
