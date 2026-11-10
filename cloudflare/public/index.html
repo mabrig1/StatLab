@@ -75,7 +75,10 @@
 
 <section id="workspace-variables" class="workspace-section" aria-label="Variable View" hidden>
 <div class="panel variables-panel">
-<div class="studio-heading"><div><span class="eyebrow">DATA DICTIONARY</span><h2>Variable View <span class="soft-label">Define your columns</span></h2><p>Give every question a name, type, label, code meanings, missing values and measurement level. Changes apply immediately to Data View.</p></div><button type="button" class="primary" id="add-variable">+ New variable</button></div>
+<div class="studio-heading"><div><span class="eyebrow">DATA DICTIONARY</span><h2>Variable View <span class="soft-label">Define your columns</span></h2><p>Give every question a name, type, label, code meanings, missing values and measurement level. Changes apply immediately to Data View.</p></div><div class="variable-heading-actions">
+<button type="button" id="open-bulk-likert" class="primary">★ Set up Q1–Q40 Likert</button>
+<button type="button" class="secondary" id="add-variable">+ New variable</button>
+</div></div>
 <div class="variable-wrap" tabindex="0" aria-label="Variable properties horizontal scroll">
 <table class="variables-table"><thead><tr><th>#</th><th>Name</th><th>Type</th><th>Width</th><th>Decimals</th><th>Label / Questionnaire item</th><th>Values</th><th>Missing</th><th>Columns</th><th>Align</th><th>Measure</th><th>Role</th><th>Arrange</th></tr></thead><tbody id="variable-body"></tbody></table>
 </div>
@@ -197,6 +200,49 @@ Total N = 153</textarea>
 <div class="section-head"><h2>Descriptive results</h2><button id="csv" type="button">Export summary CSV</button></div>
 <div class="table-scroll"><table><thead><tr><th>Item</th><th>N</th><th>Mean</th><th>SD</th><th>Median</th><th>Mode</th><th>Top response</th></tr></thead><tbody id="summary"></tbody></table></div><div id="details"></div>
 </section></section>
+
+
+<dialog id="bulk-likert-dialog" class="bulk-likert-dialog" aria-labelledby="bulk-dialog-title">
+  <div class="bulk-header">
+    <div><span class="eyebrow">STUDENT QUESTIONNAIRE SHORTCUT</span><h2 id="bulk-dialog-title">Set up Likert questions in bulk</h2>
+    <p>Create missing Q1–Q40 columns, then copy response codes to selected questions in one step. Your existing respondent values are never changed.</p></div>
+  </div>
+  <div class="bulk-create-panel">
+    <div><strong>Starting a 40-question survey?</strong><small>Create only missing columns, with blank case cells and 5-point labels. Existing Q1–Q40 variables stay untouched.</small></div>
+    <button id="bulk-create-questions" type="button" class="secondary">+ Create missing Q1–Q40</button>
+  </div>
+  <fieldset class="bulk-options">
+    <legend>Choose coding to copy</legend>
+    <label for="bulk-source">Value labels</label>
+    <select id="bulk-source">
+      <option value="preset:5">5-point: 1 = Strongly Disagree → 5 = Strongly Agree</option>
+      <option value="preset:4">4-point: 1 = Strongly Disagree → 4 = Strongly Agree</option>
+      <option value="preset:7">7-point: 1 = Strongly Disagree → 7 = Strongly Agree</option>
+    </select>
+    <label for="bulk-mode">Protect existing codebooks</label>
+    <select id="bulk-mode">
+      <option value="skip">Skip variables with existing value labels (recommended)</option>
+      <option value="replace">Replace existing value labels after confirmation</option>
+    </select>
+    <label class="bulk-checkbox"><input type="checkbox" id="bulk-ordinal" checked> Set updated variables' Measure to Ordinal</label>
+  </fieldset>
+  <div class="bulk-pick-head">
+    <h3>Choose questions</h3>
+    <div>
+      <button type="button" id="bulk-pick-questions" class="secondary">Select Q1–Q40</button>
+      <button type="button" id="bulk-pick-numeric" class="secondary">Select all numeric</button>
+      <button type="button" id="bulk-pick-none" class="secondary">Clear</button>
+    </div>
+  </div>
+  <div id="bulk-target-list" class="bulk-target-list" role="group" aria-label="Variables to assign Likert value labels"></div>
+  <div id="bulk-preview" class="bulk-preview" role="status" aria-live="polite"></div>
+  <p class="bulk-note">A reversed questionnaire statement must still be identified as reverse-scored during analysis. Bulk labels do not reverse any recorded scores or create respondents.</p>
+  <p id="bulk-error" class="vl-error" role="alert" aria-live="polite"></p>
+  <div class="dialog-actions">
+    <button type="button" id="bulk-cancel" class="secondary">Cancel</button>
+    <button type="button" id="bulk-apply" class="primary">Apply labels to selected questions</button>
+  </div>
+</dialog>
 
 <dialog id="variable-dialog" class="variable-dialog value-labels-dialog" aria-labelledby="dialog-heading">
 <form id="variable-details-form">
