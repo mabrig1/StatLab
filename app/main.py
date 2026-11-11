@@ -390,7 +390,7 @@ def capabilities():
             "aggregate_only": ["frequency_descriptives", "chapter_four_reports"],
             "study_design": ["a_priori_sample_size_power_planning"],
             "pharmaceutical_browser": ["linear_calibration", "assay_repeatability", "spike_recovery",
-                                       "observed_exposure", "dissolution_efficiency", "two_factor_formulation"],
+                                       "observed_exposure", "dissolution_efficiency", "dissolution_efficiency_comparison", "two_factor_formulation"],
             "dimensionality": [
                 "exploratory_principal_axis_factor_analysis",
                 "horn_style_pearson_component_parallel_analysis",

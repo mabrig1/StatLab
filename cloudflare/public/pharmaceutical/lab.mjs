@@ -1,3 +1,4 @@
+import {resultTableCsv} from './table-export.mjs';
 import {analyze, methods} from './methods.mjs';
 
 const byId = id => document.getElementById(id);
@@ -144,12 +145,17 @@ byId('analysis').addEventListener('submit', event => {
     byId('status').textContent = error.message;
   }
 });
-byId('export').addEventListener('click', () => {
-  if (!report) return;
-  const url = URL.createObjectURL(new Blob([JSON.stringify(report, null, 2)], {type: 'application/json'}));
+function download(content, type, extension) {
+  const url = URL.createObjectURL(new Blob([content], {type}));
   const link = make('a');
   link.href = url;
-  link.download = 'statlab-pharmaceutical-' + current + '.json';
+  link.download = 'statlab-pharmaceutical-' + current + '.' + extension;
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+byId('export').addEventListener('click', () => {
+  if (report) download(JSON.stringify(report, null, 2), 'application/json', 'json');
+});
+byId('table-export').addEventListener('click', () => {
+  if (report) download(resultTableCsv(report), 'text/csv;charset=utf-8', 'csv');
 });

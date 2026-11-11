@@ -32,7 +32,7 @@ def test_pharmaceutical_lab_is_served_with_its_browser_modules():
     page = client.get("/pharmaceutical/")
     assert page.status_code == 200
     assert "Pharmaceutical Science Lab" in page.text
-    for filename in ("lab.mjs", "methods.mjs", "inference.mjs", "lab.css"):
+    for filename in ("lab.mjs", "methods.mjs", "inference.mjs", "table-export.mjs", "lab.css"):
         asset = client.get(f"/pharmaceutical/{filename}")
         assert asset.status_code == 200
         expected_type = "javascript" if filename.endswith(".mjs") else "text/css"

@@ -136,6 +136,66 @@ function dissolution(rows) {
     columns: ['Time (min)', 'Dissolved (% label claim)', 'Interval area (%·min)', 'Cumulative area (%·min)'], data};
 }
 
+function compareDissolution(rows) {
+  const groups = [new Map(), new Map()];
+  for (const [i, [group, vessel, time, dissolved]] of rows.entries()) {
+    if (group !== 1 && group !== 2) throw Error(`Measurement ${i + 1}: use formulation code 1 or 2.`);
+    if (!Number.isSafeInteger(vessel) || vessel < 1) throw Error(`Measurement ${i + 1}: use a positive whole-number vessel ID.`);
+    const vessels = groups[group - 1];
+    if (!vessels.has(vessel)) vessels.set(vessel, []);
+    vessels.get(vessel).push([time, dissolved]);
+  }
+  if (groups.some(vessels => vessels.size === 0)) throw Error('Include at least one complete vessel for each formulation.');
+  const data = [], summaries = [];
+  let endTime, firstSchedule, differentSchedules = false;
+  for (const [index, vessels] of groups.entries()) {
+    const efficiencies = [];
+    for (const [vessel, points] of [...vessels].sort(([a], [b]) => a - b)) {
+      points.sort(([a], [b]) => a - b);
+      let result;
+      try {
+        result = dissolution(points);
+      } catch (error) {
+        throw Error(`Formulation ${index + 1}, vessel ${vessel}: ${error.message}`);
+      }
+      const end = points.at(-1)[0], efficiency = result.metrics['Dissolution efficiency (%)'];
+      if (endTime === undefined) endTime = end;
+      if (end !== endTime) throw Error(`Formulation ${index + 1}, vessel ${vessel}: use the same final time for every profile.`);
+      const schedule = points.map(([t]) => t);
+      firstSchedule ??= schedule;
+      if (firstSchedule.length !== schedule.length || schedule.some((t, i) => t !== firstSchedule[i])) differentSchedules = true;
+      efficiencies.push(efficiency);
+      data.push([index + 1, vessel, points.length, end, result.metrics['Area (%·min)'], efficiency]);
+    }
+    const n = efficiencies.length, average = mean(efficiencies);
+    summaries.push({n, average, variance: n > 1 ? ss(efficiencies, average) / (n - 1) : null});
+  }
+  const [a, b] = summaries, difference = b.average - a.average;
+  const label = 'Difference, formulation 2 − 1 (percentage points)';
+  const metrics = {'Duration (min)': endTime, 'Formulation 1 vessels': a.n, 'Formulation 2 vessels': b.n,
+    'Formulation 1 mean efficiency (%)': a.average, 'Formulation 2 mean efficiency (%)': b.average,
+    'Formulation 1 sample SD (percentage points)': a.n > 1 ? Math.sqrt(a.variance) : null,
+    'Formulation 2 sample SD (percentage points)': b.n > 1 ? Math.sqrt(b.variance) : null, [label]: difference};
+  let intervals = [], note;
+  if (a.n < 2 || b.n < 2) {
+    note = 'Descriptive comparison only. A Welch interval needs at least two independent vessels in each formulation.';
+  } else {
+    const va = a.variance / a.n, vb = b.variance / b.n, total = va + vb;
+    if (total === 0) {
+      note = 'All vessel efficiencies are identical within each formulation. The Welch degrees of freedom are undefined.';
+    } else {
+      const df = 1 / ((va / total) ** 2 / (a.n - 1) + (vb / total) ** 2 / (b.n - 1));
+      intervals = intervals95(df, [[label, difference, Math.sqrt(total)]]);
+      const {lower, upper} = intervals[0];
+      if (lower > 0) note = 'The entire interval is above zero, consistent with higher mean efficiency for formulation 2.';
+      else if (upper < 0) note = 'The entire interval is below zero, consistent with lower mean efficiency for formulation 2.';
+      else note = 'The interval includes zero. These data are compatible with equal mean efficiencies over the observed interval, as well as differences within the interval.';
+    }
+  }
+  if (differentSchedules) note += ' Interior sampling times differ across vessels. Trapezoidal estimates can depend on the sampling schedule.';
+  return {metrics, intervals, note, columns: ['Formulation', 'Vessel', 'Time points', 'End (min)', 'Area (%·min)', 'Efficiency (%)'], data};
+}
+
 function factorial(rows) {
   nonnegative(rows, 2, 'breaking force');
   const levels = [-1, 1];
@@ -200,6 +260,14 @@ export const methods = {
     instructions: 'Use one dissolution vessel. Enter elapsed minutes starting at zero and measured cumulative percent of label claim, corrected for sampling according to your protocol.',
     interpretation: 'Efficiency is the trapezoidal area divided by the area of a 100% reference rectangle over the same duration, expressed as a percent. Compare profiles over an identical interval. Measurements above 100% are retained as entered. This summary does not establish equivalence between products.',
     sources: [['Khan · The concept of dissolution efficiency','https://pubmed.ncbi.nlm.nih.gov/235616/'],['National University of Singapore · MSc formulation science','https://pharmacy.nus.edu.sg/study/postgraduate-programmes/msc-pharmaceutical-science-technology-programme/full-time/']], calculate: dissolution
+  },
+  dissolutionComparison: {
+    level: 'PhD', title: 'Compare dissolution efficiency', question: 'How much does mean dissolution efficiency differ between two formulations?',
+    headers: ['formulation','vessel','time_min','dissolved_percent'],
+    sample: '1,1,0,0\n1,1,10,40\n1,1,20,80\n1,2,0,0\n1,2,10,42\n1,2,20,84\n1,3,0,0\n1,3,10,38\n1,3,20,76\n2,1,0,0\n2,1,10,42\n2,1,20,84\n2,2,0,0\n2,2,10,44\n2,2,20,88\n2,3,0,0\n2,3,10,46\n2,3,20,92\n2,4,0,0\n2,4,10,56\n2,4,20,96',
+    instructions: 'Code formulations as 1 and 2. Give each independent vessel a positive integer ID within its formulation. Enter minutes and sampling-corrected cumulative percent of label claim. Every vessel must cover zero to the same final time.',
+    interpretation: 'Each vessel contributes one trapezoidal efficiency. The difference is formulation 2 minus formulation 1. The two-sided 95% Welch interval allows unequal variances and sample sizes and assumes independent experimental units with approximately normal efficiencies. If batch is the experimental unit, vessels within that batch are technical replicates. This comparison of interval averages cannot establish profile similarity or bioequivalence.',
+    sources: [['Individual-tablet dissolution efficiency in a formulation study','https://doi.org/10.3390/pharmaceutics15092191'],['NIST · confidence interval for the difference of means','https://itl.nist.gov/div898/software/dataplot/refman1/auxillar/diffmean.htm']], calculate: compareDissolution
   },
   factorial: {
     level: 'PhD', title: 'Two-factor formulation experiment', question: 'Does the effect of binder level on tablet breaking force depend on compression setting?',

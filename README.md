@@ -141,7 +141,7 @@ Use `samples/SYNTHETIC_demo_survey.csv` to explore correlations, regression, gro
 
 ## Pharmaceutical Science Lab
 
-In the Cloudflare workstation, open **Academic Research → Pharmaceutical Science Lab**. In the local FastAPI workstation, select **Pharmaceutical science** in the sidebar. Both open the same browser-based lab in a separate tab, preserving the current data editor. Paste numeric rows from a spreadsheet or Data View, or load a synthetic teaching example. Calculations run on the device. Download the inputs and results as JSON to keep a reproducible record.
+In the Cloudflare workstation, open **Academic Research → Pharmaceutical Science Lab**. In the local FastAPI workstation, select **Pharmaceutical science** in the sidebar. Both open the same browser-based lab in a separate tab, preserving the current data editor. Paste numeric rows from a spreadsheet or Data View, or load a synthetic teaching example. Calculations run on the device. Download the inputs and results as JSON to keep a reproducible record, or open the results table in a spreadsheet using the CSV export.
 
 | Suggested level | Runnable method | What the student can report |
 | --- | --- | --- |
@@ -150,6 +150,7 @@ In the Cloudflare workstation, open **Academic Research → Pharmaceutical Scien
 | MSc | Spike recovery | Paired recoveries, bias and a confidence interval for mean recovery at one spike level |
 | MSc | Dissolution efficiency | Trapezoidal area and efficiency up to the last sampled minute for one vessel |
 | MSc | Observed pharmacokinetic exposure | Linear and linear-up/log-down AUC over the supplied interval, measured peak concentration and earliest peak time for one profile |
+| PhD | Compare dissolution efficiency | Per-vessel efficiencies, group means and a Welch 95% confidence interval for the difference in percentage points over a common interval |
 | PhD | Balanced two-factor formulation experiment | Cell means, main and interaction effects, and pooled standard error with individual confidence intervals when independent runs are replicated |
 
 The degree labels suggest learning paths. Each method includes units, input requirements, interpretation and linked curriculum or methodological sources. The lab accepts up to 5,000 rows per analysis.

@@ -1,4 +1,4 @@
-// Positive integer and half-integer parameters from t and F distributions.
+// Positive shape parameters from t and F distributions, including fractional Welch degrees of freedom.
 const coefficients = [676.5203681218851, -1259.1392167224028, 771.3234287776531,
   -176.61502916214059, 12.507343278686905, -0.13857109526572012,
   9.984369578019572e-6, 1.5056327351493116e-7];

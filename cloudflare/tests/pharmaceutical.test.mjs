@@ -103,3 +103,46 @@ test('log-down AUC interpolates positive declines only, including nearly equal c
   assert.equal(r.data[0][4], null);
   assert.ok(Math.abs(analyze('exposure', '0,1.000000000000001\n1,1').data[1][4] - 1) < 1e-14);
 });
+
+test('dissolution comparison uses one efficiency per vessel and agrees with the SciPy unequal-variance interval', () => {
+  const input = methods.dissolutionComparison.sample;
+  const result = analyze('dissolutionComparison', input);
+  assert.equal(result.data.length, 7);
+  assert.deepEqual(result.data.map(row => row.at(-1)), [40,42,38,42,44,46,52]);
+  const [ci] = result.intervals;
+  assert.equal(ci.estimate, 6);
+  assert.ok(Math.abs(ci.df - 4.418181818181819) < 1e-12);
+  assert.ok(Math.abs(ci.lower + 0.554378784679133) < 1e-10);
+  assert.ok(Math.abs(ci.upper - 12.554378784679134) < 1e-10);
+  assert.match(result.note, /includes zero/);
+  assert.deepEqual(analyze('dissolutionComparison', input.split('\n').reverse().join('\n')), result);
+});
+
+test('single vessels, zero variance, unequal times and malformed dissolution designs', () => {
+  const input = '1,1,0,0\n1,1,20,80\n2,1,0,0\n2,1,10,44\n2,1,20,88';
+  const result = analyze('dissolutionComparison', input);
+  assert.deepEqual(result.intervals, []);
+  assert.match(result.note, /two independent vessels/);
+  assert.match(result.note, /Interior sampling times differ/);
+  const replicated = input + '\n' + input.replaceAll(',1,', ',2,');
+  assert.match(analyze('dissolutionComparison', replicated).note, /undefined/);
+  assert.throws(() => analyze('dissolutionComparison', input.replace('1,1,20,80', '1,1,15,80')), /same final time/);
+  assert.throws(() => analyze('dissolutionComparison', input + '\n2,1,10,45'), /vessel 1:.*duplicate/);
+  assert.throws(() => analyze('dissolutionComparison', input.replace('1,1,0,0','1,1,5,0')), /time-zero/);
+  assert.throws(() => analyze('dissolutionComparison', '1,1,0,0'), /each formulation/);
+  assert.throws(() => analyze('dissolutionComparison', '3,1,0,0'), /formulation code/);
+  assert.throws(() => analyze('dissolutionComparison', '1,1.2,0,0'), /whole-number vessel/);
+});
+
+test('CSV preserves numeric results and the data source for all analysis tables', async () => {
+  const {resultTableCsv} = await import('../public/pharmaceutical/table-export.mjs');
+  for (const [id, method] of Object.entries(methods)) {
+    const result = analyze(id, method.sample);
+    const csv = resultTableCsv({result, method:method.title, source:'Synthetic teaching example'});
+    const lines = csv.trimEnd().split('\r\n');
+    assert.equal(lines.length, 1 + (result.data?.length ?? Object.keys(result.metrics).length));
+    assert.match(lines[0], /^"Method","Data source",/);
+    assert.ok(lines[1].includes('"Synthetic teaching example"'));
+    if (id === 'dissolutionComparison') assert.equal(lines.at(-1), '"Compare dissolution efficiency","Synthetic teaching example",2,4,3,20,1040,52');
+  }
+});
