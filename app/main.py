@@ -19,6 +19,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, File, HTTPException, UploadFile, Query
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, StreamingResponse, HTMLResponse
 from pydantic import BaseModel, Field
 from typing import Literal
@@ -42,6 +43,10 @@ TTL = 3600
 # Each session contains df + metadata + creation time; no disk database.
 sessions: dict[str, dict] = {}
 app = FastAPI(title="MABRIG StatLab", version="0.9.0", docs_url=None, redoc_url=None)
+app.mount("/pharmaceutical", StaticFiles(
+    directory=APP_DIR.parent / "cloudflare" / "public" / "pharmaceutical", html=True
+), name="pharmaceutical")
+
 
 
 class FrequencyOnlyRequest(BaseModel):
@@ -384,6 +389,8 @@ def capabilities():
                            "crosstabs", "cronbach_alpha", "t_tests", "anova"],
             "aggregate_only": ["frequency_descriptives", "chapter_four_reports"],
             "study_design": ["a_priori_sample_size_power_planning"],
+            "pharmaceutical_browser": ["linear_calibration", "assay_repeatability",
+                                       "observed_exposure", "dissolution_efficiency", "two_factor_formulation"],
             "dimensionality": [
                 "exploratory_principal_axis_factor_analysis",
                 "horn_style_pearson_component_parallel_analysis",

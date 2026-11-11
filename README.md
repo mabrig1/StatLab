@@ -138,3 +138,17 @@ Core dependencies: **SciPy**, **statsmodels**, **NumPy**, **Pandas**, **FastAPI*
 ## Try it with a sample
 
 Use `samples/SYNTHETIC_demo_survey.csv` to explore correlations, regression, group comparisons and a 3-item reliability test. **These 110 rows are machine-generated demonstration data, not field-survey responses, and must never be presented as real academic findings.**
+
+## Pharmaceutical Science Lab
+
+In the Cloudflare workstation, open **Academic Research → Pharmaceutical Science Lab**. In the local FastAPI workstation, select **Pharmaceutical science** in the sidebar. Both open the same browser-based lab in a separate tab, preserving the current data editor. Paste numeric rows from a spreadsheet or Data View, or load a synthetic teaching example. Calculations run on the device. Download the inputs and results as JSON to keep a reproducible record.
+
+| Suggested level | Runnable method | What the student can report |
+| --- | --- | --- |
+| BSc | Linear calibration | Slope, intercept, R², residual SD and a residual for each standard |
+| BSc | Assay repeatability | Mean, sample SD and relative SD at a single concentration level |
+| MSc | Dissolution efficiency | Trapezoidal area and efficiency up to the last sampled minute for one vessel |
+| MSc | Observed pharmacokinetic exposure | AUC over the supplied interval, measured peak concentration and earliest peak time for one profile |
+| PhD | Balanced two-factor formulation experiment | Cell means, main and interaction effects, and pooled standard error when independent runs are replicated |
+
+The degree labels suggest learning paths. Each method includes units, input requirements, interpretation and linked curriculum or methodological sources. The lab accepts up to 5,000 rows per analysis.

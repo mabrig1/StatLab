@@ -1,0 +1,33 @@
+* { box-sizing:border-box }
+body { margin:0; font:1rem/1.5 system-ui,sans-serif; color:#172d40; background:#f3f6f8 }
+header { background:#102741; color:white; display:flex; align-items:center; gap:1.5rem; padding:.9rem max(5vw,1rem) }
+header a { color:white; font-weight:750; text-decoration:none }
+header span { color:#cad8e2; font-size:.88rem }
+main { max-width:76rem; padding:1.5rem clamp(1rem,4vw,3rem) 3rem; margin:auto }
+h1 { font-size:clamp(1.8rem,4vw,2.65rem); letter-spacing:-.04em; margin:.3rem 0 }
+h2,h3,p { margin:.45rem 0 .8rem }
+.intro,aside p,#instructions,#format { color:#455c69 }
+.layout { display:grid; grid-template-columns:minmax(13rem,1fr) minmax(0,2.7fr); gap:1rem; margin-top:1.6rem; align-items:start }
+aside,article { background:white; border:1px solid #ced9df; border-radius:.65rem; padding:clamp(1rem,2vw,1.6rem); min-width:0 }
+aside h3 { font-size:.85rem; letter-spacing:.04em; margin:1rem 0 .2rem; color:#3e6573 }
+button { cursor:pointer; font:inherit; font-weight:650; background:#11595a; border:1px solid #11595a; color:white; padding:.5rem .9rem; border-radius:.35rem }
+nav button,.secondary { background:white; color:#13484c; border-color:#a6bcc0 }
+nav button { width:100%; text-align:left; margin:.14rem 0; font-size:.93rem }
+nav button[aria-pressed="true"] { color:#fff; background:#11595a; border-color:#11595a }
+button:focus-visible,a:focus-visible,textarea:focus-visible { outline:3px solid #bd7414; outline-offset:2px }
+label { display:block; font-weight:700; margin-top:1.25rem }
+code { display:block; overflow-wrap:anywhere; margin-bottom:.4rem }
+textarea { width:100%; min-height:10rem; padding:.75rem; font:1rem/1.55 monospace; border:1px solid #849eaa; border-radius:.35rem; resize:vertical }
+#format,aside p { font-size:.88rem }
+.actions { display:flex; flex-wrap:wrap; gap:.55rem }
+#status { color:#305960 } #status.error { color:#973823 }
+#metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr)); gap:.45rem }
+.metric { background:#edf4f4; border-radius:.3rem; padding:.65rem }
+.metric span { display:block; font-size:.85rem }
+.metric strong { font-size:1.2rem; overflow-wrap:anywhere; font-variant-numeric:tabular-nums }
+#details { overflow:auto; max-height:22rem; margin:.85rem 0 }
+table { border-collapse:collapse; width:100%; font-size:.9rem; font-variant-numeric:tabular-nums }
+th,td { text-align:right; padding:.4rem; border-bottom:1px solid #dbe3e5 }
+th { position:sticky; top:0; background:#eff4f5 }
+article h3 { margin-top:1.2rem } ul { padding-left:1.3rem } a { color:#16546a }
+@media(max-width:700px) { .layout { grid-template-columns:1fr } nav button { width:auto; margin-right:.3rem } }

@@ -38,7 +38,13 @@ function render(category){
     top.append(node("span",feature.title,"ws-feature-title"),
       node("span",status[0],"ws-feature-badge "+status[1]));
     card.append(top,node("p",feature.description,"ws-feature-description"));
-    if(feature.status==="browser"&&feature.view){
+    if(feature.status==="browser" && feature.href){
+      const link=node("a",feature.action,"ws-launch");
+      link.href=feature.href;
+      link.target="_blank";
+      link.rel="noopener";
+      card.append(link);
+    }else if(feature.status==="browser"&&feature.view){
       const button=node("button",feature.action,"ws-launch");
       button.type="button";button.addEventListener("click",()=>navigate(feature.view));
       card.append(button);

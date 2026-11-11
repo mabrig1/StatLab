@@ -3,6 +3,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY app ./app
+COPY cloudflare/public/pharmaceutical ./cloudflare/public/pharmaceutical
 ENV PYTHONUNBUFFERED=1
 # Local safe default. To publish, implement authentication and tenant isolation first.
 EXPOSE 8000
