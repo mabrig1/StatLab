@@ -59,3 +59,47 @@ test('all examples run and malformed, missing and invalid data never become zero
   assert.throws(() => analyze('precision', '0\n1e308'), /range exceeded/);
   assert.throws(() => analyze('precision', Array(5001).fill('1').join('\n')), /5,000/);
 });
+
+test('replicated calibration separates pure error from curvature; zero variance and singletons are explicit', () => {
+  const r = analyze('calibration', '0,-1\n0,1\n1,2\n1,4\n2,-1\n2,1');
+  assert.equal(r.metrics['Pure-error SS (AU²)'], 6);
+  assert.equal(r.metrics['Lack-of-fit SS (AU²)'], 12);
+  assert.equal(r.metrics['Lack-of-fit F'], 6);
+  assert.ok(Math.abs(r.metrics['Lack-of-fit p'] - 0.09172111331157187) < 1e-10);
+  assert.equal(r.intervals[0].df, 4);
+  assert.ok(analyze('calibration', '0,1\n1,2\n2,3').note.includes('requires replicate'));
+  const identical = analyze('calibration', '0,0.1\n0,0.1\n0,0.1\n1,2\n2,5');
+  assert.equal(identical.metrics['Lack-of-fit p'], null);
+  assert.match(identical.note, /zero within-level/);
+});
+
+test('recovery uses within-pair differences, preserves negative recoveries, and checks spike levels', () => {
+  const r = analyze('recovery', '1,5.5,5\n1,6.5,5');
+  assert.ok(Math.abs(r.data[0][3] - 90) < 1e-12);
+  assert.ok(Math.abs(r.data[1][3] - 110) < 1e-12);
+  assert.equal(r.metrics['Mean recovery (%)'], 100);
+  const ci = r.intervals[0];
+  assert.ok(Math.abs(ci.standardError - 10) < 1e-12);
+  assert.ok(Math.abs(ci.upper - 227.0620473617) < 1e-8);
+  assert.equal(analyze('recovery', '2,1,5\n1,6,5').data[0][3], -20);
+  for (const input of ['1,4,0\n1,5,0','1,6,5\n1,12,10','1,4,-1\n1,4,-1']) {
+    assert.throws(() => analyze('recovery', input), /positive added/);
+  }
+});
+
+test('mean and factorial intervals match t references; unreplicated designs omit intervals', () => {
+  const ci = analyze('precision', '9\n10\n11').intervals[0];
+  assert.ok(Math.abs(ci.lower - (10 - 4.30265272975 / Math.sqrt(3))) < 1e-9);
+  const effects = analyze('factorial', methods.factorial.sample).intervals;
+  assert.equal(effects.length, 3);
+  assert.ok(Math.abs(effects[2].upper - (4 + 2.7764451052)) < 1e-9);
+  assert.deepEqual(analyze('factorial', '-1,-1,40\n-1,1,48\n1,-1,44\n1,1,60').intervals, []);
+});
+
+test('log-down AUC interpolates positive declines only, including nearly equal concentrations', () => {
+  const r = analyze('exposure', '0,0\n1,8\n3,4\n4,4\n6,0');
+  assert.equal(r.metrics['AUC over observed interval (mg·h/L)'], 24);
+  assert.ok(Math.abs(r.metrics['Linear-up/log-down AUC (mg·h/L)'] - (12 + 8 / Math.log(2))) < 1e-12);
+  assert.equal(r.data[0][4], null);
+  assert.ok(Math.abs(analyze('exposure', '0,1.000000000000001\n1,1').data[1][4] - 1) < 1e-14);
+});

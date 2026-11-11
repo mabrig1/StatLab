@@ -145,10 +145,11 @@ In the Cloudflare workstation, open **Academic Research → Pharmaceutical Scien
 
 | Suggested level | Runnable method | What the student can report |
 | --- | --- | --- |
-| BSc | Linear calibration | Slope, intercept, R², residual SD and a residual for each standard |
-| BSc | Assay repeatability | Mean, sample SD and relative SD at a single concentration level |
+| BSc | Linear calibration | Slope, intercept, R², residual SD with a residual plot, slope and intercept intervals, and a replicated lack-of-fit test when estimable |
+| BSc | Assay repeatability | Mean, sample SD and relative SD and a confidence interval for the mean at one concentration level |
+| MSc | Spike recovery | Paired recoveries, bias and a confidence interval for mean recovery at one spike level |
 | MSc | Dissolution efficiency | Trapezoidal area and efficiency up to the last sampled minute for one vessel |
-| MSc | Observed pharmacokinetic exposure | AUC over the supplied interval, measured peak concentration and earliest peak time for one profile |
-| PhD | Balanced two-factor formulation experiment | Cell means, main and interaction effects, and pooled standard error when independent runs are replicated |
+| MSc | Observed pharmacokinetic exposure | Linear and linear-up/log-down AUC over the supplied interval, measured peak concentration and earliest peak time for one profile |
+| PhD | Balanced two-factor formulation experiment | Cell means, main and interaction effects, and pooled standard error with individual confidence intervals when independent runs are replicated |
 
 The degree labels suggest learning paths. Each method includes units, input requirements, interpretation and linked curriculum or methodological sources. The lab accepts up to 5,000 rows per analysis.

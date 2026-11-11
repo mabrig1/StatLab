@@ -12,7 +12,7 @@ function invalidate() {
   report = null;
   byId('results').hidden = true;
   byId('metrics').replaceChildren();
-  byId('details').replaceChildren();
+  for (const id of ['details', 'diagnostic', 'intervals', 'plot']) byId(id).replaceChildren();
   byId('status').textContent = '';
   byId('status').className = '';
 }
@@ -64,7 +64,41 @@ byId('example').addEventListener('click', () => {
   byId('status').textContent = 'Synthetic teaching data loaded. Select Calculate to inspect the results.';
 });
 const numberFormat = new Intl.NumberFormat('en', {maximumSignificantDigits: 7});
-const display = value => value === null ? 'Undefined' : numberFormat.format(value);
+function display(value) {
+  if (value === null) return 'Undefined';
+  if (typeof value === 'string') return value;
+  if (value !== 0 && Math.abs(value) < 1e-5) return value.toExponential(3);
+  return numberFormat.format(value);
+}
+function residualPlot(data) {
+  const svgNode = (tag, attrs, text) => {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (const [key, value] of Object.entries(attrs)) el.setAttribute(key, value);
+    if (text !== undefined) el.textContent = text;
+    return el;
+  };
+  const figure = make('figure');
+  figure.append(make('figcaption', 'Calibration residuals (AU) by standard concentration (mg/L)'));
+  const svg = svgNode('svg', {viewBox:'0 0 560 180', role:'img', 'aria-label':'Residual scatterplot. Each point is an observed minus fitted response. Exact values follow in the table.'});
+  const xs = data.map(row => row[0]);
+  const min = Math.min(...xs), max = Math.max(...xs);
+  const maxResidual = Math.max(...data.map(row => Math.abs(row[3])));
+  const extent = maxResidual || 1;
+  svg.append(svgNode('line', {x1:85,y1:78,x2:510,y2:78,stroke:'#748d98','stroke-dasharray':'4 3'}),
+    svgNode('line', {x1:85,y1:18,x2:85,y2:138,stroke:'#748d98'}));
+  for (const [value, y] of [[maxResidual,18],[0,78],[-maxResidual,138]]) {
+    if (!maxResidual && y !== 78) continue;
+    svg.append(svgNode('text', {x:78,y:y+4,'text-anchor':'end'}, display(value)));
+  }
+  for (const [value, x] of [[min,85],[max,510]]) {
+    svg.append(svgNode('text', {x,y:161,'text-anchor':'middle'}, display(value)));
+  }
+  for (const [x,,,residual] of data) {
+    svg.append(svgNode('circle', {cx:85+(x-min)/(max-min)*425,cy:78-residual/extent*60,r:3,fill:'#11595a',opacity:0.72}));
+  }
+  figure.append(svg);
+  return figure;
+}
 function resultTable(result) {
   const table = make('table');
   const headRow = table.createTHead().insertRow();
@@ -94,6 +128,14 @@ byId('analysis').addEventListener('submit', event => {
       card.append(make('span', label), make('strong', display(value)));
       byId('metrics').append(card);
     }
+    byId('diagnostic').textContent = result.note ?? '';
+    if (result.intervals?.length) {
+      const data = result.intervals.map(row => [row.label, row.estimate, row.standardError, row.df, row.lower, row.upper]);
+      byId('intervals').append(make('h3', '95% confidence intervals'), resultTable({
+        columns: ['Quantity', 'Estimate', 'SE', 'df', 'Lower', 'Upper'], data
+      }));
+    }
+    if (current === 'calibration') byId('plot').append(residualPlot(result.data));
     if (result.data) byId('details').append(resultTable(result));
     byId('results').hidden = false;
     byId('status').textContent = 'Analysis complete · ' + source;
