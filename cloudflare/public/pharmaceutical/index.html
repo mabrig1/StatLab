@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Pharmaceutical Science Lab · MABRIG StatLab</title>
+<link rel="stylesheet" href="./lab.css"><script type="module" src="./lab.mjs"></script>
+</head>
+<body>
+<header><a href="/">MABRIG StatLab</a><span>Academic research</span></header>
+<main>
+<h1>Pharmaceutical Science Lab</h1>
+<p class="intro">Choose a research question, enter laboratory measurements and inspect the calculations in your browser.</p>
+<div class="layout">
+<aside>
+<h2>Methods</h2>
+<p>Suggested starting points by degree. Choose any method that fits your study design.</p>
+<nav id="methods" aria-label="Analysis methods"></nav>
+</aside>
+<article>
+<h2 id="title"></h2><p id="question"></p>
+<form id="analysis">
+<label for="measurements">Measurements</label>
+<p id="instructions"></p>
+<code id="headers"></code>
+<textarea id="measurements" aria-describedby="instructions headers format" spellcheck="false" maxlength="200000"></textarea>
+<p id="format">Paste numeric rows separated by commas or tabs. Column headings are optional. If included, use the names shown above.</p>
+<div class="actions"><button type="submit">Calculate</button><button class="secondary" id="example" type="button">Load teaching example</button></div>
+</form>
+<p id="status" role="status"></p>
+<section id="results" hidden><h3>Results</h3><div id="metrics"></div><p id="diagnostic"></p><div id="intervals"></div><div id="plot"></div><div id="details"></div><button type="button" class="secondary" id="table-export">Download results table (CSV)</button> <button type="button" class="secondary" id="export">Download inputs and results (JSON)</button></section>
+<h3>Interpretation</h3><p id="interpretation"></p>
+<h3>Method and teaching sources</h3><ul id="sources"></ul>
+</article>
+</div></main></body></html>

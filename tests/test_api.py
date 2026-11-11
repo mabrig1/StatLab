@@ -27,6 +27,18 @@ def test_local_home_and_health():
     assert client.get("/static/../../app/main.py").status_code==404
 
 
+def test_pharmaceutical_lab_is_served_with_its_browser_modules():
+    assert 'href="/pharmaceutical/"' in client.get("/").text
+    page = client.get("/pharmaceutical/")
+    assert page.status_code == 200
+    assert "Pharmaceutical Science Lab" in page.text
+    for filename in ("lab.mjs", "methods.mjs", "inference.mjs", "table-export.mjs", "lab.css"):
+        asset = client.get(f"/pharmaceutical/{filename}")
+        assert asset.status_code == 200
+        expected_type = "javascript" if filename.endswith(".mjs") else "text/css"
+        assert expected_type in asset.headers["content-type"]
+
+
 def test_upload_analyze_export_delete():
     r=upload()
     assert r.status_code==200,r.text

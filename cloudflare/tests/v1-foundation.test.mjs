@@ -23,7 +23,7 @@ test("capability statuses distinguish browser, local Python and future features"
   assert.ok(capabilitiesFor("academic").some(x=>x.id==="frequency"));
   assert.ok(capabilitiesFor("business").some(x=>x.id==="customer"));
   assert.ok(EXECUTION_MODES.local_python.includes("not in the Cloudflare"));
-  assert.ok(WORKSTATION_FEATURES.filter(x=>x.status==="browser").every(x=>x.view));
+  assert.ok(WORKSTATION_FEATURES.filter(x=>x.status==="browser").every(x=>x.view || x.href));
   assert.throws(()=>capabilitiesFor("unknown"),/Unknown workspace/);
 });
 
