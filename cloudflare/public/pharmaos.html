@@ -28,13 +28,14 @@
   <p id="plain-summary" class="plain-summary"></p>
   <section class="next priority-next" id="action-panel" tabindex="-1" aria-labelledby="action-title">
     <p class="eyebrow success">YOUR REPORT IS READY</p>
-    <h3 id="action-title">Download your findings</h3>
+    <h3 id="action-title">Your findings are ready. Prepare your paper for a journal.</h3>
     <p id="analysis-insight" class="analysis-insight"></p>
     <div class="actions">
-      <button type="button" id="download-summary">Download readable findings (.txt)</button>
-      <button type="button" id="download-report" class="outline-button">Download full original report (.json)</button>
+      <button type="button" id="download-summary">1. Download findings & checklist</button>
+      <a class="secondary-action" href="https://scholar.mabrigkorie.org/publishing-agent" target="_blank" rel="noopener noreferrer">2. Prepare journal submission plan</a>
     </div>
-    <p class="footnote">Both files are saved directly on your device. Importing the report here does not run new statistical tests.</p>
+    <p class="footnote">This report checks available scientific evidence; it cannot certify journal acceptance. The publishing agent asks for your paper's title and abstract and helps plan journal fit, revision and verified submission requirements. No manuscript is automatically sent to it.</p>
+    <details class="technical"><summary>Extra: Download complete original data report (.json)</summary><p>Keep this copy for reproducibility or importing into other compatible research tools.</p><button type="button" id="download-report" class="outline-button">Download complete original JSON</button></details>
   </section>
   <div class="stats" id="stats" aria-label="Evidence summary"></div>
   <details id="compounds-section" class="compound-summary" hidden><summary>See all compounds and their PubChem status</summary><ul id="compound-list"></ul><p class="footnote">A PubChem lookup checks molecular reference data; it does not prove the compound treats a disease.</p></details>
@@ -54,7 +55,7 @@
     <p class="footnote">These values came from NcheSent. Importing the report here does not recalculate statistics or reconstruct individual observations.</p>
   </section>
   <div class="next secondary-next">
-    <h3>Want to analyze actual numerical data?</h3>
+    <h3>Does your paper contain numerical results?</h3>
     <p>StatLab's statistical tools need a numerical CSV dataset, not a manuscript list of compounds. If you have original observations, import them separately to compute suitable statistics.</p>
     <p><a class="secondary-action" href="/">Open StatLab for a numerical dataset</a></p>
   </div>
