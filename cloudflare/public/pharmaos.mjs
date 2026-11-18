@@ -4,6 +4,8 @@ const status = document.getElementById("message");
 const panel = document.getElementById("result");
 const numericSection = document.getElementById("numeric-section");
 const manuscriptSection = document.getElementById("manuscript-section");
+const compoundSection = document.getElementById("compounds-section");
+const compoundList = document.getElementById("compound-list");
 const tbody = document.getElementById("numeric");
 const csvDownload = document.getElementById("download");
 const summaryDownload = document.getElementById("download-summary");
@@ -54,6 +56,11 @@ function makePlainSummary(data, cols) {
     "PubChem-verified compounds: " + count(data.summary.pubchemVerified),
     "Completed bounded research tasks: " + count(data.summary.executedAgentTasks),
     "Defined research roles: " + count(data.summary.totalPlannedRoles),
+    "",
+    "COMPOUNDS NAMED IN THE PAPER",
+    ...data.compounds.slice(0, 20).map((c) =>
+      (typeof c.name === "string" ? c.name.slice(0, 120) : "Unnamed compound") +
+      " — " + (c.pubchem && Number.isSafeInteger(c.pubchem.cid) ? "PubChem reference found" : "PubChem reference not verified")),
     "",
     "STATISTICAL DATA",
     isNumeric
@@ -119,6 +126,16 @@ fileInput.addEventListener("change", async () => {
       card.append(title, number);
       stats.appendChild(card);
     }
+    compoundList.replaceChildren();
+    for (const c of parsed.compounds.slice(0, 20)) {
+      const item = document.createElement("li");
+      const name = typeof c.name === "string" ? c.name.slice(0, 120) : "Unnamed compound";
+      const verified = c.pubchem && Number.isSafeInteger(c.pubchem.cid);
+      item.textContent = name + " — " +
+        (verified ? "PubChem molecular reference found" : "PubChem reference not verified");
+      compoundList.appendChild(item);
+    }
+    compoundSection.hidden = parsed.compounds.length === 0;
     tbody.replaceChildren();
     for (const c of cols) {
       const row = document.createElement("tr");
