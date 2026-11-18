@@ -1,26 +1,61 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self'; object-src 'none'; base-uri 'none'; connect-src 'none'">
-<title>PharmaOS × StatLab — Secondary Data Handoff</title><link rel="stylesheet" href="/pharmaos.css">
-<script type="module" src="/pharmaos.mjs"></script></head>
+<title>StatLab — View your PharmaOS results</title>
+<link rel="stylesheet" href="/pharmaos.css">
+<script type="module" src="/pharmaos.mjs"></script>
+</head>
 <body><main class="shell">
-<nav><a href="/">← StatLab main workstation</a> · <a href="https://nchesent.mabrigkorie.org/pharmaos">PharmaOS Research Hub</a></nav>
-<header><span>MABRIG PHARMAOS NETWORK · STATLAB</span><h1>Secondary-data statistics workspace</h1>
-<p>Import the structured, non-identifying PharmaOS discovery report from NcheSent. Review numeric findings in your browser and export a clean summary CSV to open in StatLab. The original research is never sent to StatLab servers.</p></header>
-<section class="panel"><h2>1. Import PharmaOS discovery JSON</h2>
-<label for="handoff">Select the JSON downloaded from NcheSent's PharmaOS Studio</label>
-<input id="handoff" type="file" accept=".json,application/json">
-<p id="message" role="status">No report imported. Only schema discovery-1.0 is accepted.</p></section>
-<section class="panel" id="result" hidden>
-<h2>2. Evidence summary</h2><div class="stats" id="stats"></div><p class="digest" id="digest"></p>
-<h3>Real numeric summaries from submitted CSV</h3><p id="method"></p>
-<div class="scroll"><table><thead><tr><th>Variable</th><th>Valid n</th><th>Mean</th><th>Sample SD</th><th>Min</th><th>Max</th></tr></thead><tbody id="numeric"></tbody></table></div>
-<button type="button" id="download">Download summary CSV for StatLab</button>
-<p id="no-numeric" hidden>This research-only manuscript contains no numeric CSV analysis. Upload the underlying non-identifying CSV directly in the StatLab workstation when suitable.</p>
-<p><a href="/">Open StatLab Data View and statistical tools</a></p>
-<h3>Scientific safeguards</h3><p>The imported data are original NcheSent results, not a second independent statistical computation. No inferential test, drug efficacy, molecular docking or patient-level analysis was run by this handoff.</p>
+<nav aria-label="Return to research"><a href="https://nchesent.mabrigkorie.org/discovery">← Back to NcheSent</a><a href="/">StatLab home</a></nav>
+<header>
+  <span>MABRIG PHARMAOS · STAGE 3</span>
+  <h1>View your research results in StatLab</h1>
+  <p>You do not need to repeat the analysis. Just choose the report downloaded from NcheSent. StatLab will show the findings immediately.</p>
+</header>
+<section class="panel import-panel" aria-labelledby="import-title">
+  <p class="eyebrow">ONE SIMPLE ACTION</p>
+  <h2 id="import-title">Choose your PharmaOS report</h2>
+  <p>In NcheSent, click <strong>Download research report (.json)</strong>. Then select that downloaded file here.</p>
+  <label for="handoff" class="file-label">Select downloaded report (.json)</label>
+  <input id="handoff" type="file" accept=".json,application/json" aria-describedby="message">
+  <p id="message" role="status" aria-live="polite">No file selected. Your report stays on this device.</p>
 </section>
-<section class="panel"><h2>3. Continue your research network</h2>
-<p><a href="https://nigerflora.mabrigkorie.org/pharmaos-network">NigerFlora molecular research</a> · <a href="https://scholar.mabrigkorie.org/pharmaos">Scholar publishing handoff</a></p></section>
-<footer>Browser-local import only · Research use · MABRIG Technologies</footer>
+<section class="panel results-panel" id="result" tabindex="-1" aria-label="Imported research findings" hidden>
+  <p class="eyebrow success">REPORT OPENED SUCCESSFULLY</p>
+  <h2>Here is what your research contains</h2>
+  <p id="plain-summary" class="plain-summary"></p>
+  <div class="stats" id="stats" aria-label="Evidence summary"></div>
+  <section id="compounds-section" class="compound-summary" hidden><h3>Compounds mentioned in your research</h3><ul id="compound-list"></ul><p class="footnote">A PubChem lookup checks molecular reference data; it does not prove the compound treats a disease.</p></section>
+  <section id="manuscript-section" class="explanation" hidden>
+    <h3>There are no numerical statistics in this manuscript</h3>
+    <p>That is normal for a research paper. It includes information about compounds, not a table of measured observations. StatLab has <strong>not</strong> calculated a mean, standard deviation or statistical test from it.</p>
+    <p>If you have a separate numeric dataset, open the StatLab workstation and import that dataset for appropriate analysis.</p>
+  </section>
+  <section id="numeric-section" hidden>
+    <h3>Numbers already summarized in NcheSent</h3>
+    <p id="method"></p>
+    <div class="scroll"><table>
+      <thead><tr><th>Variable</th><th>Valid n</th><th>Mean</th><th>Sample SD</th><th>Min</th><th>Max</th></tr></thead>
+      <tbody id="numeric"></tbody>
+    </table></div>
+    <button type="button" id="download" disabled>Download numeric summary (.csv)</button>
+    <p class="footnote">These values came from NcheSent. Importing the report here does not recalculate statistics or reconstruct individual observations.</p>
+  </section>
+  <div class="next">
+    <h3>What to do next</h3>
+    <p>Save a readable summary of this research. If you also have original numerical data, use the main StatLab workstation to analyze those data separately.</p>
+    <div class="actions">
+      <button type="button" id="download-summary">Download readable summary (.txt)</button>
+      <a class="secondary-action" href="/">Open StatLab for a new dataset</a>
+    </div>
+  </div>
+  <details class="technical">
+    <summary>View research methods and limitations</summary>
+    <p id="digest" class="digest"></p>
+    <p>StatLab is displaying an imported NcheSent report, not performing an independent second computation. A PubChem descriptor check does not demonstrate clinical activity, drug efficacy or safety. No docking, ADMET, patient-level analysis or inferential test was performed by this importer.</p>
+  </details>
+</section>
+<footer>Private, browser-local import · No research file upload to StatLab servers · MABRIG Technologies</footer>
 </main></body></html>
