@@ -26,8 +26,18 @@
   <p class="eyebrow success">REPORT OPENED SUCCESSFULLY</p>
   <h2>Here is what your research contains</h2>
   <p id="plain-summary" class="plain-summary"></p>
+  <section class="next priority-next" id="action-panel" tabindex="-1" aria-labelledby="action-title">
+    <p class="eyebrow success">YOUR REPORT IS READY</p>
+    <h3 id="action-title">Download your findings</h3>
+    <p id="analysis-insight" class="analysis-insight"></p>
+    <div class="actions">
+      <button type="button" id="download-summary">Download readable findings (.txt)</button>
+      <button type="button" id="download-report" class="outline-button">Download full original report (.json)</button>
+    </div>
+    <p class="footnote">Both files are saved directly on your device. Importing the report here does not run new statistical tests.</p>
+  </section>
   <div class="stats" id="stats" aria-label="Evidence summary"></div>
-  <section id="compounds-section" class="compound-summary" hidden><h3>Compounds mentioned in your research</h3><ul id="compound-list"></ul><p class="footnote">A PubChem lookup checks molecular reference data; it does not prove the compound treats a disease.</p></section>
+  <details id="compounds-section" class="compound-summary" hidden><summary>See all compounds and their PubChem status</summary><ul id="compound-list"></ul><p class="footnote">A PubChem lookup checks molecular reference data; it does not prove the compound treats a disease.</p></details>
   <section id="manuscript-section" class="explanation" hidden>
     <h3>There are no numerical statistics in this manuscript</h3>
     <p>That is normal for a research paper. It includes information about compounds, not a table of measured observations. StatLab has <strong>not</strong> calculated a mean, standard deviation or statistical test from it.</p>
@@ -43,13 +53,10 @@
     <button type="button" id="download" disabled>Download numeric summary (.csv)</button>
     <p class="footnote">These values came from NcheSent. Importing the report here does not recalculate statistics or reconstruct individual observations.</p>
   </section>
-  <div class="next">
-    <h3>What to do next</h3>
-    <p>Save a readable summary of this research. If you also have original numerical data, use the main StatLab workstation to analyze those data separately.</p>
-    <div class="actions">
-      <button type="button" id="download-summary">Download readable summary (.txt)</button>
-      <a class="secondary-action" href="/">Open StatLab for a new dataset</a>
-    </div>
+  <div class="next secondary-next">
+    <h3>Want to analyze actual numerical data?</h3>
+    <p>StatLab's statistical tools need a numerical CSV dataset, not a manuscript list of compounds. If you have original observations, import them separately to compute suitable statistics.</p>
+    <p><a class="secondary-action" href="/">Open StatLab for a numerical dataset</a></p>
   </div>
   <details class="technical">
     <summary>View research methods and limitations</summary>
