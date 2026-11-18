@@ -1,5 +1,13 @@
-// Browser-only PharmaOS handoff. No network requests and no independent statistical analysis.
+// Browser-only PharmaOS handoff. No network requests or unsupported statistical analyses.
+import { readXlsxWorkbook, readCsv, sheetAsCsv, summarizeSheet } from "./pharmaos-xlsx.mjs";
 const fileInput = document.getElementById("handoff");
+const datasetPanel = document.getElementById("dataset-result");
+const workbookSummary = document.getElementById("workbook-summary");
+const sheetSelector = document.getElementById("sheet-select");
+const sheetSummary = document.getElementById("sheet-summary");
+const previewHeader = document.getElementById("sheet-preview-header");
+const previewBody = document.getElementById("sheet-preview-body");
+const exportSheet = document.getElementById("export-sheet");
 const status = document.getElementById("message");
 const panel = document.getElementById("result");
 const numericSection = document.getElementById("numeric-section");
@@ -14,6 +22,64 @@ const actionPanel = document.getElementById("action-panel");
 const analysisInsight = document.getElementById("analysis-insight");
 let current = null;
 let columns = [];
+let importedSheets = [];
+let selectedDataName = "";
+// Worksheets may contain different chemical markers, units, plant organs and extraction bases;
+// displaying rows is safe, but we deliberately do NOT pool concentrations or run significance tests here.
+function renderResearchSheet() {
+  const sheet = importedSheets[Number(sheetSelector.value)];
+  if (!sheet) return;
+  const summary = summarizeSheet(sheet.rows);
+  sheetSummary.textContent = summary.rows + " data rows, " + summary.columns + " columns" +
+    (summary.distinctStudies === null ? "" : ", " + summary.distinctStudies + " distinct study IDs") +
+    ". Columns with numerical entries: " +
+    (summary.numericColumns.length ? summary.numericColumns.slice(0, 7).join(", ") : "none detected") + ".";
+  previewHeader.replaceChildren();
+  previewBody.replaceChildren();
+  const header = sheet.rows[0] || [];
+  const maxCols = Math.min(8, Math.max(...sheet.rows.map(r => r.length), 0));
+  for (let i = 0; i < maxCols; i++) {
+    const th = document.createElement("th");
+    th.textContent = header[i] == null || header[i] === "" ? "Column " + (i + 1) : String(header[i]);
+    previewHeader.appendChild(th);
+  }
+  for (const row of sheet.rows.slice(1, 11)) {
+    const tr = document.createElement("tr");
+    for (let i = 0; i < maxCols; i++) {
+      const cell = document.createElement("td");
+      cell.textContent = String(row[i] ?? "");
+      tr.appendChild(cell);
+    }
+    previewBody.appendChild(tr);
+  }
+}
+function showResearchSheets(sheets, filename) {
+  importedSheets = sheets;
+  selectedDataName = filename;
+  sheetSelector.replaceChildren();
+  sheets.forEach((sheet, index) => {
+    const opt = document.createElement("option");
+    opt.value = String(index);
+    opt.textContent = sheet.name;
+    sheetSelector.appendChild(opt);
+  });
+  const preferred = sheets.findIndex(s => /chemical.?observations/i.test(s.name));
+  sheetSelector.value = String(preferred >= 0 ? preferred : 0);
+  workbookSummary.textContent = "Opened " + filename + " with " + sheets.length +
+    " worksheet(s). Choose the sheet you want to inspect below.";
+  renderResearchSheet();
+  status.textContent = "Excel/CSV research data opened successfully. Choose your worksheet and download it as CSV.";
+  datasetPanel.hidden = false;
+  datasetPanel.focus({ preventScroll: true });
+  datasetPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+sheetSelector.addEventListener("change", renderResearchSheet);
+exportSheet.addEventListener("click", () => {
+  const sheet = importedSheets[Number(sheetSelector.value)];
+  if (!sheet || !sheet.rows.length) return;
+  const safeName = sheet.name.replace(/[^a-z0-9_-]+/gi, "_").slice(0, 60) || "research";
+  saveAs(sheetAsCsv(sheet.rows), "statlab-" + safeName + ".csv", "text/csv;charset=utf-8");
+});
 
 const format = (v) => typeof v === "number" && Number.isFinite(v) ? v.toFixed(3) : "N/A";
 const count = (v) => Number.isSafeInteger(v) && v >= 0 ? String(v) : "Not recorded";
@@ -126,17 +192,37 @@ function saveAs(content, filename, type) {
 fileInput.addEventListener("change", async () => {
   current = null;
   columns = [];
+  importedSheets = [];
   panel.hidden = true;
+  datasetPanel.hidden = true;
   csvDownload.disabled = true;
   const file = fileInput.files?.[0];
   if (!file) {
-    status.textContent = "No file selected. Your report stays on this device.";
+    status.textContent = "No file selected. Files stay on this device.";
     return;
   }
-  status.textContent = "Opening your report on this device…";
+  const name = file.name.toLowerCase();
+  status.textContent = "Opening your file on this device…";
   try {
-    if (file.size > 300000) throw new Error("This report is too large. Select a PharmaOS JSON report under 300 KB.");
-    const parsed = JSON.parse(await file.text());
+    if (name.endsWith(".xlsx")) {
+      const sheets = await readXlsxWorkbook(file);
+      showResearchSheets(sheets, file.name);
+      return;
+    }
+    if (name.endsWith(".csv")) {
+      const sheets = readCsv(await file.text());
+      showResearchSheets(sheets, file.name);
+      return;
+    }
+    if (!name.endsWith(".json")) {
+      throw new Error("Choose an Excel workbook (.xlsx), research CSV (.csv), or PharmaOS report (.json). Word/PDF manuscripts should be uploaded to NcheSent.");
+    }
+    if (file.size > 300000) throw new Error("This JSON report exceeds 300 KB. Choose a smaller PharmaOS report.");
+    const jsonText = await file.text();
+    if (jsonText.startsWith("PK")) throw new Error("This file contains an Excel workbook, not JSON. Rename it .xlsx and select it again.");
+    let parsed;
+    try { parsed = JSON.parse(jsonText); }
+    catch { throw new Error("This JSON report could not be opened. Download the .json report from NcheSent, or choose your Excel .xlsx file."); }
     const cols = check(parsed);
     current = parsed;
     columns = cols;
@@ -195,8 +281,9 @@ fileInput.addEventListener("change", async () => {
     actionPanel.focus({ preventScroll: true });
     actionPanel.scrollIntoView({ behavior: "smooth", block: "center" });
   } catch (error) {
-    status.textContent = error instanceof Error ? error.message : "Could not read this file. Choose a PharmaOS report ending in .json.";
+    status.textContent = error instanceof Error ? error.message : "Could not read this file. Choose Excel (.xlsx), CSV (.csv) or PharmaOS (.json).";
     panel.hidden = true;
+    datasetPanel.hidden = true;
   }
 });
 
