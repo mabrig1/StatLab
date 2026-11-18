@@ -9,6 +9,9 @@ const compoundList = document.getElementById("compound-list");
 const tbody = document.getElementById("numeric");
 const csvDownload = document.getElementById("download");
 const summaryDownload = document.getElementById("download-summary");
+const reportDownload = document.getElementById("download-report");
+const actionPanel = document.getElementById("action-panel");
+const analysisInsight = document.getElementById("analysis-insight");
 let current = null;
 let columns = [];
 
@@ -58,9 +61,20 @@ function makePlainSummary(data, cols) {
     "Defined research roles: " + count(data.summary.totalPlannedRoles),
     "",
     "COMPOUNDS NAMED IN THE PAPER",
-    ...data.compounds.slice(0, 20).map((c) =>
-      (typeof c.name === "string" ? c.name.slice(0, 120) : "Unnamed compound") +
-      " — " + (c.pubchem && Number.isSafeInteger(c.pubchem.cid) ? "PubChem reference found" : "PubChem reference not verified")),
+    ...data.compounds.slice(0, 50).flatMap((c) => {
+      const name = typeof c.name === "string" ? c.name.slice(0, 120) : "Unnamed compound";
+      const p = c.pubchem && Number.isSafeInteger(c.pubchem.cid) ? c.pubchem : null;
+      const details = [
+        name + " — " + (p ? "PubChem reference found (CID " + p.cid + ")" : "PubChem reference not verified"),
+        p ? "Molecular formula: " + (p.formula ?? "not available") +
+          "; Molecular weight: " + (p.molecularWeight ?? "not available") +
+          "; XLogP: " + (p.xlogp ?? "not available") +
+          "; TPSA: " + (p.tpsa ?? "not available") : "",
+        typeof c.sourceExcerpt === "string" ? "Source excerpt (not independently fact-checked): " + c.sourceExcerpt.slice(0, 450) : "",
+        typeof c.safety === "string" ? "Caution: " + c.safety.slice(0, 350) : "",
+      ].filter(Boolean);
+      return [...details, ""];
+    }),
     "",
     "STATISTICAL DATA",
     isNumeric
@@ -70,6 +84,13 @@ function makePlainSummary(data, cols) {
       c.name + ": n=" + c.n + ", mean=" + format(c.mean) +
       ", sample SD=" + format(c.sampleSd) + ", min=" + format(c.min) + ", max=" + format(c.max)
     ) : []),
+    "",
+    "RESEARCH TASK AUDIT (reported by NcheSent)",
+    ...data.agents.slice(0, 50).map((step) =>
+      (typeof step.role === "string" ? step.role.slice(0, 100) : "Research role") +
+      ": " + (typeof step.status === "string" ? step.status.slice(0, 40) : "status unavailable") +
+      (typeof step.evidence === "string" ? " — " + step.evidence.slice(0, 250) : "")
+    ),
     "",
     "LIMITATIONS",
     "This is a readable copy of NcheSent findings viewed in StatLab.",
@@ -106,7 +127,7 @@ fileInput.addEventListener("change", async () => {
     current = parsed;
     columns = cols;
     const name = typeof parsed.source.name === "string" ? parsed.source.name.slice(0, 100) : "your research";
-    status.textContent = "Report opened successfully. Your findings are displayed below.";
+    status.textContent = "Report opened. Your research findings and download buttons are ready below.";
     document.getElementById("plain-summary").textContent =
       "Report: " + name + ". These are the evidence checks already performed by NcheSent; no second analysis is needed to review them.";
     document.getElementById("digest").textContent = "Original source SHA-256: " + parsed.source.sha256;
@@ -149,9 +170,16 @@ fileInput.addEventListener("change", async () => {
     csvDownload.disabled = !hasNumbers;
     document.getElementById("method").textContent =
       parsed.csv?.warning || "Descriptive numeric values from the imported NcheSent report.";
+    analysisInsight.textContent = hasNumbers
+      ? "This report includes " + cols.length + " numerical variable(s) summarized in NcheSent. Their existing descriptive values are shown below. StatLab has not independently recalculated or performed hypothesis tests."
+      : "NcheSent identified " + count(parsed.summary.candidatesMentioned) +
+        " named compounds, linked " + count(parsed.summary.pubchemVerified) +
+        " to PubChem references and reported " + count(parsed.summary.executedAgentTasks) +
+        " completed bounded tasks. These are source and descriptor checks, not drug-efficacy findings. There are 0 numerical variables, so no statistical tests can be performed on this report.";
+    compoundSection.open = false;
     panel.hidden = false;
-    panel.focus({ preventScroll: true });
-    panel.scrollIntoView({ behavior: "smooth", block: "start" });
+    actionPanel.focus({ preventScroll: true });
+    actionPanel.scrollIntoView({ behavior: "smooth", block: "center" });
   } catch (error) {
     status.textContent = error instanceof Error ? error.message : "Could not read this file. Choose a PharmaOS report ending in .json.";
     panel.hidden = true;
@@ -174,5 +202,11 @@ csvDownload.addEventListener("click", () => {
 summaryDownload.addEventListener("click", () => {
   if (!current) return;
   saveAs(makePlainSummary(current, columns),
-    "pharmaos-readable-research-summary.txt", "text/plain;charset=utf-8");
+    "pharmaos-readable-research-findings.txt", "text/plain;charset=utf-8");
+});
+
+reportDownload.addEventListener("click", () => {
+  if (!current) return;
+  saveAs(JSON.stringify(current, null, 2),
+    "pharmaos-original-research-report.json", "application/json;charset=utf-8");
 });
