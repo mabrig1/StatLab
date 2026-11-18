@@ -13,5 +13,13 @@
     "OPENROUTER_MODEL": "",
     "RESEND_FROM_EMAIL": "",
     "STATLAB_SITE_URL": ""
+  },
+  "previews": {
+    "vars": {
+      "INTEGRATIONS_ENABLED": "false",
+      "OPENROUTER_MODEL": "",
+      "RESEND_FROM_EMAIL": "",
+      "STATLAB_SITE_URL": ""
+    }
   }
 }
