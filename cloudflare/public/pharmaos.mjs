@@ -50,7 +50,7 @@ function makePlainSummary(data, cols) {
   const isNumeric = cols.length > 0;
   const sourceName = typeof data.source.name === "string" ? data.source.name.slice(0, 100) : "Research document";
   return [
-    "MABRIG PHARMAOS — RESEARCH REPORT SUMMARY",
+    "MABRIG PHARMAOS — EVIDENCE FINDINGS & JOURNAL PREPARATION CHECKLIST",
     "Source: " + sourceName,
     "Source fingerprint (SHA-256): " + data.source.sha256,
     "",
@@ -91,6 +91,20 @@ function makePlainSummary(data, cols) {
       ": " + (typeof step.status === "string" ? step.status.slice(0, 40) : "status unavailable") +
       (typeof step.evidence === "string" ? " — " + step.evidence.slice(0, 250) : "")
     ),
+    "",
+    "JOURNAL SUBMISSION READINESS — MANUAL REVIEW REQUIRED",
+    "Status: NOT YET ASSESSED. A list of compounds and PubChem reference records is not a complete manuscript integrity review.",
+    "1. Original contribution: demonstrate a novel, important research question and explain the gap in current literature.",
+    "2. Evidence and citations: verify every citation against the actual source and check whether it supports the cited claim; do not invent references.",
+    "3. Methods and reproducibility: document research design, samples, materials, protocols, statistical assumptions, software and appropriate controls.",
+    "4. Results: use the original measurements or dataset where needed; disclose uncertainty, adverse findings and limitations. Do not reconstruct data from summary tables.",
+    "5. Ethics and integrity: verify ethics approvals, consent if applicable, conflicts, funding, authorship and AI-use disclosure.",
+    "6. Journal fit: read the target journal's scope, article type, reporting standards and author instructions; independently confirm indexing, Journal Impact Factor (if claimed), and fees.",
+    "7. Final check: revise the full article and submit only after human scientific review. Acceptance can never be guaranteed.",
+    "",
+    "NEXT ACTION",
+    "Open https://scholar.mabrigkorie.org/publishing-agent and enter the full paper title and abstract for a journal-matching and revision plan.",
+    "The publishing agent is a planning aid, not peer-review approval. This JSON import did not transfer the manuscript to Scholar.",
     "",
     "LIMITATIONS",
     "This is a readable copy of NcheSent findings viewed in StatLab.",
