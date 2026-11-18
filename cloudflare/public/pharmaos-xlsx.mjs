@@ -129,7 +129,12 @@ export function readCsv(text){
  return[{name:"CSV data",rows}];
 }
 export function sheetAsCsv(rows){
- return rows.map(row=>row.map(value=>{
+ // StatLab's Data View requires each CSV row to have exactly the header width.
+ // Sparse Excel rows can omit trailing empty cells: preserve those as blank CSV columns.
+ const width=rows[0]?.length||0;
+ if(width<1||width>MAX_COLS)throw Error("Worksheet has no readable header row or too many columns.");
+ return rows.map(row=>Array.from({length:width},(_,i)=>{
+  const value=row[i];
   let text=value==null?"":String(value);
   if(typeof value!=="number"&&/^[=+@\-\t\r]/.test(text))text="'"+text;
   return '"'+text.replaceAll('"','""')+'"';
