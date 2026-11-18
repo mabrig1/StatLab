@@ -15,3 +15,18 @@
 .secondary-next{background:#f5f7f9;border:1px solid #dfe7ed}
 .secondary-next .secondary-action{display:inline-block;min-height:44px;padding:9px 16px;margin-top:9px}
 @media(max-width:600px){.priority-next{padding:19px 14px}.priority-next .actions button{width:100%}}
+
+
+/* Separate Excel/CSV evidence input from JSON compound-report review. */
+.file-help{display:grid;gap:9px;margin:14px 0}
+.file-help p{border-left:4px solid #0f766e;background:#f3faf8;margin:0;padding:11px 13px;border-radius:8px}
+.dataset-panel{border:2px solid #0f766e;scroll-margin-top:14px}
+.dataset-panel:focus{outline:3px solid #ec9b19;outline-offset:3px}
+.dataset-panel select{width:100%;padding:13px;border:2px solid #087160;border-radius:10px;background:#fff;color:#123348;font-size:1rem}
+.dataset-panel .method-note{padding:14px 16px;border:1px solid #e3cf94;background:#fff8e9;border-radius:12px;font-size:.94rem;line-height:1.65}
+.dataset-panel .preview-table{min-width:640px;font-size:.88rem}
+.dataset-panel .preview-table th{background:#e9f6f2;color:#173c34;white-space:nowrap}
+.dataset-panel .preview-table td{max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dataset-panel .actions{margin-top:20px}
+.dataset-panel .footnote{margin-top:12px}
+@media(max-width:560px){.dataset-panel{padding:18px}.dataset-panel .actions>*{width:100%}}

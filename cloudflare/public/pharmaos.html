@@ -11,16 +11,38 @@
 <nav aria-label="Return to research"><a href="https://nchesent.mabrigkorie.org/discovery">← Back to NcheSent</a><a href="/">StatLab home</a></nav>
 <header>
   <span>MABRIG PHARMAOS · STAGE 3</span>
-  <h1>View your research results in StatLab</h1>
-  <p>You do not need to repeat the analysis. Just choose the report downloaded from NcheSent. StatLab will show the findings immediately.</p>
+  <h1>Open your PharmaOS report or Excel research dataset</h1>
+  <p>Choose the file already on your device. StatLab will recognise a PharmaOS report, an Excel workbook or a CSV dataset and show the correct next step.</p>
 </header>
 <section class="panel import-panel" aria-labelledby="import-title">
-  <p class="eyebrow">ONE SIMPLE ACTION</p>
-  <h2 id="import-title">Choose your PharmaOS report</h2>
-  <p>In NcheSent, click <strong>Download research report (.json)</strong>. Then select that downloaded file here.</p>
-  <label for="handoff" class="file-label">Select downloaded report (.json)</label>
-  <input id="handoff" type="file" accept=".json,application/json" aria-describedby="message">
-  <p id="message" role="status" aria-live="polite">No file selected. Your report stays on this device.</p>
+  <p class="eyebrow">UPLOAD ONCE</p>
+  <h2 id="import-title">Choose your research file</h2>
+  <div class="file-help">
+    <p><strong>Excel or CSV (.xlsx, .csv)</strong> — choose your research-data workbook, review its worksheets and download a sheet for analysis.</p>
+    <p><strong>PharmaOS report (.json)</strong> — review NcheSent's chemical evidence report and download its findings.</p>
+  </div>
+  <label for="handoff" class="file-label">Select Excel, CSV or PharmaOS JSON file</label>
+  <input id="handoff" type="file" accept=".xlsx,.csv,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/json" aria-describedby="message">
+  <p id="message" role="status" aria-live="polite">No file selected. Files are read privately in your browser.</p>
+</section>
+<section class="panel dataset-panel" id="dataset-result" tabindex="-1" aria-label="Imported Excel or CSV research data" hidden>
+  <p class="eyebrow success">DATA FILE OPENED</p>
+  <h2>Your research-data workbook is ready</h2>
+  <p id="workbook-summary"></p>
+  <label for="sheet-select" class="file-label">Choose the worksheet to inspect</label>
+  <select id="sheet-select" aria-describedby="sheet-summary"></select>
+  <p id="sheet-summary" role="status"></p>
+  <p class="method-note">These are the values supplied in the workbook, not new statistical results. Published chemical concentrations must be compared by the same compound, plant part, units and sample basis. A paper listed in the 50-study inventory is not automatically verified.</p>
+  <div class="scroll"><table class="preview-table">
+    <thead><tr id="sheet-preview-header"></tr></thead>
+    <tbody id="sheet-preview-body"></tbody>
+  </table></div>
+  <p class="footnote">Previewing the first 10 data rows. Download the selected sheet as CSV to inspect all of its records.</p>
+  <div class="actions">
+    <button type="button" id="export-sheet">1. Download selected sheet (.csv)</button>
+    <a class="secondary-action" href="/">2. Open StatLab to import CSV</a>
+  </div>
+  <p class="footnote">The StatLab workstation currently imports CSV and StatLab project files. Export one worksheet above, then select Import in the workstation.</p>
 </section>
 <section class="panel results-panel" id="result" tabindex="-1" aria-label="Imported research findings" hidden>
   <p class="eyebrow success">REPORT OPENED SUCCESSFULLY</p>
