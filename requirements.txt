@@ -5,6 +5,7 @@ pandas>=2.2,<3
 numpy>=2.0,<3
 scipy>=1.13,<2
 statsmodels>=0.14,<1
+arch>=9,<10
 openpyxl>=3.1,<4
 pyreadstat>=1.2,<2
 python-docx>=1.1,<2

@@ -287,6 +287,10 @@ def analyze(df: pd.DataFrame, request:dict, variable_specs: dict[str, dict] | No
     if mode=="ttest_paired":return paired_t(df,a,b)
     if mode=="anova":return anova(df,a,b)
     if mode=="normality":return normality(df,columns)
+    if mode=="garch":
+        from .garch_volatility import garch_volatility
+        return garch_volatility(df, a, input_type=request.get("garch_input_type", "prices"),
+                                steps=request.get("forecast_steps", 5))
     if mode=="arima":
         from .advanced_timeseries import arima_forecast
         return arima_forecast(df, a, p=request.get("arima_p", 1),

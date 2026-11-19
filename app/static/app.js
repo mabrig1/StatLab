@@ -7,6 +7,7 @@ const METHODS = {
   descriptives:{name:'Descriptive statistics made simple',desc:'Choose questions, get an easy summary, and read what each result means.',tip:'Uses Variable View measurement levels: Scale → averages; Nominal/Ordinal → answer counts. Missing responses are excluded. Check your coding first.',fields:[]},
   frequencies:{name:'Frequencies',desc:'Counts, percentages, valid percentages and cumulative percentages.',tip:'Works with nominal categories, survey responses and numeric codes.',fields:[['a','Choose one variable','all','single']]},
   correlation:{name:'Correlations',desc:'Test strength and direction of linear or monotonic relationships.',tip:'Pearson requires approximately linear relationships; Spearman uses ranks.',fields:[['columns','Choose 2 or more variables','numeric','multi'],['method','Correlation method','method','single']]},
+  garch:{name:'GARCH financial-volatility forecasting (local)',desc:'Estimate how uncertain percentage financial returns may be over future periods. This predicts volatility, not prices.',tip:'Requires 150–2,500 chronologically ordered equally spaced rows. Choose whether the selected numeric variable is a positive price, returns expressed as percentages, or decimal returns. Cloudflare browser edition does not run this Python model.',fields:[['a','Price or return variable','numeric','single']]},
   arima:{name:'ARIMA time-series forecasting (local)',desc:'Predict a numeric series using its original chronological row order. Compare real held-out predictions against a naive baseline.',tip:'Requires 50–1,200 equally spaced, chronologically sorted numeric rows with no missing periods. No date parsing or frequency inference. Cloudflare browser edition cannot run this Python model.',fields:[['a','Time-series variable','numeric','single']]},
   regression:{name:'Multiple linear regression',desc:'Predict a continuous outcome with one or more numeric predictors.',tip:'Linear OLS requires appropriate model assumptions; coefficients are associations, not proof of causation.',fields:[['a','Dependent (outcome) variable','numeric','single'],['columns','Independent (predictor) variables','numeric','multi']]},
   crosstab:{name:'Crosstabs & chi-square',desc:'Cross-tabulate two categorical variables and test association.',tip:'Inspect expected cell counts. Chi-square approximation is less reliable for sparse tables.',fields:[['a','Row variable','all','single'],['b','Column variable','all','single']]},
@@ -536,6 +537,12 @@ function buildControls(){
       <p class="method-note"><strong>Factor-retention guide:</strong> Horn-style comparison uses simulated <em>Pearson correlation component eigenvalues</em>, not an exact common-factor parallel analysis. The suggested count does not override your chosen number of principal-axis factors. Oblimin adds a pattern matrix, separate structure matrix, and factor correlations; it does not establish causality. Polychoric EFA and CFA remain unavailable.</p>`;
    $('dynamic-controls').append(settings);
  }
+ if(state.mode==='garch'){
+   const settings=document.createElement('section');
+   settings.className='analysis-efa-options';
+   settings.innerHTML='<label class="field-label" for="garch-input-type">What does this column contain?</label><select class="input-select" id="garch-input-type"><option value="prices" selected>Positive prices (calculate log returns)</option><option value="returns_percent">Returns as percent (e.g. 2.5 means 2.5%)</option><option value="returns_decimal">Returns as decimals (e.g. 0.025 means 2.5%)</option></select><label class="field-label" for="garch-steps">Forecast periods</label><select class="input-select" id="garch-steps"><option value="3">3 periods</option><option value="5" selected>5 periods</option><option value="10">10 periods</option></select><p class="method-note">GARCH(1,1) predicts conditional return variance and volatility, not return direction or future prices. Check equal time spacing and chronological order. Holdout scoring compares variance proxies with a historical-variance baseline.</p>';
+   $('dynamic-controls').append(settings);
+ }
  if(state.mode==='arima'){
    const settings=document.createElement('section');
    settings.className='analysis-efa-options';
@@ -561,6 +568,10 @@ function readForm(){
   return out;
  }
  for(const [key,title,type,kind] of METHODS[state.mode].fields){if(kind==='multi'){out[key]=[...document.querySelectorAll(`.multiselect[data-field="${key}"] input:checked`)].map(i=>i.value)}else{out[key]=$(`field-${key}`).value}}
+ if(state.mode==='garch'){
+    out.garch_input_type=$('garch-input-type').value;
+    out.forecast_steps=Number($('garch-steps').value);
+ }
  if(state.mode==='arima'){
     out.arima_p=Number($('arima-p').value);
     out.arima_d=Number($('arima-d').value);
