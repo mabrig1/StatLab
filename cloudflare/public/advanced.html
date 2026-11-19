@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>MABRIG StatLab · Advanced Computing Pilot</title>
+  <link rel="stylesheet" href="/advanced.css">
+  <script defer type="module" src="/advanced.mjs"></script>
+</head>
+<body>
+  <header><a href="/">M. MABRIG StatLab</a><span>Research Computing · Access-protected pilot</span></header>
+  <main>
+    <section class="intro">
+      <span class="eyebrow">ADVANCED ANALYSIS · PILOT</span>
+      <h1>Advanced statistics, without writing code.</h1>
+      <p>Run ARIMA forecasting or GARCH volatility analysis. Select one numeric time-series column, check its time order, and review actual statistical results.</p>
+      <p class="notice"><strong>Privacy:</strong> Your file stays on this device until you explicitly approve remote processing. If you submit, the selected numeric series is sent to a secured Python service. Do not upload confidential participant data without appropriate approval.</p>
+    </section>
+    <section class="status">
+      <strong id="availability" role="status" aria-live="polite">Checking pilot availability…</strong>
+      <small>The browser workstation and its locally saved projects are separate. Remote processing is opt-in, and availability requires Cloudflare Access and a configured private backend.</small>
+    </section>
+    <form id="analysis" novalidate>
+      <fieldset>
+        <legend>1 · Select your statistical method</legend>
+        <label for="mode">Analysis method</label>
+        <select id="mode"><option value="arima">ARIMA — forecast numeric values</option><option value="garch">GARCH(1,1) — forecast return volatility</option></select>
+        <p id="method-help" class="hint">ARIMA predicts future values. It compares its error with a naive historical baseline.</p>
+      </fieldset>
+      <fieldset>
+        <legend>2 · Choose your research data</legend>
+        <label for="file">CSV file (maximum 180 KB)</label>
+        <input id="file" type="file" accept=".csv,text/csv" required>
+        <label for="column">Numeric variable</label>
+        <select id="column" disabled><option value="">Choose a CSV file first</option></select>
+        <label for="time">Time index (optional, for strict regularity check)</label>
+        <select id="time" disabled><option value="">Manual chronology check (no date column)</option></select>
+        <p class="hint">Sort observations oldest to newest. Select a date column to check uninterrupted daily, weekly or monthly periods; calendar gaps are not filled. For trading-day data with weekends/holidays, check the correct period sequence yourself before using manual mode.</p>
+        <p id="file-help" role="status"></p>
+      </fieldset>
+      <fieldset>
+        <legend>3 · Select model settings</legend>
+        <section id="arima-settings">
+          <div class="three"><label>AR terms (p)<select id="p"><option>0</option><option selected>1</option><option>2</option></select></label>
+            <label>Differencing (d)<select id="d"><option selected>0</option><option>1</option></select></label>
+            <label>MA terms (q)<select id="q"><option selected>0</option><option>1</option><option>2</option></select></label></div>
+          <p class="hint">Bounded educational models: p+q must be at most 3. Stationarity still needs researcher review.</p>
+        </section>
+        <section id="garch-settings" hidden>
+          <label for="kind">Values in the numeric column</label>
+          <select id="kind">
+            <option value="prices">Positive price levels → log percentage returns</option>
+            <option value="returns_percent">Returns expressed in percentages</option>
+            <option value="returns_decimal">Returns expressed as decimals</option>
+          </select>
+          <p class="hint">GARCH predicts volatility of returns, not future prices, profits or return direction.</p>
+        </section>
+        <label for="steps">Future periods</label>
+        <select id="steps"><option>3</option><option selected>5</option><option>6</option><option>10</option><option>12</option></select>
+      </fieldset>
+      <fieldset>
+        <legend>4 · Check privacy and accuracy</legend>
+        <label class="check"><input id="ordered" type="checkbox"> I have confirmed the original observations are chronologically ordered and equally spaced.</label>
+        <label class="check"><input id="consent" type="checkbox"> I consent to transferring only the selected numeric series for this remote statistical calculation.</label>
+        <p class="hint">This pilot does not save your full CSV file in a cloud database. The underlying service does not create analysis sessions; avoid uploading sensitive research data until its full security review is complete.</p>
+        <button id="run" type="submit" disabled>Run validated analysis →</button>
+        <p id="error" class="error" role="alert"></p>
+      </fieldset>
+    </form>
+    <section class="output" id="output" hidden aria-live="polite">
+      <h2 id="report-title">Research findings</h2>
+      <p id="report-method"></p>
+      <p id="report-text"></p>
+      <div id="report-warnings"></div>
+      <div id="report-tables"></div>
+      <button id="export" type="button">Download calculation report (JSON)</button>
+    </section>
+    <footer>Research-only pilot · Independent MABRIG software · Statistical outputs require researcher review.
+      <a href="/">Return to browser workspace</a>
+    </footer>
+  </main>
+</body>
+</html>
