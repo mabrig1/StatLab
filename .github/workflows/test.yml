@@ -12,5 +12,6 @@ jobs:
           python-version: '3.12'
       - run: pip install -r requirements-dev.txt
       - run: pytest -q
+      - run: python scripts/smoke_compute_local.py
       - run: node --check app/static/power.js
       - run: node --check app/static/app.js
