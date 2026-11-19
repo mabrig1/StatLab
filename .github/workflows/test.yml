@@ -13,5 +13,9 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: pytest -q
       - run: python scripts/smoke_compute_local.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/integration/advanced-gateway.e2e.mjs
       - run: node --check app/static/power.js
       - run: node --check app/static/app.js
