@@ -21,6 +21,7 @@ jobs:
       - run: node --check cloudflare/src/index.mjs
       - run: node --check cloudflare/src/advanced-compute.mjs
       - run: node --check cloudflare/public/advanced.mjs
+      - run: node --check cloudflare/public/advanced-demo.mjs
       - run: node --check cloudflare/public/statistics.mjs
       - run: node --check cloudflare/public/app.mjs
       - run: node --check cloudflare/public/likert-engine.mjs
