@@ -2,6 +2,10 @@
 
 **Implementation scope:** The existing **local Python/FastAPI** edition only. The separate Cloudflare/Worker/browser edition does not run Python forecasting or call the local API. No production secrets, D1 database, public API, migration or external AI service are involved.
 
+## Try the practice dataset first
+
+Download `samples/SYNTHETIC_arima_monthly_demo.csv` from this branch. Its 96 monthly values are **generated demonstration data**, not observations of UNN students, a real market or a published study. Import it and select the `value` column; its `month` text column simply documents chronology.
+
 ## Student workflow
 
 1. Prepare an observed CSV, TSV, Excel or SPSS SAV dataset, sorted **oldest to newest**.
