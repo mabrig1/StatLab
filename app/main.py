@@ -241,6 +241,7 @@ class AnalysisRequest(BaseModel):
     scale_points: int = 5
     higher_is_favourable: bool | None = None
     min_answered_pct: int = 50
+    garch_input_type: Literal["prices", "returns_percent", "returns_decimal"] = "prices"
     arima_p: int = Field(default=1, ge=0, le=2)
     arima_d: int = Field(default=0, ge=0, le=1)
     arima_q: int = Field(default=0, ge=0, le=2)
@@ -388,7 +389,8 @@ def capabilities():
                            "crosstabs", "cronbach_alpha", "t_tests", "anova"],
             "aggregate_only": ["frequency_descriptives", "chapter_four_reports"],
             "study_design": ["a_priori_sample_size_power_planning"],
-            "time_series": ["local_only_arima_manual_order_with_contiguous_holdout"],
+            "time_series": ["local_only_arima_manual_order_with_contiguous_holdout",
+                            "local_only_garch_volatility_with_contiguous_holdout"],
             "dimensionality": [
                 "exploratory_principal_axis_factor_analysis",
                 "horn_style_pearson_component_parallel_analysis",
