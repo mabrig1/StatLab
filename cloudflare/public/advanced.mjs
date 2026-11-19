@@ -1,3 +1,4 @@
+import {syntheticTimeSeries} from "./advanced-demo.mjs";
 // Standalone, opt-in pilot. No browser project is read, copied or auto-uploaded.
 const byId=id=>document.getElementById(id);
 const state={rows:[],headers:[],ready:false,output:null};
@@ -79,32 +80,46 @@ function getValues(){
     throw Error("Selected method requires "+limit[0]+"–"+limit[1]+" observations.");
   return values;
 }
+function setRows(parsed,label){
+  state.rows=parsed;state.headers=parsed[0];state.output=null;byId("output").hidden=true;
+  byId("ordered").checked=false;byId("consent").checked=false;
+  for(const id of ["column","time"])byId(id).replaceChildren();
+  for(const [i,h] of parsed[0].entries()){
+    const opt=document.createElement("option");opt.value=String(i);opt.textContent=h;
+    byId("column").append(opt);
+  }
+  const blank=document.createElement("option");blank.value="";blank.textContent="Manual chronology check (no date column)";
+  byId("time").append(blank);
+  parsed[0].forEach((h,i)=>{
+    const opt=document.createElement("option");opt.value=String(i);opt.textContent=h;byId("time").append(opt);
+  });
+  const likely=state.headers.findIndex(h=>/^(value|price|returns?|close)$/i.test(h.trim()));
+  if(likely!==-1)byId("column").value=String(likely);
+  const time=state.headers.findIndex(h=>/^(date|month|day|period)$/i.test(h.trim()));
+  if(time!==-1)byId("time").value=String(time);
+  byId("column").disabled=false;byId("time").disabled=false;
+  say(label);
+}
 async function importFile(){
   state.rows=[];state.headers=[];state.output=null;byId("output").hidden=true;
+  byId("ordered").checked=false;byId("consent").checked=false;
   const file=byId("file").files[0];
   if(!file)return;
   if(file.size>180000){say("CSV exceeds the 180 KB browser import limit.",true);return}
   try{
     const parsed=csvParse(await file.text());
-    state.rows=parsed;state.headers=parsed[0];
-    for(const id of ["column","time"]){byId(id).replaceChildren()}
-    for(const [i,h] of parsed[0].entries()){
-      const opt=document.createElement("option");opt.value=String(i);opt.textContent=h;
-      byId("column").append(opt);
-    }
-    const blank=document.createElement("option");blank.value="";blank.textContent="Manual chronology check (no date column)";
-    byId("time").append(blank);
-    parsed[0].forEach((h,i)=>{
-      const opt=document.createElement("option");opt.value=String(i);opt.textContent=h;byId("time").append(opt);
-    });
-    const likely=state.headers.findIndex(h=>/^(value|price|returns?|close)$/i.test(h.trim()));
-    if(likely!==-1)byId("column").value=String(likely);
-    const time=state.headers.findIndex(h=>/^(date|month|day|period)$/i.test(h.trim()));
-    if(time!==-1)byId("time").value=String(time);
-    byId("column").disabled=false;byId("time").disabled=false;
-    say((parsed.length-1)+" CSV observations loaded on your device. No file has been sent.");
+    setRows(parsed,(parsed.length-1)+" CSV observations loaded on your device. No file has been sent.");
   }catch(error){state.rows=[];say(error.message,true)}
 }
+function loadExample(kind){
+  const data=syntheticTimeSeries(kind);
+  byId("file").value="";
+  byId("mode").value=kind;
+  setMode();
+  setRows(data,(data.length-1)+" SYNTHETIC observations generated in this browser. No external data transfer or calculation has occurred.");
+  byId("kind").value="prices";
+}
+
 function setMode(){
   const garch=byId("mode").value==="garch";
   byId("arima-settings").hidden=garch;byId("garch-settings").hidden=!garch;
@@ -175,7 +190,15 @@ async function status(){
   byId("run").disabled=!state.ready;
 }
 byId("file").addEventListener("change",importFile);
-byId("mode").addEventListener("change",setMode);
+byId("example-arima").addEventListener("click",()=>loadExample("arima"));
+byId("example-garch").addEventListener("click",()=>loadExample("garch"));
+byId("mode").addEventListener("change",()=>{setMode();byId("ordered").checked=false;byId("consent").checked=false;});
+for(const id of ["column","time","kind"]){
+  byId(id).addEventListener("change",()=>{
+    byId("consent").checked=false;
+    if(id==="time")byId("ordered").checked=false;
+  });
+}
 byId("analysis").addEventListener("submit",run);
 byId("export").addEventListener("click",()=>{
   if(!state.output)return;
