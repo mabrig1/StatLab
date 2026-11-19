@@ -7,8 +7,8 @@
 - New responsive **/advanced.html** (Cloudflare static asset), with local-only CSV parsing, optional consecutive ISO dates/months validation, one chosen numeric variable and two acknowledgement checkboxes: time-series integrity and opt-in remote transfer.
 - New Cloudflare **/api/advanced/status** public capability endpoint and **/api/advanced/run** Access-authenticated REST endpoint, both fail-closed unless explicitly configured.
 - Access identity JWT verified using RS256 signature and Cloudflare team's published JWKS. Validates expected issuer, application-specific AUD, expiry, optional not-before and nonempty sub. Unauthenticated or forged tokens cannot invoke the Python backend.
-- Request whitelist and <=60 KB JSON payload, method-specific bounds (ARIMA 50–1,200; GARCH 150–2,500 numeric observations), strict HTTPS backend host config, 25-second upstream timeout and sanitised errors.
-- **Daily 20-request ceiling** enforced atomically by a dedicated D1 table. The database stores only a SHA-256-derived subject ID, UTC date and number of requests. The Worker neither stores input arrays nor results.
+- Request whitelist and <=60 KB JSON payload, method-specific bounds (ARIMA 50–1,200; GARCH 150–2,500 numeric observations), strict HTTPS backend host config, 25-second upstream timeout and sanitised errors. Cloudflare Access JWKS responses are capped at 64 KB and Python responses at 85 KB while streaming, even without Content-Length.
+- **Daily 20-request ceiling** enforced atomically by a dedicated D1 table. The database stores only a secret-keyed HMAC pseudonym of the Access subject, UTC date and request count. The Worker neither stores input arrays nor results.
 - A separate \`app.compute_service:app\` FastAPI process (do **NOT** expose \`app.main:app\`), accepting only \`GET /health\` and bearer-authorized \`POST /internal/compute\`. Uses the existing bounded ARIMA/GARCH numerical modules, no dataset sessions, auth UI, file uploads or OpenRouter.
 - The existing browser-first Data View, Likert Studio and other pages do not auto-send any records; the new pilot is a separate opt-in page.
 
@@ -30,6 +30,7 @@
 |---|---|---|
 | \`STATLAB_COMPUTE_SHARED_TOKEN\` | Private Python host secret | Authenticated stateless computational endpoint |
 | \`ADVANCED_ENGINE_TOKEN\` | Worker secret | Same unique private origin token |
+| \`ADVANCED_QUOTA_HMAC_SECRET\` | Worker secret | A different random 32+ character key for quota pseudonyms; never reuse the backend token. |
 | \`ADVANCED_COMPUTE_ORIGIN\` | Worker env | Exact HTTPS origin of Python service |
 | \`CF_ACCESS_TEAM_DOMAIN\` | Worker env | Pinned Cloudflare Access issuer |
 | \`CF_ACCESS_AUD\` | Worker env | Expected Access application audience |
