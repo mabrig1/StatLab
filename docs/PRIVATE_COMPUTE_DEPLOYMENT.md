@@ -9,6 +9,7 @@
 - `compose.compute.yaml`: binds **127.0.0.1:8090 only**, a read-only filesystem, reduced OS privileges and restricted memory/CPU/PIDs. It does not publish a domain, create a Cloudflare Access policy or attach a database.
 - `scripts/smoke_compute_local.py`: boots a temporary localhost service with a new random token, calls both numerical engines using synthetic samples, checks unauthorized requests and verifies that the dataset and documentation endpoints are absent. Runs automatically in Python CI.
 - Early authentication and request-size verification on the private compute endpoint, before parsing untrusted model data.
+- Browser pilot offers **Try 96-month synthetic example** and **Try 320-day synthetic prices**. Both are deterministic local JavaScript practice datasets; they do not require remote access or silently call Python. Changing input or model invalidates the prior consent checkboxes.
 
 ## Local verification (no cloud account needed)
 
