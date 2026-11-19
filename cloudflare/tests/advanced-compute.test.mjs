@@ -25,6 +25,7 @@ function counter(limit=20){
 function env(patch={}){
   return {ADVANCED_COMPUTE_ENABLED:"true",
     ADVANCED_ENGINE_TOKEN:SHARED,
+    ADVANCED_QUOTA_HMAC_SECRET:"unit-test-quota-key-never-used-in-production-123456789",
     ADVANCED_COMPUTE_ORIGIN:"https://engine.example",
     CF_ACCESS_TEAM_DOMAIN:ISSUER,
     CF_ACCESS_AUD:AUD,
