@@ -1,0 +1,50 @@
+name: Private compute container checks
+on:
+  push:
+    paths:
+      - "Dockerfile.compute"
+      - "compose.compute.yaml"
+      - ".dockerignore"
+      - "requirements.txt"
+      - "app/compute_service.py"
+      - "app/advanced_timeseries.py"
+      - "app/garch_volatility.py"
+      - "app/stats_engine.py"
+      - "scripts/check_compute_container.py"
+      - ".github/workflows/compute-container-check.yml"
+  pull_request:
+    paths:
+      - "Dockerfile.compute"
+      - "compose.compute.yaml"
+      - ".dockerignore"
+      - "requirements.txt"
+      - "app/compute_service.py"
+      - "app/advanced_timeseries.py"
+      - "app/garch_volatility.py"
+      - "app/stats_engine.py"
+      - "scripts/check_compute_container.py"
+      - ".github/workflows/compute-container-check.yml"
+jobs:
+  build-and-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build isolated non-root compute image (no push or deployment)
+        run: docker build -f Dockerfile.compute -t statlab-private-compute:ci .
+      - name: Verify real container with synthetic numerical inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          export STATLAB_COMPUTE_SHARED_TOKEN="$(python3 -c 'import secrets;print(secrets.token_urlsafe(48))')"
+          docker run --detach --name statlab-compute-ci \
+            --publish 127.0.0.1:8090:8090 \
+            --env STATLAB_COMPUTE_SHARED_TOKEN \
+            --read-only --tmpfs /tmp:rw,nosuid,noexec,size=16m \
+            --cap-drop ALL --security-opt no-new-privileges \
+            --pids-limit 128 --cpus 1 --memory 768m \
+            statlab-private-compute:ci
+          trap 'docker rm -f statlab-compute-ci >/dev/null 2>&1 || true' EXIT
+          python3 scripts/check_compute_container.py
