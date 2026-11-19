@@ -1,3 +1,4 @@
+import { createAdvancedGateway } from "./advanced-compute.mjs";
 // MABRIG StatLab: intentionally limited Cloudflare integration gateway.
 // This is not the Python statistics engine or a public user API.
 const JSON_HEADERS = {
@@ -53,8 +54,11 @@ function validAddress(email) {
 }
 
 export function createGateway(providerFetch = globalThis.fetch) {
+  const advanced = createAdvancedGateway(providerFetch);
   return {
     async fetch(request, env) {
+      const advancedResponse = await advanced(request, env);
+      if (advancedResponse) return advancedResponse;
       const pathname = new URL(request.url).pathname;
       if (pathname === "/api/integrations/status" && request.method === "GET") {
         return respond(200, { service: "MABRIG StatLab integration gateway", enabled: env.INTEGRATIONS_ENABLED === "true" });
