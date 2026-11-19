@@ -31,7 +31,12 @@
       <fieldset>
         <legend>2 · Choose your research data</legend>
         <label for="file">CSV file (maximum 180 KB)</label>
-        <input id="file" type="file" accept=".csv,text/csv" required>
+        <input id="file" type="file" accept=".csv,text/csv">
+        <div class="example-actions" role="group" aria-label="Practice with sample data">
+          <button type="button" id="example-arima">Try 96-month synthetic example</button>
+          <button type="button" id="example-garch">Try 320-day synthetic prices</button>
+        </div>
+        <p class="hint">Practice examples are generated on your device and are not historical evidence. Loading them does not send any data to the computing server.</p>
         <label for="column">Numeric variable</label>
         <select id="column" disabled><option value="">Choose a CSV file first</option></select>
         <label for="time">Time index (optional, for strict regularity check)</label>
