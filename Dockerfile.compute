@@ -1,0 +1,20 @@
+# Dedicated numerical computing image; DOES NOT serve app.main FastAPI sessions.
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    HOME=/home/statlab
+
+WORKDIR /srv/statlab
+COPY requirements.txt /srv/statlab/requirements.txt
+RUN python -m pip install --no-cache-dir -r requirements.txt \
+    && groupadd --system statlab \
+    && useradd --system --create-home --home-dir /home/statlab --gid statlab statlab
+COPY --chown=statlab:statlab app /srv/statlab/app
+USER statlab
+EXPOSE 8090
+
+# One worker and a low concurrency ceiling: reduce computational overload.
+# The host must isolate and rate-limit this service, not publish the port.
+CMD ["uvicorn", "app.compute_service:app", "--host", "0.0.0.0", "--port", "8090", "--workers", "1", "--limit-concurrency", "3", "--timeout-keep-alive", "5", "--no-server-header"]
