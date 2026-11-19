@@ -74,3 +74,17 @@ def test_private_garch_stateless_computation(monkeypatch):
     body=response.json()
     assert "GARCH" in body["title"] and body["n_submitted"] == 330
     assert len(body["tables"][3]["rows"]) == 3
+
+
+def test_private_service_checks_auth_before_parsing_large_uploads(monkeypatch):
+    monkeypatch.setenv("STATLAB_COMPUTE_SHARED_TOKEN", SECRET)
+    huge = b"x" * 65000
+    blocked = client.post("/internal/compute", content=huge,
+                          headers={"Content-Type": "application/json"})
+    assert blocked.status_code == 401
+    too_large = client.post("/internal/compute", content=huge,
+                            headers={**auth(), "Content-Type": "application/json"})
+    assert too_large.status_code == 413
+    wrong_type = client.post("/internal/compute", content=b"plain text",
+                             headers={**auth(), "Content-Type": "text/plain"})
+    assert wrong_type.status_code == 415
