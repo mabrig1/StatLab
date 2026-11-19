@@ -7,6 +7,7 @@ const METHODS = {
   descriptives:{name:'Descriptive statistics made simple',desc:'Choose questions, get an easy summary, and read what each result means.',tip:'Uses Variable View measurement levels: Scale → averages; Nominal/Ordinal → answer counts. Missing responses are excluded. Check your coding first.',fields:[]},
   frequencies:{name:'Frequencies',desc:'Counts, percentages, valid percentages and cumulative percentages.',tip:'Works with nominal categories, survey responses and numeric codes.',fields:[['a','Choose one variable','all','single']]},
   correlation:{name:'Correlations',desc:'Test strength and direction of linear or monotonic relationships.',tip:'Pearson requires approximately linear relationships; Spearman uses ranks.',fields:[['columns','Choose 2 or more variables','numeric','multi'],['method','Correlation method','method','single']]},
+  arima:{name:'ARIMA time-series forecasting (local)',desc:'Predict a numeric series using its original chronological row order. Compare real held-out predictions against a naive baseline.',tip:'Requires 50–1,200 equally spaced, chronologically sorted numeric rows with no missing periods. No date parsing or frequency inference. Cloudflare browser edition cannot run this Python model.',fields:[['a','Time-series variable','numeric','single']]},
   regression:{name:'Multiple linear regression',desc:'Predict a continuous outcome with one or more numeric predictors.',tip:'Linear OLS requires appropriate model assumptions; coefficients are associations, not proof of causation.',fields:[['a','Dependent (outcome) variable','numeric','single'],['columns','Independent (predictor) variables','numeric','multi']]},
   crosstab:{name:'Crosstabs & chi-square',desc:'Cross-tabulate two categorical variables and test association.',tip:'Inspect expected cell counts. Chi-square approximation is less reliable for sparse tables.',fields:[['a','Row variable','all','single'],['b','Column variable','all','single']]},
   reliability:{name:"Cronbach’s alpha",desc:'Estimate internal consistency of a multi-item scale.',tip:'Ensure Likert items reflect the same construct and reverse-worded questions were correctly recoded.',fields:[['columns','Scale items (2 or more)','numeric','multi']]},
@@ -535,6 +536,12 @@ function buildControls(){
       <p class="method-note"><strong>Factor-retention guide:</strong> Horn-style comparison uses simulated <em>Pearson correlation component eigenvalues</em>, not an exact common-factor parallel analysis. The suggested count does not override your chosen number of principal-axis factors. Oblimin adds a pattern matrix, separate structure matrix, and factor correlations; it does not establish causality. Polychoric EFA and CFA remain unavailable.</p>`;
    $('dynamic-controls').append(settings);
  }
+ if(state.mode==='arima'){
+   const settings=document.createElement('section');
+   settings.className='analysis-efa-options';
+   settings.innerHTML='<label class="field-label" for="arima-p">AR terms (p)</label><select class="input-select" id="arima-p"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option></select><label class="field-label" for="arima-d">Differencing (d)</label><select class="input-select" id="arima-d"><option value="0" selected>0</option><option value="1">1</option></select><label class="field-label" for="arima-q">MA terms (q)</label><select class="input-select" id="arima-q"><option value="0" selected>0</option><option value="1">1</option><option value="2">2</option></select><label class="field-label" for="arima-steps">Forecast periods</label><select class="input-select" id="arima-steps"><option value="3">3</option><option value="6" selected>6</option><option value="12">12</option></select><p class="method-note">Researcher must sort original rows by time and check equal spacing. ARIMA compares holdout MAE/RMSE with a naive baseline and reports 95% model-based intervals. Choose p+q at most 3.</p>';
+   $('dynamic-controls').append(settings);
+ }
  const a=$('field-a'),b=$('field-b');if(a&&b&&a.value===b.value){const alternative=[...b.options].find(o=>o.value&&o.value!==a.value);if(alternative)b.value=alternative.value}
 }
 function readForm(){
@@ -554,6 +561,12 @@ function readForm(){
   return out;
  }
  for(const [key,title,type,kind] of METHODS[state.mode].fields){if(kind==='multi'){out[key]=[...document.querySelectorAll(`.multiselect[data-field="${key}"] input:checked`)].map(i=>i.value)}else{out[key]=$(`field-${key}`).value}}
+ if(state.mode==='arima'){
+    out.arima_p=Number($('arima-p').value);
+    out.arima_d=Number($('arima-d').value);
+    out.arima_q=Number($('arima-q').value);
+    out.forecast_steps=Number($('arima-steps').value);
+ }
  if(state.mode==='efa'){
     out.factor_count=Number($('efa-count').value);
     out.factor_rotation=$('efa-rotation').value;
