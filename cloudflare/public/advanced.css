@@ -9,6 +9,7 @@ fieldset{min-width:0}legend{font-size:18px;color:#173f57;font-weight:750;padding
 label{display:block;font-weight:600;font-size:14px;margin:14px 0 7px}.check{display:flex;align-items:flex-start;gap:11px;line-height:1.6;font-weight:500}
 .check input{margin-top:6px}input[type="file"],select{max-width:100%;width:100%;font:inherit;border:1px solid #b6cdd7;border-radius:8px;padding:10px 12px;background:#fbfdfd;color:#123649}
 input[type="file"]{cursor:pointer}.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.example-actions{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0 8px}.example-actions button{padding:10px 12px;background:#e8f4f2;color:#13554f;border:1px solid #b5d5d1;font-size:13px}.example-actions button:hover{background:#d4ebe7}
 .hint{font-size:13px;color:#526d7a;line-height:1.65;margin:11px 0}
 button{border:0;padding:13px 17px;border-radius:8px;background:#067c76;color:white;font:inherit;font-weight:700;cursor:pointer}
 button:disabled{cursor:not-allowed;background:#a8b8bd}

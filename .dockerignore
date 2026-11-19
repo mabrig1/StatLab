@@ -1,0 +1,23 @@
+# Do not upload secrets or repository history into image build context.
+.git
+.github
+.env
+.env.*
+**/.dev.vars
+**/.dev.vars.*
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/__pycache__
+**/*.pyc
+cloudflare
+samples
+tests
+docs
+scripts
+*.zip
+*.tar
+*.db
+*.sqlite
+*.sqlite3

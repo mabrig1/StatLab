@@ -12,7 +12,8 @@ from typing import Literal
 
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI, Header, HTTPException
+from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
 from .advanced_timeseries import arima_forecast
@@ -43,6 +44,41 @@ def _authorize(authorization: str | None) -> None:
     supplied = authorization[len("Bearer "):]
     if not hmac.compare_digest(supplied, secret):
         raise HTTPException(401, "Private compute authorization is required.")
+
+
+
+MAX_COMPUTE_BODY_BYTES = 60_000
+
+
+@app.middleware("http")
+async def guard_private_compute_body(request: Request, call_next):
+    """Authenticate before parsing user data; reject oversized streams early.
+
+    The route itself also authenticates to preserve defense in depth.
+    """
+    if request.url.path == "/internal/compute" and request.method == "POST":
+        try:
+            _authorize(request.headers.get("authorization"))
+        except HTTPException as exc:
+            return JSONResponse({"detail": exc.detail}, status_code=exc.status_code)
+        content_type = request.headers.get("content-type", "").lower()
+        if not (content_type == "application/json" or content_type.startswith("application/json;")):
+            return JSONResponse({"detail": "application/json required."}, status_code=415)
+        declared = request.headers.get("content-length")
+        if declared is not None:
+            try:
+                size = int(declared)
+            except ValueError:
+                return JSONResponse({"detail": "Invalid content length."}, status_code=400)
+            if size < 0 or size > MAX_COMPUTE_BODY_BYTES:
+                return JSONResponse({"detail": "Compute request exceeds the allowed size."}, status_code=413)
+        received = bytearray()
+        async for chunk in request.stream():
+            if len(received) + len(chunk) > MAX_COMPUTE_BODY_BYTES:
+                return JSONResponse({"detail": "Compute request exceeds the allowed size."}, status_code=413)
+            received.extend(chunk)
+        request._body = bytes(received)
+    return await call_next(request)
 
 
 @app.get("/health")
