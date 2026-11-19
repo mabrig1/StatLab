@@ -133,7 +133,7 @@ test("quota identity uses keyed pseudonym rather than the old predictable digest
   const oldHex=Buffer.from(oldDigest).toString("hex");
   assert.notEqual(account.hash,oldHex);
   assert.equal(account.hash.includes("pilot-student-1"),false);
-  assert.match(account.day,/^\\d{4}-\\d{2}-\\d{2}$/);
+  assert.match(account.day,/^\d{4}-\d{2}-\d{2}$/);
 });
 
 test("oversized upstream response with Content-Length is rejected before parsing",async()=>{
