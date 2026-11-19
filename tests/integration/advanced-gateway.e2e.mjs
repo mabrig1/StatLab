@@ -120,6 +120,7 @@ test("Cloudflare JWT + D1 quota -> real Python ARIMA/GARCH over HTTP", {timeout:
   });
   const env={ADVANCED_COMPUTE_ENABLED:"true",
     ADVANCED_COMPUTE_ORIGIN:ORIGIN,ADVANCED_ENGINE_TOKEN:BACKEND_TOKEN,
+    ADVANCED_QUOTA_HMAC_SECRET:"integration-only-pseudonym-key-very-long-and-private",
     CF_ACCESS_TEAM_DOMAIN:TEAM,CF_ACCESS_AUD:AUD,ADVANCED_USAGE_DB:database};
   try{
     await waitUntilHealthy(backend,child);
