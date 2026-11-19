@@ -1,0 +1,19 @@
+:root{color-scheme:light;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#f3f7f9;color:#183249}
+*{box-sizing:border-box}body{margin:0}header{background:#132e47;padding:18px max(20px,calc((100vw - 1020px)/2));color:#dce9ed;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px}
+header a{color:#fff;text-decoration:none;font-size:18px;font-weight:750}main{max-width:1020px;margin:auto;padding:24px 17px 70px}
+.intro{border-radius:18px;padding:32px;background:linear-gradient(115deg,#143b55,#15685f);color:white}.intro h1{font-size:clamp(27px,4vw,40px);margin:12px 0 6px}.intro>p{line-height:1.65;max-width:790px}
+.eyebrow{font-size:12px;letter-spacing:.1em;color:#a1f1db;font-weight:750}.notice{padding:15px 16px;background:#ffffff17;border-left:3px solid #9bebd4;border-radius:6px}
+.status,fieldset,.output{background:#fff;border:1px solid #dae7eb;border-radius:13px;padding:21px;margin-top:19px;box-shadow:0 4px 14px #0d28350a}
+.status{display:grid;gap:8px}.status strong{color:#125d62}.status small{color:#526a77;line-height:1.6}
+fieldset{min-width:0}legend{font-size:18px;color:#173f57;font-weight:750;padding:0 7px}
+label{display:block;font-weight:600;font-size:14px;margin:14px 0 7px}.check{display:flex;align-items:flex-start;gap:11px;line-height:1.6;font-weight:500}
+.check input{margin-top:6px}input[type="file"],select{max-width:100%;width:100%;font:inherit;border:1px solid #b6cdd7;border-radius:8px;padding:10px 12px;background:#fbfdfd;color:#123649}
+input[type="file"]{cursor:pointer}.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.hint{font-size:13px;color:#526d7a;line-height:1.65;margin:11px 0}
+button{border:0;padding:13px 17px;border-radius:8px;background:#067c76;color:white;font:inherit;font-weight:700;cursor:pointer}
+button:disabled{cursor:not-allowed;background:#a8b8bd}
+.error{color:#a12b2b;font-weight:650;line-height:1.6}.output h2{margin-top:0}.output p{line-height:1.6}.warning{border-left:3px solid #d49c43;background:#fff8eb;padding:11px}
+.result-card{margin:19px 0}.result-card h3{margin:8px 0;font-size:17px}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border-bottom:1px solid #dbe7ed;padding:10px 12px;text-align:left;white-space:nowrap}
+th{background:#edf4f6}footer{margin-top:26px;text-align:center;color:#657784;font-size:12px}footer a{margin-left:8px;color:#00786f}
+@media(max-width:650px){main{padding:15px 10px}.intro{padding:20px}.three{grid-template-columns:1fr}.status,fieldset,.output{padding:16px}header{padding:12px}}
