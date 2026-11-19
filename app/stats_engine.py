@@ -287,6 +287,11 @@ def analyze(df: pd.DataFrame, request:dict, variable_specs: dict[str, dict] | No
     if mode=="ttest_paired":return paired_t(df,a,b)
     if mode=="anova":return anova(df,a,b)
     if mode=="normality":return normality(df,columns)
+    if mode=="arima":
+        from .advanced_timeseries import arima_forecast
+        return arima_forecast(df, a, p=request.get("arima_p", 1),
+                              d=request.get("arima_d", 0), q=request.get("arima_q", 0),
+                              steps=request.get("forecast_steps", 6))
     if mode=="efa":
         from .factor_analysis import exploratory_factor
         return exploratory_factor(df, columns,
