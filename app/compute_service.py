@@ -86,6 +86,14 @@ def health():
     return {"ok": True, "service": "statlab-private-compute", "public_data_uploads": False}
 
 
+@app.get("/internal/ready")
+def private_ready(authorization: str | None = Header(default=None)):
+    """Readiness probe for the trusted Worker only; never expose model data."""
+    _authorize(authorization)
+    return {"ok": True, "service": "statlab-private-compute",
+            "models": ["arima", "garch"]}
+
+
 @app.post("/internal/compute")
 def compute(request: ComputeRequest, authorization: str | None = Header(default=None)):
     _authorize(authorization)
