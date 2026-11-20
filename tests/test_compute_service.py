@@ -88,3 +88,17 @@ def test_private_service_checks_auth_before_parsing_large_uploads(monkeypatch):
     wrong_type = client.post("/internal/compute", content=b"plain text",
                              headers={**auth(), "Content-Type": "text/plain"})
     assert wrong_type.status_code == 415
+
+
+def test_private_readiness_requires_backend_token(monkeypatch):
+    monkeypatch.setenv("STATLAB_COMPUTE_SHARED_TOKEN", SECRET)
+    assert client.get("/internal/ready").status_code == 401
+    assert client.get("/internal/ready", headers={"Authorization": "Bearer wrong"}).status_code == 401
+    ready = client.get("/internal/ready", headers=auth())
+    assert ready.status_code == 200
+    assert ready.json() == {
+        "ok": True, "service": "statlab-private-compute",
+        "models": ["arima", "garch"],
+    }
+    monkeypatch.delenv("STATLAB_COMPUTE_SHARED_TOKEN")
+    assert client.get("/internal/ready", headers=auth()).status_code == 503
