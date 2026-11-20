@@ -12,6 +12,12 @@
 - A separate \`app.compute_service:app\` FastAPI process (do **NOT** expose \`app.main:app\`), accepting only \`GET /health\` and bearer-authorized \`POST /internal/compute\`. Uses the existing bounded ARIMA/GARCH numerical modules, no dataset sessions, auth UI, file uploads or OpenRouter.
 - The existing browser-first Data View, Likert Studio and other pages do not auto-send any records; the new pilot is a separate opt-in page.
 
+## Live readiness check (code implemented, environment not configured)
+
+The public `GET /api/advanced/status` endpoint now returns `available: true` **only if all three conditions succeed**: the pilot is explicitly enabled with the required environment variables, a read-only query confirms the dedicated D1 quota table exists, and the trusted HTTPS origin accepts the private backend token at `GET /internal/ready` and reports both ARIMA and GARCH. The readiness query never sends any student data and never returns credentials, table rows or numerical inputs.
+
+If the D1 table is missing, credentials are invalid, the backend is down or reports the wrong service/models, the response is `available: false` without revealing the failure details. The private readiness endpoint itself requires the 32+-character backend bearer credential. This **is not** a substitute for checking a live Cloudflare Access policy, real quota concurrency, the data-processing agreement, or browser testing before student use.
+
 ## Required security gates BEFORE enabling or enrolling actual students
 
 1. **Private Python host:** Provision and audit a private CPU compute host (or managed container), install \`requirements.txt\`, run \`uvicorn app.compute_service:app --host 127.0.0.1 --port 8090\`, terminate TLS at a private tunnel or audited ingress. Never expose unauthenticated \`app.main:app\` to the public network.
