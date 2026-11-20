@@ -128,13 +128,36 @@ async function accountForRequest(subject,env) {
     "ON CONFLICT(subject_hash,day) DO UPDATE SET requests=requests+1 WHERE requests<20 RETURNING requests";
   return env.ADVANCED_USAGE_DB.prepare(sql).bind(hash,day).first();
 }
+async function pilotReady(env,network){
+  if(!enabled(env))return false;
+  try{
+    // Read-only check: an absent D1 table or disconnected binding must fail closed.
+    const day=new Date().toISOString().slice(0,10);
+    const row=await env.ADVANCED_USAGE_DB.prepare(
+      "SELECT COUNT(*) AS entries FROM statlab_compute_usage WHERE day=?1"
+    ).bind(day).first();
+    if(!row||typeof row.entries!=="number")return false;
+    const response=await network(env.ADVANCED_COMPUTE_ORIGIN+"/internal/ready",{
+      method:"GET",redirect:"error",headers:{
+        "Authorization":"Bearer "+env.ADVANCED_ENGINE_TOKEN,
+        "Accept":"application/json",
+      },signal:AbortSignal.timeout(3500),
+    });
+    if(!response.ok)return false;
+    const status=await readBoundedJson(response,2048);
+    return status?.ok===true&&status?.service==="statlab-private-compute"&&
+      Array.isArray(status.models)&&status.models.includes("arima")&&status.models.includes("garch");
+  }catch{return false}
+}
 export function createAdvancedGateway(network=globalThis.fetch){
   return async function advanced(request,env){
     const path=new URL(request.url).pathname;
-    if(path==="/api/advanced/status"&&request.method==="GET")
-      return reply(200,{available:!!enabled(env),status:enabled(env)?"access_protected_pilot":"disabled",
+    if(path==="/api/advanced/status"&&request.method==="GET"){
+      const ready=await pilotReady(env,network);
+      return reply(200,{available:ready,status:ready?"pilot_compute_ready":"disabled_or_unavailable",
         execution:"remote_python",privacy:"numeric series transferred only after explicit consent",
         researchOnly:true});
+    }
     if(path!=="/api/advanced/run")return null;
     if(request.method!=="POST")return reply(405,{error:"POST required."});
     if(!enabled(env))return reply(503,{error:"Advanced remote computation has not been configured."});
