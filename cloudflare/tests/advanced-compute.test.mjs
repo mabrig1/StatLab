@@ -25,6 +25,7 @@ function counter(limit=20){
 function env(patch={}){
   return {ADVANCED_COMPUTE_ENABLED:"true",
     ADVANCED_ENGINE_TOKEN:SHARED,
+    ADVANCED_QUOTA_HMAC_SECRET:"unit-test-quota-key-never-used-in-production-123456789",
     ADVANCED_COMPUTE_ORIGIN:"https://engine.example",
     CF_ACCESS_TEAM_DOMAIN:ISSUER,
     CF_ACCESS_AUD:AUD,
@@ -106,4 +107,127 @@ test("disallowed backend origin and unknown fields reject",async()=>{
 test("unrelated existing Cloudflare API paths retain their restricted behavior",async()=>{
   const worker=createGateway(network());
   assert.equal((await worker.fetch(new Request("https://statlab.example/api/datasets"),env())).status,404);
+});
+
+
+test("private pilot requires a configured HMAC quota secret, not just an Access JWT",async()=>{
+  let called=0;
+  const worker=createGateway(async()=>{called++;throw Error("Unexpected network");});
+  const response=await worker.fetch(req(valid),env({ADVANCED_QUOTA_HMAC_SECRET:""}));
+  assert.equal(response.status,503);
+  assert.equal(called,0);
+});
+
+test("quota identity uses keyed pseudonym rather than the old predictable digest",async()=>{
+  let account;
+  const db={prepare(){return {bind(hash,day){
+    account={hash,day};
+    return {async first(){return {requests:1}}};
+  }}}};
+  const worker=createGateway(network());
+  const settings=env({ADVANCED_USAGE_DB:db});
+  assert.equal((await worker.fetch(req(valid),settings)).status,200);
+  assert.match(account.hash,/^[0-9a-f]{64}$/);
+  const oldDigest=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(
+    "statlab-advanced-v1:"+AUD+":pilot-student-1"));
+  const oldHex=Buffer.from(oldDigest).toString("hex");
+  assert.notEqual(account.hash,oldHex);
+  assert.equal(account.hash.includes("pilot-student-1"),false);
+  assert.match(account.day,/^\d{4}-\d{2}-\d{2}$/);
+});
+
+test("oversized upstream response with Content-Length is rejected before parsing",async()=>{
+  const worker=createGateway(async(url)=>{
+    if(url===ISSUER+"/cdn-cgi/access/certs")return Response.json({keys:[{...jwk,kid:"unit-test-key"}]});
+    return new Response("x",{status:200,headers:{"Content-Length":"90000"}});
+  });
+  const response=await worker.fetch(req(valid),env());
+  assert.equal(response.status,502);
+  assert.equal((await response.json()).error.includes("Computing service"),true);
+});
+
+test("chunked oversized upstream response is bounded and canceled without Content-Length",async()=>{
+  let canceled=false;
+  const worker=createGateway(async(url)=>{
+    if(url===ISSUER+"/cdn-cgi/access/certs")return Response.json({keys:[{...jwk,kid:"unit-test-key"}]});
+    return new Response(new ReadableStream({
+      start(controller){
+        controller.enqueue(new Uint8Array(45000));
+        controller.enqueue(new Uint8Array(45000));
+        controller.enqueue(new Uint8Array(45000));
+      },
+      cancel(){canceled=true;}
+    }),{status:200,headers:{"Content-Type":"application/json"}});
+  });
+  const response=await worker.fetch(req(valid),env());
+  assert.equal(response.status,502);
+  assert.equal(canceled,true);
+});
+
+test("oversized Access JWKS is rejected before identity verification",async()=>{
+  let backendCalled=false;
+  const worker=createGateway(async(url)=>{
+    if(url===ISSUER+"/cdn-cgi/access/certs"){
+      return new Response(new Uint8Array(70000),{status:200,headers:{"Content-Type":"application/json"}});
+    }
+    backendCalled=true;
+    throw Error("Backend must not run");
+  });
+  const settings=env();
+  const response=await worker.fetch(req(valid),settings);
+  assert.equal(response.status,401);
+  assert.equal(backendCalled,false);
+  assert.equal(settings.ADVANCED_USAGE_DB.calls,0);
+});
+
+
+test("pilot status reports ready only when D1 quota and authenticated Python are healthy",async()=>{
+  let quotaChecked=false,readyChecked=false;
+  const settings=env({ADVANCED_USAGE_DB:{
+    prepare(sql){
+      assert.match(sql,/SELECT COUNT\(\*\)/);
+      return {bind(day){
+        assert.match(day,/^\d{4}-\d{2}-\d{2}$/);
+        return {async first(){quotaChecked=true;return {entries:0}}};
+      }};
+    }
+  }});
+  const gateway=createGateway(async(url,options)=>{
+    assert.equal(url,"https://engine.example/internal/ready");
+    assert.equal(options.headers.Authorization,"Bearer "+SHARED);
+    readyChecked=true;
+    return Response.json({ok:true,service:"statlab-private-compute",models:["arima","garch"]});
+  });
+  const res=await gateway.fetch(new Request("https://statlab.example/api/advanced/status"),settings);
+  assert.equal(res.status,200);
+  const json=await res.json();
+  assert.equal(json.available,true);
+  assert.equal(json.status,"pilot_compute_ready");
+  assert.equal(quotaChecked,true);
+  assert.equal(readyChecked,true);
+  assert.equal(JSON.stringify(json).includes(SHARED),false);
+});
+
+test("pilot status fails closed when D1 schema or private origin is unavailable",async()=>{
+  const request=new Request("https://statlab.example/api/advanced/status");
+  let contacted=0;
+  const missingTable=env({ADVANCED_USAGE_DB:{
+    prepare(){throw Error("no such table: statlab_compute_usage")}
+  }});
+  const never=createGateway(async()=>{contacted++;throw Error("Never call backend");});
+  const notReady=await never.fetch(request,missingTable);
+  assert.equal(notReady.status,200);
+  assert.equal((await notReady.json()).available,false);
+  assert.equal(contacted,0);
+  const validD1=env({ADVANCED_USAGE_DB:{
+    prepare(){return {bind(){return {async first(){return {entries:0}}}}}}
+  }});
+  const down=createGateway(async()=>{throw Error("private backend offline");});
+  const offline=await down.fetch(request,validD1);
+  assert.equal((await offline.json()).available,false);
+  const wrongService=createGateway(async()=>Response.json({
+    ok:true,service:"unexpected-process",models:["arima","garch"]
+  }));
+  const wrong=await wrongService.fetch(request,validD1);
+  assert.equal((await wrong.json()).available,false);
 });

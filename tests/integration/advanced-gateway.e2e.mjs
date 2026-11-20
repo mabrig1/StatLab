@@ -51,6 +51,12 @@ function quotaDB(){
   return {
     subjects,counts,
     prepare(sql){
+      if(sql.includes("SELECT COUNT(*) AS entries")){
+        return {bind(date){
+          assert.match(date,/^\d{4}-\d{2}-\d{2}$/);
+          return {async first(){return {entries:0}}};
+        }};
+      }
       assert.match(sql,/ON CONFLICT\(subject_hash,day\)/);
       return {
         bind(subject,date){
@@ -110,6 +116,10 @@ test("Cloudflare JWT + D1 quota -> real Python ARIMA/GARCH over HTTP", {timeout:
     if(url===TEAM+"/cdn-cgi/access/certs")return Response.json({
       keys:[{...publicJwk,kid:keyId}]
     });
+    if(url===ORIGIN+"/internal/ready"){
+      assert.equal(init.headers.Authorization,"Bearer "+BACKEND_TOKEN);
+      return fetch(backend+"/internal/ready",init);
+    }
     if(url===ORIGIN+"/internal/compute"){
       const {Authorization,...safeHeaders}=init.headers;
       assert.equal(Authorization,"Bearer "+BACKEND_TOKEN);
@@ -120,9 +130,13 @@ test("Cloudflare JWT + D1 quota -> real Python ARIMA/GARCH over HTTP", {timeout:
   });
   const env={ADVANCED_COMPUTE_ENABLED:"true",
     ADVANCED_COMPUTE_ORIGIN:ORIGIN,ADVANCED_ENGINE_TOKEN:BACKEND_TOKEN,
+    ADVANCED_QUOTA_HMAC_SECRET:"integration-only-pseudonym-key-very-long-and-private",
     CF_ACCESS_TEAM_DOMAIN:TEAM,CF_ACCESS_AUD:AUD,ADVANCED_USAGE_DB:database};
   try{
     await waitUntilHealthy(backend,child);
+    const pilotReady=await gateway.fetch(new Request("https://statlab.example/api/advanced/status"),env);
+    assert.equal(pilotReady.status,200);
+    assert.equal((await pilotReady.json()).available,true);
     const protectedOriginal=await fetch(backend+"/api/datasets");
     assert.equal(protectedOriginal.status,404);
     const directNoToken=await fetch(backend+"/internal/compute",{

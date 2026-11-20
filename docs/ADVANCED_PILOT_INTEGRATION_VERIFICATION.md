@@ -22,7 +22,7 @@ Test cases demonstrate:
 - invalid JWT audience and missing explicit consent never reach Python;
 - successful ARIMA(1,0,0) three-period forecast on **96 synthetic monthly observations**;
 - successful GARCH(1,1) three-period volatility forecast on **320 synthetic daily prices**;
-- identity is hashed before quota storage and quotas count requests;
+- identity is HMAC-pseudonymized using a private secret before quota storage; quotas count requests;
 - no raw source CSV, JWT, authentication token, or pilot identity is included in returned results;
 - original unsecured dataset endpoints remain unavailable in the private service;
 - process is terminated after the test.

@@ -1,10 +1,41 @@
 // Opt-in, fail-closed, Cloudflare Access authenticated advanced-compute bridge.
 // Does not expose the unprotected FastAPI dataset-session endpoints.
 const LIMIT=60000;
+const MAX_BACKEND_RESPONSE_BYTES=85000;
+const MAX_JWKS_BYTES=64000;
+
+async function readBoundedJson(response,maxBytes) {
+  const advertised=response.headers.get("content-length");
+  if(advertised!==null) {
+    const value=Number(advertised);
+    if(!Number.isFinite(value)||value<0||value>maxBytes)throw Error("Response exceeds configured size.");
+  }
+  const reader=response.body?.getReader();
+  if(!reader)throw Error("Missing response body.");
+  const parts=[];let total=0;
+  try {
+    for(;;) {
+      const {done,value}=await reader.read();
+      if(done)break;
+      total+=value.byteLength;
+      if(total>maxBytes) {
+        await reader.cancel();
+        throw Error("Response exceeds configured size.");
+      }
+      parts.push(value);
+    }
+    const out=new Uint8Array(total);let offset=0;
+    for(const item of parts){out.set(item,offset);offset+=item.length}
+    return JSON.parse(new TextDecoder("utf-8",{fatal:true}).decode(out));
+  }finally {
+    try {reader.releaseLock()} catch {/* Body may have been canceled. */}
+  }
+}
 const HEADERS={"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store","X-Content-Type-Options":"nosniff"};
 const reply=(code,payload)=>new Response(JSON.stringify(payload),{status:code,headers:HEADERS});
 const enabled=env=>env.ADVANCED_COMPUTE_ENABLED==="true" &&
   typeof env.ADVANCED_ENGINE_TOKEN==="string" && env.ADVANCED_ENGINE_TOKEN.length>=32 &&
+  typeof env.ADVANCED_QUOTA_HMAC_SECRET==="string" && env.ADVANCED_QUOTA_HMAC_SECRET.length>=32 &&
   typeof env.ADVANCED_COMPUTE_ORIGIN==="string" &&
   /^https:\/\/[a-z0-9.-]+(?::443)?$/i.test(env.ADVANCED_COMPUTE_ORIGIN) &&
   typeof env.CF_ACCESS_TEAM_DOMAIN==="string" &&
@@ -33,7 +64,7 @@ async function verifiedSubject(token,env,network) {
     const response=await network(env.CF_ACCESS_TEAM_DOMAIN+"/cdn-cgi/access/certs",
       {redirect:"error",headers:{Accept:"application/json"},signal:AbortSignal.timeout(5000)});
     if(!response.ok)return null;
-    const certs=await response.json();
+    const certs=await readBoundedJson(response,MAX_JWKS_BYTES);
     const key=(Array.isArray(certs.keys)?certs.keys:[]).find(k=>k.kid===header.kid&&k.kty==="RSA");
     if(!key||typeof key.n!=="string"||typeof key.e!=="string")return null;
     const publicKey=await crypto.subtle.importKey("jwk",
@@ -83,9 +114,13 @@ function validPayload(data){
   return MODE_INPUTS.has(data.input_type);
 }
 async function accountForRequest(subject,env) {
-  const digest=await crypto.subtle.digest("SHA-256",
-    new TextEncoder().encode("statlab-advanced-v1:"+env.CF_ACCESS_AUD+":"+subject));
-  const hash=Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,"0")).join("");
+  // Secret-keyed pseudonymisation prevents straightforward offline subject-ID guessing.
+  const key=await crypto.subtle.importKey("raw",
+    new TextEncoder().encode(env.ADVANCED_QUOTA_HMAC_SECRET),
+    {name:"HMAC",hash:"SHA-256"},false,["sign"]);
+  const signed=await crypto.subtle.sign("HMAC",key,
+    new TextEncoder().encode("statlab-advanced-v2:"+env.CF_ACCESS_AUD+":"+subject));
+  const hash=Array.from(new Uint8Array(signed),b=>b.toString(16).padStart(2,"0")).join("");
   const day=new Date().toISOString().slice(0,10);
   // Requires pre-created D1 table. A missing binding or table disables compute.
   // This atomic UPSERT rejects calls after twenty daily research jobs per Access identity.
@@ -93,13 +128,36 @@ async function accountForRequest(subject,env) {
     "ON CONFLICT(subject_hash,day) DO UPDATE SET requests=requests+1 WHERE requests<20 RETURNING requests";
   return env.ADVANCED_USAGE_DB.prepare(sql).bind(hash,day).first();
 }
+async function pilotReady(env,network){
+  if(!enabled(env))return false;
+  try{
+    // Read-only check: an absent D1 table or disconnected binding must fail closed.
+    const day=new Date().toISOString().slice(0,10);
+    const row=await env.ADVANCED_USAGE_DB.prepare(
+      "SELECT COUNT(*) AS entries FROM statlab_compute_usage WHERE day=?1"
+    ).bind(day).first();
+    if(!row||typeof row.entries!=="number")return false;
+    const response=await network(env.ADVANCED_COMPUTE_ORIGIN+"/internal/ready",{
+      method:"GET",redirect:"error",headers:{
+        "Authorization":"Bearer "+env.ADVANCED_ENGINE_TOKEN,
+        "Accept":"application/json",
+      },signal:AbortSignal.timeout(3500),
+    });
+    if(!response.ok)return false;
+    const status=await readBoundedJson(response,2048);
+    return status?.ok===true&&status?.service==="statlab-private-compute"&&
+      Array.isArray(status.models)&&status.models.includes("arima")&&status.models.includes("garch");
+  }catch{return false}
+}
 export function createAdvancedGateway(network=globalThis.fetch){
   return async function advanced(request,env){
     const path=new URL(request.url).pathname;
-    if(path==="/api/advanced/status"&&request.method==="GET")
-      return reply(200,{available:!!enabled(env),status:enabled(env)?"access_protected_pilot":"disabled",
+    if(path==="/api/advanced/status"&&request.method==="GET"){
+      const ready=await pilotReady(env,network);
+      return reply(200,{available:ready,status:ready?"pilot_compute_ready":"disabled_or_unavailable",
         execution:"remote_python",privacy:"numeric series transferred only after explicit consent",
         researchOnly:true});
+    }
     if(path!=="/api/advanced/run")return null;
     if(request.method!=="POST")return reply(405,{error:"POST required."});
     if(!enabled(env))return reply(503,{error:"Advanced remote computation has not been configured."});
@@ -126,11 +184,7 @@ export function createAdvancedGateway(network=globalThis.fetch){
         body:JSON.stringify(clean),signal:AbortSignal.timeout(25000),
       });
       if(!remote.ok)return reply(remote.status===422?422:502,{error:"Computing service declined the analysis."});
-      const length=Number(remote.headers.get("content-length")||0);
-      if(length>85000)return reply(502,{error:"Computing response exceeds safety limit."});
-      const output=await remote.text();
-      if(output.length>85000)return reply(502,{error:"Computing response exceeds safety limit."});
-      const parsedOutput=JSON.parse(output);
+      const parsedOutput=await readBoundedJson(remote,MAX_BACKEND_RESPONSE_BYTES);
       if(typeof parsedOutput.title!=="string"||!Array.isArray(parsedOutput.tables)||
          !Array.isArray(parsedOutput.warnings))throw Error("Unexpected response");
       return reply(200,{...parsedOutput,execution:"remote_python",researchOnly:true});
