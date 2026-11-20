@@ -12,7 +12,7 @@ from pathlib import Path
 from threading import Thread
 
 import pytest
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import expect, sync_playwright
 
 PUBLIC = Path(__file__).resolve().parents[1] / "cloudflare" / "public"
 TEST_RESULT = {
@@ -194,7 +194,7 @@ def test_output_is_escaped_and_json_download_works(chromium, site):
         page.locator("#example-arima").click()
         acknowledge(page)
         page.locator("#run").click()
-        assert page.locator("#report-title").inner_text() == unsafe
+        expect(page.locator("#report-title")).to_have_text(unsafe, timeout=5000)
         assert page.locator("img").count() == 0
         assert page.evaluate("window.evil") is None
         with page.expect_download(timeout=5000) as download:
