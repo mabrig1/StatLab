@@ -1,0 +1,38 @@
+name: Advanced pilot real-browser checks
+on:
+  push:
+    paths:
+      - "browser_checks/**"
+      - "cloudflare/public/advanced.html"
+      - "cloudflare/public/advanced.mjs"
+      - "cloudflare/public/advanced-demo.mjs"
+      - "cloudflare/public/advanced.css"
+      - ".github/workflows/advanced-browser-check.yml"
+  pull_request:
+    paths:
+      - "browser_checks/**"
+      - "cloudflare/public/advanced.html"
+      - "cloudflare/public/advanced.mjs"
+      - "cloudflare/public/advanced-demo.mjs"
+      - "cloudflare/public/advanced.css"
+      - ".github/workflows/advanced-browser-check.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  chromium:
+    name: Chromium student pilot (localhost only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install browser test tools
+        run: python -m pip install "pytest>=8,<10" "playwright>=1.50,<2"
+      - name: Install isolated Chromium browser
+        run: python -m playwright install --with-deps chromium
+      - name: Test privacy, CSV, mobile layout and report export in real Chromium
+        run: python -m pytest -q browser_checks/test_advanced_pilot.py
